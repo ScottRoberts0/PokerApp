@@ -17,7 +17,7 @@ public class Game {
             dealTurn(board, deck);
             dealRiver(board, deck);
 
-            //scott sucks
+            //scott sucks balls
             //process hands
             playerOne.createToolArrays(board);
             playerOne.makeMadeHand();
