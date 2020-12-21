@@ -20,7 +20,10 @@ public class Player {
     public Card[] makeMadeHand() {
         Arrays.fill(madeHand, null);
 
-        if(detectThree()) {
+        if(detectStraight()) {
+            straight();
+            madeHandName = "STRAIGHT";
+        } else if(detectThree()) {
             three();
             madeHandName = "THREE OF A KIND";
         } else if(detectTwoPair()) {
@@ -45,6 +48,62 @@ public class Player {
         return madeHandName;
     }
 
+    public boolean detectStraight() {
+        int count = 0;
+        for(int i = counter.length - 1; i > 0; i--) {
+            if(counter[i] >= 1 && counter[i - 1] >= 1) {
+                count++;
+            } else {
+                count = 0;
+            }
+
+            if(count >= 4) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void straight() {
+        int[] index = new int[5];
+
+        //creates an index of which values are involved in the straight
+        int count = 0;
+        for(int i = counter.length - 1; i > 0; i--) {
+            if(counter[i] >= 1 && counter[i - 1] >= 1) {
+                index[count] = i;
+                if(count == 3) {
+                    count++;
+                    index[count] = i - 1;
+                }
+                count++;
+            } else {
+                count = 0;
+                for(int j = 0; j < index.length; j++) {
+                    index[j] = 0;
+                }
+            }
+
+            if(count >= 4) {
+                break;
+            }
+        }
+
+        //populates the straight hand array with the cards in the straight based on the index
+        for(int i = 0; i < madeHand.length; i++) {
+            for(int j = 0; j < possCards.length; j++) {
+                if(possCards[j].getValue() == index[i]) {
+                    madeHand[i] = possCards[j];
+                    break;
+                }
+            }
+        }
+
+        //in the case that it is a 5 high straight, ace will not be added to the bottom with the above array.
+        //this just adds it manually
+        if(madeHand[4] == null) {
+            madeHand[4] = possCards[0];
+        }
+    }
     public boolean detectThree() {
         for(int i = 0; i < counter.length; i++) {
             if(counter[i] == 3) {
@@ -219,7 +278,6 @@ public class Player {
                 System.out.println(possCards[i]);
             }
         }
-        System.out.println(threeValue());
         System.out.println();
     }
     public void drawHand() {
@@ -244,10 +302,18 @@ public class Player {
         } else if(playerToCompare.handValue() > handValue()) {
             return -1;
         } else {
-            if (madeHandName.equals("THREE")) {
-                if(threeValue() > playerToCompare.threeValue()) {
+            if (madeHandName.equals("STRAIGHT")) {
+                if(firstValue() > playerToCompare.firstValue()) {
                     return 1;
-                } else if(playerToCompare.threeValue() > threeValue()) {
+                } else if(playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("THREE")) {
+                if(firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if(playerToCompare.firstValue() > firstValue()) {
                     return -1;
                 } else {
                     if(highCardValue(3, playerToCompare.makeMadeHand()) == 1) {
@@ -259,14 +325,14 @@ public class Player {
                     }
                 }
             } else if(madeHandName.equals("TWO PAIR")) {
-                if(twoPairValue() > playerToCompare.twoPairValue()) {
+                if(firstValue() > playerToCompare.firstValue()) {
                     return 1;
-                } else if(playerToCompare.twoPairValue() > twoPairValue()) {
+                } else if(playerToCompare.firstValue() > firstValue()) {
                     return -1;
                 } else {
-                    if(twoPairSecondPairValue() > playerToCompare.twoPairSecondPairValue()) {
+                    if(thirdValue() > playerToCompare.thirdValue()) {
                         return 1;
-                    } else if(playerToCompare.twoPairSecondPairValue()> twoPairSecondPairValue()) {
+                    } else if(playerToCompare.thirdValue()> thirdValue()) {
                         return -1;
                     } else {
                         if(highCardValue(4, playerToCompare.makeMadeHand()) == 1) {
@@ -279,9 +345,9 @@ public class Player {
                     }
                 }
             } else if(madeHandName.equals("PAIR")) {
-                if(pairValue() > playerToCompare.pairValue()) {
+                if(firstValue() > playerToCompare.firstValue()) {
                     return 1;
-                } else if(playerToCompare.pairValue() > pairValue()) {
+                } else if(playerToCompare.firstValue() > firstValue()) {
                     return -1;
                 } else {
                     if(highCardValue(2, playerToCompare.makeMadeHand()) == 1) {
@@ -304,27 +370,29 @@ public class Player {
         }
     }
     public int handValue() {
-        if(madeHandName.equals("THREE OF A KIND")) {
+        if(madeHandName.equals("STRAIGHT")) {
+            return 4;
+        } else if(madeHandName.equals("THREE OF A KIND")) {
             return 3;
-        } else if(madeHandName == "TWO PAIR") {
+        } else if(madeHandName.equals("TWO PAIR")) {
             return 2;
-        } else if(madeHandName == "PAIR") {
+        } else if(madeHandName.equals("PAIR")) {
             return 1;
         } else {
             return 0;
         }
     }
-    public int threeValue() {
+    public int firstValue() {
         return madeHand[0].getValue();
     }
-    public int twoPairValue() {
-        return madeHand[0].getValue();
-    }
-    public int twoPairSecondPairValue() {
+    public int thirdValue() {
         return madeHand[2].getValue();
     }
-    public int pairValue() {
-        return madeHand[0].getValue();
+    public int fourthValue() {
+        return madeHand[3].getValue();
+    }
+    public int lastValue() {
+        return madeHand[4].getValue();
     }
     public int highCardValue(int startingVal, Card[] toCompare) {
         for(int i = startingVal; i < 5; i++) {

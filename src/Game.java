@@ -9,7 +9,7 @@ public class Game {
         Card[] board = new Card[5];
 
         int count = 0;
-        while(count < 10) {
+        while(count < 1000000) {
             //deal cards
             playerOne.drawHand();
             playerTwo.drawHand();
@@ -17,7 +17,6 @@ public class Game {
             dealTurn(board, deck);
             dealRiver(board, deck);
 
-            //scott sucks balls
             //process hands
             playerOne.createToolArrays(board);
             playerOne.makeMadeHand();
@@ -37,7 +36,7 @@ public class Game {
                 twoCounterString += Integer.toString(playerTwoCounter[i]);
             }
 
-         //   if(playerOne.getMadeHandName().equals("TWO PAIR") || playerTwo.getMadeHandName().equals("TWO PAIR")) {
+            if(playerOne.getMadeHandName().equals("STRAIGHT") && playerTwo.getMadeHandName().equals("STRAIGHT")) {
                 printBoard(board);
                 playerOne.printHand();
                 playerTwo.printHand();
@@ -61,7 +60,7 @@ public class Game {
                     ties++;
                 }
                 System.out.println("=============");
-         //   }
+            }
 
             deck.shuffle();
             count++;
