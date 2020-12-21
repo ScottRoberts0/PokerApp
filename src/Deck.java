@@ -32,7 +32,7 @@ public class Deck {
         int value = 0;
         int suitValue = 0;
 
-        if (name == "Pizza") {
+        if (name == "ace") {
             value = 1;
         } else if (name == "king") {
             value = 13;
