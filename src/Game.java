@@ -4,92 +4,9 @@ public class Game {
         Deck deck = new Deck();
         Player playerOne = new Player(1, deck);
         Player playerTwo = new Player(2, deck);
-        int playerOneWins = 0;
-        int playerTwoWins = 0;
-        int ties = 0;
         Card[] board = new Card[5];
 
-        int count = 0;
-        while(count < 1000000) {
-            //deal cards
-            playerOne.drawHand("ace","hearts","king","spades");
-            playerTwo.drawHand("queen","hearts","queen","diamonds");
-            dealFlop(board, deck);
-            dealTurn(board, deck);
-            dealRiver(board, deck);
-
-            //process hands
-            playerOne.createToolArrays(board);
-            playerOne.makeMadeHand();
-            playerTwo.createToolArrays(board);
-            playerTwo.makeMadeHand();
-
-            /* TESTING STUFF:
-            int[] playerOneCounter = playerOne.getCounter();
-            int[] playerTwoCounter = playerTwo.getCounter();
-            String oneCounterString = "";
-            String twoCounterString = "";
-
-            for(int i = 0; i < playerOneCounter.length; i++) {
-                oneCounterString += Integer.toString(playerOneCounter[i]);
-            }
-
-            for(int i = 0; i < playerOneCounter.length; i++) {
-                twoCounterString += Integer.toString(playerTwoCounter[i]);
-            }
-
-            int[] playerOneSuitCounter = playerOne.getSuitCounter();
-            int[] playerTwoSuitCounter = playerTwo.getSuitCounter();
-
-            String oneSuitCounterString = "";
-            String twoSuitCounterString = "";
-
-            for(int i = 0; i < playerOneSuitCounter.length; i++) {
-                oneSuitCounterString += Integer.toString(playerOneSuitCounter[i]);
-            }
-
-            for(int i = 0; i < playerTwoSuitCounter.length; i++) {
-                twoSuitCounterString += Integer.toString(playerTwoSuitCounter[i]);
-            }*/
-
-            //if(playerOne.getMadeHandName().equals("ROYAL FLUSH") || playerTwo.getMadeHandName().equals("ROYAL FLUSH")) {
-                //printBoard(board);
-                //playerOne.printHand();
-                //playerTwo.printHand();
-
-                //System.out.println(oneCounterString);
-                //System.out.println(oneSuitCounterString);
-                //playerOne.printPossCards();
-                //playerOne.printMadeHand();
-
-                //System.out.println(twoCounterString);
-                //System.out.println(twoSuitCounterString);
-                //playerTwo.printPossCards();
-                //playerTwo.printMadeHand();
-
-                if (playerOne.compareHands(playerTwo) == 1) {
-                    //System.out.println("Player ONE wins!");
-                    playerOneWins++;
-                } else if (playerOne.compareHands(playerTwo) == -1) {
-                    //System.out.println("Player TWO wins!");
-                    playerTwoWins++;
-                } else {
-                    //System.out.println("It is a tie.");
-                    ties++;
-                }
-                //System.out.println("=============");
-            //}
-
-            deck.shuffle();
-            count++;
-        }
-
-        System.out.println("Player one wins: " + playerOneWins);
-        System.out.println("Player two wins: " + playerTwoWins);
-        System.out.println("Ties: " + ties);
-        System.out.println("Player one equity: " + (int)(((double)playerOneWins / ((double)playerOneWins + (double)playerTwoWins + (double)ties)) * 100) + "%");
-        System.out.println("Player two equity: " + (int)(((double)playerTwoWins / ((double)playerOneWins + (double)playerTwoWins + (double)ties)) * 100) + "%");
-        //System.out.println("Percentage of games ending in a tie: " + (int)(((double)ties / ((double)playerOneWins + (double)playerTwoWins + (double)ties)) * 100) + "%");
+        equityCalculator(playerOne, "ace", "spades", "king", "hearts", playerTwo, board, deck);
     }
     public static void dealFlop(Card[] board, Deck deck) {
         for(int i = 0; i < 3; i++) {
@@ -121,5 +38,43 @@ public class Game {
             }
         }
         System.out.println();
+    }
+    public static void equityCalculator(Player player1, String value1, String suit1, String value2, String suit2, Player player2, Card[] board, Deck deck) {
+        double player1Wins = 0;
+        double player2Wins = 0;
+        double ties = 0;
+        for(int i = 0; i < 1000000; i++){
+            player1.drawHand(value1, suit1, value2, suit2);
+            player2.drawHand();
+            dealFlop(board, deck);
+            dealTurn(board, deck);
+            dealRiver(board, deck);
+
+            player1.createToolArrays(board);
+            player2.createToolArrays(board);
+
+            player1.makeMadeHand();
+            player2.makeMadeHand();
+
+            if(player1.compareHands(player2) == 1) {
+                player1Wins++;
+            } else if(player1.compareHands(player2) == -1) {
+                player2Wins++;
+            } else {
+                ties++;
+            }
+
+            deck.shuffle();
+        }
+
+        double p1Equity = player1Wins / (player1Wins + player2Wins + ties);
+        double p2Equity = player2Wins / (player1Wins + player2Wins + ties);
+
+        System.out.println("Player one wins: " + player1Wins);
+        System.out.println("Plyaer two wins: " + player2Wins);
+        System.out.println("Hands ending in a tie: " + ties);
+        System.out.println();
+        System.out.println("Player one equity: " + p1Equity + "%");
+        System.out.println("Plyaer two equity: " + p2Equity + "%");
     }
 }
