@@ -20,7 +20,22 @@ public class Player {
     public Card[] makeMadeHand() {
         Arrays.fill(madeHand, null);
 
-        if(detectStraight()) {
+        /*if(detectRoyalFlush()) {
+            straightFlush();
+            madeHandName = "ROYAL FLUSH";
+        } else if(detectStraightFlush()) {
+            straightFlush();
+            madeHandName = "STRAIGHT FLUSH";
+        } else if(detectFour()) {
+            four();
+            madeHandName = "FOUR OF A KIND";
+        } else */if(detectFullHouse()) {
+            fullHouse();
+            madeHandName = "FULL HOUSE";
+        } else if(detectFlush()) {
+            flush();
+            madeHandName = "FLUSH";
+        } else if(detectStraight()) {
             straight();
             madeHandName = "STRAIGHT";
         } else if(detectThree()) {
@@ -48,6 +63,104 @@ public class Player {
         return madeHandName;
     }
 
+    public boolean detectFullHouse() {
+        int pairCount = 0;
+        int threeCount = 0;
+        for(int i = 0; i < counter.length - 2; i++) {
+            if(counter[i] == 2) {
+                pairCount++;
+            } else if(counter[i] == 3) {
+                threeCount++;
+            }
+        }
+
+        if((pairCount >= 1 && threeCount >= 1) || threeCount == 2) {
+            return true;
+        }
+        return false;
+    }
+    public void fullHouse() {
+        int threeValue = -1;
+        int twoValue = -1;
+
+        //looks for the value of the set of three
+        for(int i = counter.length - 1; i > 0; i--) {
+            if(counter[i] == 3) {
+                threeValue = i;
+                break;
+            }
+        }
+
+        //looks for the value of the set of two
+        for(int i = counter.length - 1; i > 0; i--) {
+            if(counter[i] == 2) {
+                twoValue = i;
+                break;
+            }
+        }
+
+        //deals with an edge case where there are two sets of three in possCards
+        if(twoValue == -1) {
+            for(int i = counter.length - 1; i > 0; i--) {
+                if(counter[i] == 3 && i != threeValue) {
+                    twoValue = i;
+                    break;
+                }
+            }
+        }
+
+        //begins populating the hand array with the set of 3
+        int count = 0;
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getValue() == threeValue) {
+                madeHand[count] = possCards[i];
+                count++;
+                if(count == 3) {
+                    break;
+                }
+            }
+        }
+
+        //finishes populating the hand array with the set of 2
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getValue() == twoValue) {
+                madeHand[count] = possCards[i];
+                count++;
+                if(count == 5) {
+                    break;
+                }
+            }
+        }
+    }
+    public boolean detectFlush() {
+        for(int i = 0; i < suitCounter.length; i++) {
+            if(suitCounter[i] >= 5) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void flush() {
+        //finds what suit value the flush is
+        int suitValue = -1;
+        for(int i = 0; i < suitCounter.length; i++) {
+            if(suitCounter[i] >= 5) {
+                suitValue = i;
+            }
+        }
+
+        //populates the flush array from possCards based on suit value
+        int count = 0;
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getSuitValue() == suitValue) {
+                madeHand[count] = possCards[i];
+                count++;
+                if(count >= 5) {
+                    break;
+                }
+            }
+        }
+    }
     public boolean detectStraight() {
         int count = 0;
         for(int i = counter.length - 1; i > 0; i--) {
@@ -302,7 +415,29 @@ public class Player {
         } else if(playerToCompare.handValue() > handValue()) {
             return -1;
         } else {
-            if (madeHandName.equals("STRAIGHT")) {
+            if(madeHandName.equals("FULL HOUSE")) {
+                if(firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if(playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    if(lastValue() > playerToCompare.lastValue()) {
+                        return 1;
+                    } else if(playerToCompare.lastValue() > lastValue()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else if (madeHandName.equals("FLUSH")) {
+                if(highCardValue(0, playerToCompare.makeMadeHand()) == 1) {
+                    return 1;
+                } else if(highCardValue(0, playerToCompare.makeMadeHand()) == -1) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("STRAIGHT")) {
                 if(firstValue() > playerToCompare.firstValue()) {
                     return 1;
                 } else if(playerToCompare.firstValue() > firstValue()) {
@@ -370,7 +505,17 @@ public class Player {
         }
     }
     public int handValue() {
-        if(madeHandName.equals("STRAIGHT")) {
+        if(madeHandName.equals("ROYAL FLUSH")) {
+            return 9;
+        } else if(madeHandName.equals("STRAIGHT FLUSH")) {
+            return 8;
+        } else if(madeHandName.equals("FOUR OF A KIND")) {
+            return 7;
+        } else if(madeHandName.equals("FULL HOUSE")) {
+            return 6;
+        } else if(madeHandName.equals("FLUSH")) {
+            return 5;
+        } else if(madeHandName.equals("STRAIGHT")) {
             return 4;
         } else if(madeHandName.equals("THREE OF A KIND")) {
             return 3;
@@ -387,9 +532,6 @@ public class Player {
     }
     public int thirdValue() {
         return madeHand[2].getValue();
-    }
-    public int fourthValue() {
-        return madeHand[3].getValue();
     }
     public int lastValue() {
         return madeHand[4].getValue();
@@ -408,5 +550,8 @@ public class Player {
     //for testing purposes only, delete when done:
     public int[] getCounter() {
         return Arrays.copyOf(counter, counter.length);
+    }
+    public int[] getSuitCounter() {
+        return Arrays.copyOf(suitCounter, counter.length);
     }
 }

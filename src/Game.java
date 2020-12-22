@@ -36,16 +36,32 @@ public class Game {
                 twoCounterString += Integer.toString(playerTwoCounter[i]);
             }
 
-            if(playerOne.getMadeHandName().equals("STRAIGHT") && playerTwo.getMadeHandName().equals("STRAIGHT")) {
+            int[] playerOneSuitCounter = playerOne.getSuitCounter();
+            int[] playerTwoSuitCounter = playerTwo.getSuitCounter();
+
+            String oneSuitCounterString = "";
+            String twoSuitCounterString = "";
+
+            for(int i = 0; i < playerOneSuitCounter.length; i++) {
+                oneSuitCounterString += Integer.toString(playerOneSuitCounter[i]);
+            }
+
+            for(int i = 0; i < playerTwoSuitCounter.length; i++) {
+                twoSuitCounterString += Integer.toString(playerTwoSuitCounter[i]);
+            }
+
+            if(playerOne.getMadeHandName().equals("FULL HOUSE") && playerTwo.getMadeHandName().equals("FULL HOUSE")) {
                 printBoard(board);
                 playerOne.printHand();
                 playerTwo.printHand();
 
                 System.out.println(oneCounterString);
+                System.out.println(oneSuitCounterString);
                 playerOne.printPossCards();
                 playerOne.printMadeHand();
 
                 System.out.println(twoCounterString);
+                System.out.println(twoSuitCounterString);
                 playerTwo.printPossCards();
                 playerTwo.printMadeHand();
 
