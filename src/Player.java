@@ -447,6 +447,13 @@ public class Player {
         this.madeHandName = "HIGH CARD";
     }
 
+    /**
+     * Automatic function comments
+     *
+     * @param cards
+     * @param card
+     * @return
+     */
     public boolean containsCard(Card[] cards, Card card) {
         for (int i = 0; i < cards.length; i++) {
             if (cards[i] != null && cards[i].equals(card)) {
