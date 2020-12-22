@@ -20,7 +20,7 @@ public class Player {
     public Card[] makeMadeHand() {
         Arrays.fill(madeHand, null);
 
-        /*if(detectRoyalFlush()) {
+        if(detectRoyalFlush()) {
             straightFlush();
             madeHandName = "ROYAL FLUSH";
         } else if(detectStraightFlush()) {
@@ -29,7 +29,7 @@ public class Player {
         } else if(detectFour()) {
             four();
             madeHandName = "FOUR OF A KIND";
-        } else */if(detectFullHouse()) {
+        } else if(detectFullHouse()) {
             fullHouse();
             madeHandName = "FULL HOUSE";
         } else if(detectFlush()) {
@@ -63,10 +63,112 @@ public class Player {
         return madeHandName;
     }
 
+    public boolean detectRoyalFlush() {
+        for(int i = 0; i < specialCounter.length; i++) {
+            if(specialCounter[i][14] == 1 &&
+                    specialCounter[i][13] == 1 &&
+                    specialCounter[i][12] == 1 &&
+                    specialCounter[i][11] == 1 &&
+                    specialCounter[i][10] == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean detectStraightFlush() {
+        //specialCounter is a 2d array of ints with where a 1 maps the suit and value of a card
+        int count = 0;
+        for(int i = 0; i < specialCounter.length; i++) {
+            for(int j = specialCounter[i].length - 1; j > 0; j--) {
+                if(specialCounter[i][j] >= 1 && specialCounter[i][j - 1] >= 1) {
+                    count++;
+                } else {
+                    count = 0;
+                }
+
+                if(count >= 4) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public void straightFlush() {
+        straight();
+
+        int suitValue = 0;
+        int suitArraySize = 0;
+        for(int i = 0; i < suitCounter.length; i++) {
+            if(suitCounter[i] >= 5) {
+                suitValue = i;
+                suitArraySize = suitCounter[i];
+            }
+        }
+
+        Card[] updatedPossCards = new Card[suitArraySize];
+
+        int count = 0;
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getSuitValue() == suitValue) {
+                updatedPossCards[count] = possCards[i];
+                count++;
+                if(count == updatedPossCards.length) {
+                    break;
+                }
+            }
+        }
+
+        count = 0;
+        for(int i = 0; i < updatedPossCards.length - 1; i++) {
+            if(updatedPossCards[i].getValue() - 1 == updatedPossCards[i + 1].getValue()) {
+                madeHand[count] = updatedPossCards[i];
+                madeHand[count + 1] = updatedPossCards[i + 1];
+                count++;
+                if(count >= 4) {
+                    break;
+                }
+            }
+        }
+    }
+    public boolean detectFour() {
+        for(int i = 0; i < counter.length; i++) {
+            if(counter[i] == 4) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void four() {
+        int fourValue = -1;
+
+        for(int i = 0; i < counter.length; i++) {
+            if(counter[i] == 4) {
+                fourValue = i;
+            }
+        }
+
+        int count = 0;
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getValue() == fourValue) {
+                madeHand[count] = possCards[i];
+                count++;
+                if(count >= 4) {
+                    break;
+                }
+            }
+        }
+
+        for(int i = 0; i < possCards.length; i++) {
+            if(possCards[i].getValue() != fourValue) {
+                madeHand[count] = possCards[i];
+                break;
+            }
+        }
+    }
     public boolean detectFullHouse() {
         int pairCount = 0;
         int threeCount = 0;
-        for(int i = 0; i < counter.length - 2; i++) {
+        for(int i = counter.length - 2; i > 1; i--) {
             if(counter[i] == 2) {
                 pairCount++;
             } else if(counter[i] == 3) {
@@ -163,7 +265,7 @@ public class Player {
     }
     public boolean detectStraight() {
         int count = 0;
-        for(int i = counter.length - 1; i > 0; i--) {
+        for(int i = counter.length - 1; i > 1; i--) {
             if(counter[i] >= 1 && counter[i - 1] >= 1) {
                 count++;
             } else {
@@ -218,7 +320,7 @@ public class Player {
         }
     }
     public boolean detectThree() {
-        for(int i = 0; i < counter.length; i++) {
+        for(int i = counter.length - 1; i > 1; i--) {
             if(counter[i] == 3) {
                 return true;
             }
@@ -248,7 +350,7 @@ public class Player {
     }
     public boolean detectTwoPair() {
         int count = 0;
-        for(int i = 0; i < counter.length - 2; i++) {
+        for(int i = counter.length - 1; i > 1; i--) {
             if(counter[i] == 2) {
                 count++;
                 if(count == 2) {
@@ -290,7 +392,7 @@ public class Player {
         }
     }
     public boolean detectPair() {
-        for(int i = 0; i < counter.length; i++) {
+        for(int i = counter.length - 1; i > 1; i--) {
             if(counter[i] == 2) {
                 return true;
             }
@@ -415,7 +517,23 @@ public class Player {
         } else if(playerToCompare.handValue() > handValue()) {
             return -1;
         } else {
-            if(madeHandName.equals("FULL HOUSE")) {
+            if(madeHandName.equals("STRAIGHT FLUSH")) {
+                if(firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if(playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if(madeHandName.equals("FOUR OF A KIND")) {
+                if(lastValue() > playerToCompare.lastValue()) {
+                    return 1;
+                } else if(playerToCompare.lastValue() > lastValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if(madeHandName.equals("FULL HOUSE")) {
                 if(firstValue() > playerToCompare.firstValue()) {
                     return 1;
                 } else if(playerToCompare.firstValue() > firstValue()) {
@@ -552,6 +670,6 @@ public class Player {
         return Arrays.copyOf(counter, counter.length);
     }
     public int[] getSuitCounter() {
-        return Arrays.copyOf(suitCounter, counter.length);
+        return Arrays.copyOf(suitCounter, suitCounter.length);
     }
 }
