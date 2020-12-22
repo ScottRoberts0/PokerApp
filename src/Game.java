@@ -1,12 +1,32 @@
-import java.util.Arrays;
 public class Game {
     public static void main(String[] args) {
         Deck deck = new Deck();
-        Player playerOne = new Player(1, deck);
-        Player playerTwo = new Player(2, deck);
+        Player[] players = new Player[4];
+        for(int i = 0; i < players.length; i++) {
+            players[i] = new Player(i + 1, deck);
+        }
+
         Card[] board = new Card[5];
 
-        equityCalculator(playerOne, "ace", "spades", "king", "hearts", playerTwo, board, deck);
+        for(Player player : players) {
+            player.drawHand();
+        }
+
+        dealFlop(board, deck);
+        dealTurn(board, deck);
+        dealRiver(board, deck);
+
+        printBoard(board);
+
+        for(Player player : players) {
+            player.printHand();
+        }
+
+        int winner = Evaluator.findWinner(players, board);
+        System.out.println("Player " + winner + " wins!");
+
+
+        //equityCalculator(players[0], "ace", "spades", "king", "hearts", players[1], board, deck);
     }
     public static void dealFlop(Card[] board, Deck deck) {
         for(int i = 0; i < 3; i++) {
