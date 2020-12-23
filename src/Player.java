@@ -39,6 +39,10 @@ public class Player {
         return Evaluator.getMadeHandName(madeHand);
     }
 
+    public int getMadeHandValue() {
+        return Evaluator.getMadeHandValue(madeHand);
+    }
+
     public void createPossCards(Card[] board) {
         Arrays.fill(possCards, null);
 

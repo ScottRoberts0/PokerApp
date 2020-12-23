@@ -10,27 +10,7 @@ public class Evaluator {
 
         int[] handValues = new int[players.length];
         for(int i = 0; i < handValues.length; i++) {
-            if(players[i].getMadeHandName().equals("ROYAL FLUSH")) {
-                handValues[i] = 9;
-            } else if(players[i].getMadeHandName().equals("STRAIGHT FLUSH")) {
-                handValues[i] = 8;
-            } else if(players[i].getMadeHandName().equals("FOUR OF A KIND")) {
-                handValues[i] = 7;
-            } else if(players[i].getMadeHandName().equals("FULL HOUSE")) {
-                handValues[i] = 6;
-            } else if(players[i].getMadeHandName().equals("FLUSH")) {
-                handValues[i] = 5;
-            } else if(players[i].getMadeHandName().equals("STRAIGHT")) {
-                handValues[i] = 4;
-            } else if(players[i].getMadeHandName().equals("THREE OF A KIND")) {
-                handValues[i] = 3;
-            } else if(players[i].getMadeHandName().equals("TWO PAIR")) {
-                handValues[i] = 2;
-            } else if(players[i].getMadeHandName().equals("PAIR")) {
-                handValues[i] = 1;
-            } else {
-                handValues[i] = 0;
-            }
+            handValues[i] = players[i].getMadeHandValue();
         }
 
         for(int val : handValues) {
@@ -135,6 +115,36 @@ public class Evaluator {
             return "PAIR";
         } else {
             return "HIGH CARD";
+        }
+    }
+
+    public static int getMadeHandValue(Card[] madeHand) {
+        int[] counter = new int[15];
+        int[] suitCounter = new int[4];
+        int[][] specialCounter = new int[4][15];
+
+        createToolArrays(madeHand, counter, suitCounter, specialCounter);
+
+        if(detectRoyalFlush(specialCounter)) {
+            return 9;
+        } else if(detectStraightFlush(specialCounter)) {
+            return 8;
+        } else if(detectFour(counter)) {
+            return 7;
+        } else if(detectFullHouse(counter)) {
+            return 6;
+        } else if(detectFlush(suitCounter)) {
+            return 5;
+        } else if(detectStraight(counter)) {
+            return 4;
+        } else if(detectThree(counter)) {
+            return 3;
+        } else if(detectTwoPair(counter)) {
+            return 2;
+        } else if(detectPair(counter)) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 

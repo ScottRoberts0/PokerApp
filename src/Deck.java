@@ -1,4 +1,5 @@
 import java.util.Arrays;
+
 public class Deck {
     private Card[][] deck;
 
@@ -7,6 +8,7 @@ public class Deck {
         deck = new Card[4][13];
         shuffle();
     }
+
     public Card drawCard() {
         Card card;
         Card[][] copy = Arrays.copyOf(deck, deck.length);
@@ -24,9 +26,10 @@ public class Deck {
 
         return card;
     }
+
     public Card drawCard(String name, String suit) {
         /*this method will return the card regardless of whether it has been drawn or not,
-        * which means it is best to use this BEFORE drawing any card randomly*/
+         * which means it is best to use this BEFORE drawing any card randomly*/
         Card card;
 
         int value = 0;
@@ -59,6 +62,7 @@ public class Deck {
         deck[suitValue][value - 1] = null;
         return card;
     }
+
     public void printDeck() {
         for (int i = 0; i < deck.length; i++) {
             for (int j = 0; j < deck[i].length; j++) {
@@ -67,6 +71,7 @@ public class Deck {
             System.out.println();
         }
     }
+
     public void shuffle() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 13; j++) {
