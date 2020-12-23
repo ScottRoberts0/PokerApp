@@ -1,32 +1,51 @@
 public class Game {
     public static void main(String[] args) {
         Deck deck = new Deck();
-        Player[] players = new Player[4];
+
+        //create a new array of players
+        Player[] players = new Player[3];
         for(int i = 0; i < players.length; i++) {
             players[i] = new Player(i + 1, deck);
         }
 
+        //draw cards in both the board and the player hands
         Card[] board = new Card[5];
-
         for(Player player : players) {
             player.drawHand();
         }
-
         dealFlop(board, deck);
         dealTurn(board, deck);
         dealRiver(board, deck);
 
+        //print board and hands
         printBoard(board);
-
         for(Player player : players) {
             player.printHand();
         }
 
-        int winner = Evaluator.findWinner(players, board);
-        System.out.println("Player " + winner + " wins!");
+        boolean[] winners = Evaluator.findWinner(players, board);
+        int winnerCount = 0;
 
+        for(boolean winner : winners) {
+            if(winner) {
+                winnerCount++;
+            }
+        }
 
-        //equityCalculator(players[0], "ace", "spades", "king", "hearts", players[1], board, deck);
+        if(winnerCount == 1) {
+            for(int i = 0; i < winners.length; i++) {
+                if(winners[i]) {
+                    System.out.println("Player " + players[i].getPlayerNum() + " wins!");
+                }
+            }
+        } else {
+            System.out.println("Split pot between:");
+            for(int i = 0; i < winners.length; i++) {
+                if(winners[i]) {
+                    System.out.println("Player " + players[i].getPlayerNum());
+                }
+            }
+        }
     }
     public static void dealFlop(Card[] board, Deck deck) {
         for(int i = 0; i < 3; i++) {
@@ -70,20 +89,17 @@ public class Game {
             dealTurn(board, deck);
             dealRiver(board, deck);
 
-            player1.createToolArrays(board);
-            player2.createToolArrays(board);
+            player1.makeMadeHand(board);
+            player2.makeMadeHand(board);
 
-            player1.makeMadeHand();
-            player2.makeMadeHand();
-
-            if(player1.compareHands(player2) == 1) {
+            /*if(player1.compareHands(player2) == 1) {
                 player1Wins++;
             } else if(player1.compareHands(player2) == -1) {
                 player2Wins++;
             } else {
                 ties++;
             }
-
+*/
             deck.shuffle();
         }
 

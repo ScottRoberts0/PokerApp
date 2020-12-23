@@ -1,75 +1,87 @@
 import java.util.Arrays;
 
 public class Evaluator {
-    public static int findWinner(Player[] players, Card[] board) {
-        int winner = -1;
-        int winningHandValue = -1;
-        Card[][] playerMadeHands = new Card[players.length][7];
+    public static boolean[] findWinner(Player[] players, Card[] board) {
+        Card[][] madeHands = new Card[players.length][5];
 
-        for (int i = 0; i < playerMadeHands.length; i++) {
-            playerMadeHands[i] = makeMadeHand(players[i], board);
+        for(int i = 0; i < madeHands.length; i++) {
+            madeHands[i] = players[i].makeMadeHand(board);
         }
 
-        /*for(int i = 0; i < playerMadeHands.length; i++) {
-            System.out.println("Player " + players[i].getPlayerNum() + " made hand:");
-            for(int j = 0; j < playerMadeHands[i].length; j++) {
-                System.out.println(playerMadeHands[i][j]);
+        int[] handValues = new int[players.length];
+        for(int i = 0; i < handValues.length; i++) {
+            if(players[i].getMadeHandName().equals("ROYAL FLUSH")) {
+                handValues[i] = 9;
+            } else if(players[i].getMadeHandName().equals("STRAIGHT FLUSH")) {
+                handValues[i] = 8;
+            } else if(players[i].getMadeHandName().equals("FOUR OF A KIND")) {
+                handValues[i] = 7;
+            } else if(players[i].getMadeHandName().equals("FULL HOUSE")) {
+                handValues[i] = 6;
+            } else if(players[i].getMadeHandName().equals("FLUSH")) {
+                handValues[i] = 5;
+            } else if(players[i].getMadeHandName().equals("STRAIGHT")) {
+                handValues[i] = 4;
+            } else if(players[i].getMadeHandName().equals("THREE OF A KIND")) {
+                handValues[i] = 3;
+            } else if(players[i].getMadeHandName().equals("TWO PAIR")) {
+                handValues[i] = 2;
+            } else if(players[i].getMadeHandName().equals("PAIR")) {
+                handValues[i] = 1;
+            } else {
+                handValues[i] = 0;
             }
-            System.out.println();
-        }*/
+        }
 
-        for(int i = 0; i < players.length; i++) {
-            if(handValue(players[i], board) > winningHandValue) {
-                winningHandValue = handValue(players[i], board);
-                winner = players[i].getPlayerNum();
-                if(winningHandValue == handValue(players[i], board)) {
-                    //if the winning hand values are equal (there is a tie) we need to do something
+        for(int val : handValues) {
+            System.out.println(val);
+        }
+        System.out.println();
+
+        boolean[] winners = new boolean[players.length];
+        int winningHandValue = -1;
+
+        for(int i = 0; i < handValues.length; i++) {
+            if(handValues[i] > winningHandValue) {
+                Arrays.fill(winners,false);
+                winners[i] = true;
+                winningHandValue = handValues[i];
+            } else if(handValues[i] == winningHandValue) {
+                if(handValues[i] == 0) {
+                    for(int j = 0; j < winners.length; j++) {
+                        if(i != j && winners[j]) {
+                            for(int k = 0; k < madeHands[i].length; k++) {
+                                if(madeHands[i][k].getValue() > madeHands[j][k].getValue()) {
+                                    winners[i] = true;
+                                    winners[j] = false;
+                                } else if(madeHands[j][k].getValue() > madeHands[i][k].getValue()) {
+                                    winners[j] = true;
+                                    winners[i] = false;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    winners[i] = true;
                 }
             }
         }
 
-        return winner;
-    }
-
-    public static int handValue(Player player, Card[] board) {
-        Card[] possCards = new Card[7];
-        int[] counter = new int[15];
-        int[] suitCounter = new int[4];
-        int[][] specialCounter = new int[4][15];
-
-        createToolArrays(board, player, possCards, counter, suitCounter, specialCounter);
-
-        if(detectRoyalFlush(specialCounter)) {
-           return 9;
-        } else if(detectStraightFlush(specialCounter)) {
-            return 8;
-        } else if(detectFour(counter)) {
-            return 7;
-        } else if(detectFullHouse(counter)) {
-            return 6;
-        } else if(detectFlush(suitCounter)) {
-            return 5;
-        } else if(detectStraight(counter)) {
-            return 4;
-        } else if(detectThree(counter)) {
-            return 3;
-        } else if(detectTwoPair(counter)) {
-            return 2;
-        } else if(detectPair(counter)) {
-            return 1;
-        } else {
-            return 0;
+        for(boolean wl : winners) {
+            System.out.println(wl);
         }
+        System.out.println();
+
+        return Arrays.copyOf(winners, winners.length);
     }
 
-    public static Card[] makeMadeHand(Player player, Card[] board) {
+    public static Card[] makeMadeHand(Card[] possCards) {
         Card[] madeHand = new Card[5];
-        Card[] possCards = new Card[7];
         int[] counter = new int[15];
         int[] suitCounter = new int[4];
         int[][] specialCounter = new int[4][15];
 
-        createToolArrays(board, player, possCards, counter, suitCounter, specialCounter);
+        createToolArrays(possCards, counter, suitCounter, specialCounter);
 
         if(detectRoyalFlush(specialCounter)) {
             straightFlush(counter, suitCounter, possCards, madeHand);
@@ -96,38 +108,42 @@ public class Evaluator {
         return Arrays.copyOf(madeHand, madeHand.length);
     }
 
-    public static void createToolArrays(Card[] board, Player player, Card[] possCards, int[] counter, int[] suitCounter, int[][] specialCounter) {
+    public static String getMadeHandName(Card[] madeHand) {
+        int[] counter = new int[15];
+        int[] suitCounter = new int[4];
+        int[][] specialCounter = new int[4][15];
+
+        createToolArrays(madeHand, counter, suitCounter, specialCounter);
+
+        if(detectRoyalFlush(specialCounter)) {
+            return "ROYAL FLUSH";
+        } else if(detectStraightFlush(specialCounter)) {
+            return "STRAIGHT FLUSH";
+        } else if(detectFour(counter)) {
+            return "FOUR OF A KIND";
+        } else if(detectFullHouse(counter)) {
+            return "FULL HOUSE";
+        } else if(detectFlush(suitCounter)) {
+            return "FLUSH";
+        } else if(detectStraight(counter)) {
+            return "STRAIGHT";
+        } else if(detectThree(counter)) {
+            return "THREE OF A KIND";
+        } else if(detectTwoPair(counter)) {
+            return "TWO PAIR";
+        } else if(detectPair(counter)) {
+            return "PAIR";
+        } else {
+            return "HIGH CARD";
+        }
+    }
+
+    private static void createToolArrays(Card[] possCards, int[] counter, int[] suitCounter, int[][] specialCounter) {
         //reset all these arrays
-        Arrays.fill(possCards, null);
         Arrays.fill(counter, 0);
         Arrays.fill(suitCounter, 0);
         for(int i = 0; i < suitCounter.length; i++) {
             Arrays.fill(specialCounter[i], 0);
-        }
-
-        //populates possCards
-        //only call this method after the river has been dealt
-        for(int i = 0; i < possCards.length; i++) {
-            if(i == 0) {
-                possCards[0] = player.getHand()[0];
-            } else if(i == 1) {
-                possCards[1] = player.getHand()[1];
-            } else {
-                if(board[i - 2] != null) {
-                    possCards[i] = board[i - 2];
-                }
-            }
-        }
-
-        //sorts possCards from highest val to lowest val
-        for(int i = 0; i < possCards.length; i++) {
-            for(int j = 0; j < possCards.length; j++) {
-                if(j != i && possCards[i].getValue() > possCards[j].getValue()) {
-                    Card temp = possCards[i];
-                    possCards[i] = possCards[j];
-                    possCards[j] = temp;
-                }
-            }
         }
 
         for(int i = 0; i < possCards.length; i++) {
@@ -149,7 +165,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectRoyalFlush(int[][] specialCounter) {
+    private static boolean detectRoyalFlush(int[][] specialCounter) {
         for (int i = 0; i < specialCounter.length; i++) {
             if (specialCounter[i][14] == 1 &&
                     specialCounter[i][13] == 1 &&
@@ -162,7 +178,7 @@ public class Evaluator {
         return false;
     }
 
-    public static boolean detectStraightFlush(int[][] specialCounter) {
+    private static boolean detectStraightFlush(int[][] specialCounter) {
         //specialCounter is a 2d array of ints with where a 1 maps the suit and value of a card
         int count = 0;
         for (int i = 0; i < specialCounter.length; i++) {
@@ -181,7 +197,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void straightFlush(int[] counter, int[] suitCounter, Card[] possCards, Card[] madeHand) {
+    private static void straightFlush(int[] counter, int[] suitCounter, Card[] possCards, Card[] madeHand) {
         straight(counter, possCards, madeHand);
 
         int suitValue = 0;
@@ -219,7 +235,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectFour(int[] counter) {
+    private static boolean detectFour(int[] counter) {
         for (int i = 0; i < counter.length; i++) {
             if (counter[i] == 4) {
                 return true;
@@ -228,7 +244,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void four(int[] counter, Card[] possCards, Card[] madeHand) {
+    private static void four(int[] counter, Card[] possCards, Card[] madeHand) {
         int fourValue = -1;
 
         for (int i = 0; i < counter.length; i++) {
@@ -256,7 +272,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectFullHouse(int[] counter) {
+    private static boolean detectFullHouse(int[] counter) {
         int pairCount = 0;
         int threeCount = 0;
         for (int i = counter.length - 2; i > 1; i--) {
@@ -273,7 +289,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void fullHouse(int[] counter, Card[] possCards, Card[] madeHand) {
+    private static void fullHouse(int[] counter, Card[] possCards, Card[] madeHand) {
         int threeValue = -1;
         int twoValue = -1;
 
@@ -327,7 +343,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectFlush(int[] suitCounter) {
+    private static boolean detectFlush(int[] suitCounter) {
         for (int i = 0; i < suitCounter.length; i++) {
             if (suitCounter[i] >= 5) {
                 return true;
@@ -336,7 +352,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void flush(int[] suitCounter, Card[] possCards, Card[] madeHand) {
+    private static void flush(int[] suitCounter, Card[] possCards, Card[] madeHand) {
         //finds what suit value the flush is
         int suitValue = -1;
         for (int i = 0; i < suitCounter.length; i++) {
@@ -358,7 +374,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectStraight(int[] counter) {
+    private static boolean detectStraight(int[] counter) {
         int count = 0;
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] >= 1 && counter[i - 1] >= 1) {
@@ -374,7 +390,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void straight(int[] counter, Card[] possCards, Card[] madeHand) {
+    private static void straight(int[] counter, Card[] possCards, Card[] madeHand) {
         int[] index = new int[5];
 
         //creates an index of which values are involved in the straight
@@ -416,7 +432,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectThree(int[] counter) {
+    private static boolean detectThree(int[] counter) {
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] == 3) {
                 return true;
@@ -425,7 +441,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void three(Card[] possCards, Card[] madeHand) {
+    private static void three(Card[] possCards, Card[] madeHand) {
         //grabs the highest set of 3 and puts in the array threeHand
         for (int i = 0; i < possCards.length - 2; i++) {
             if (possCards[i].getValue() == possCards[i + 1].getValue() &&
@@ -447,7 +463,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectTwoPair(int[] counter) {
+    private static boolean detectTwoPair(int[] counter) {
         int count = 0;
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] == 2) {
@@ -460,7 +476,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void twoPair(Card[] possCards, Card[] madeHand) {
+    private static void twoPair(Card[] possCards, Card[] madeHand) {
         //pulls the first pair out of the sorted possCards array
         for (int i = 0; i < possCards.length - 1; i++) {
             if (possCards[i].getValue() == possCards[i + 1].getValue() &&
@@ -492,7 +508,7 @@ public class Evaluator {
         }
     }
 
-    public static boolean detectPair(int[] counter) {
+    private static boolean detectPair(int[] counter) {
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] == 2) {
                 return true;
@@ -501,7 +517,7 @@ public class Evaluator {
         return false;
     }
 
-    public static void pair(Card[] possCards, Card[] madeHand) {
+    private static void pair(Card[] possCards, Card[] madeHand) {
         for (int i = 0; i < possCards.length - 1; i++) {
             if (possCards[i].getValue() == possCards[i + 1].getValue()) {
                 madeHand[0] = possCards[i];
@@ -522,13 +538,13 @@ public class Evaluator {
         }
     }
 
-    public static void highCard(Card[] possCards, Card[] madeHand) {
+    private static void highCard(Card[] possCards, Card[] madeHand) {
         for (int i = 0; i < madeHand.length; i++) {
             madeHand[i] = possCards[i];
         }
     }
 
-    public static boolean containsCard(Card[] cards, Card card) {
+    private static boolean containsCard(Card[] cards, Card card) {
         for (int i = 0; i < cards.length; i++) {
             if (cards[i] != null && cards[i].equals(card)) {
                 return true;
@@ -536,4 +552,117 @@ public class Evaluator {
         }
         return false;
     }
+
+
+    /*public int compareHands(Player playerToCompare) {
+        if (handValue() > playerToCompare.handValue()) {
+            return 1;
+        } else if (playerToCompare.handValue() > handValue()) {
+            return -1;
+        } else {
+            if (madeHandName.equals("STRAIGHT FLUSH")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("FOUR OF A KIND")) {
+                if (lastValue() > playerToCompare.lastValue()) {
+                    return 1;
+                } else if (playerToCompare.lastValue() > lastValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("FULL HOUSE")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    if (lastValue() > playerToCompare.lastValue()) {
+                        return 1;
+                    } else if (playerToCompare.lastValue() > lastValue()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else if (madeHandName.equals("FLUSH")) {
+                if (highCardValue(0, playerToCompare.makeMadeHand()) == 1) {
+                    return 1;
+                } else if (highCardValue(0, playerToCompare.makeMadeHand()) == -1) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("STRAIGHT")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (madeHandName.equals("THREE")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    if (highCardValue(3, playerToCompare.makeMadeHand()) == 1) {
+                        return 1;
+                    } else if (highCardValue(3, playerToCompare.makeMadeHand()) == -1) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else if (madeHandName.equals("TWO PAIR")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    if (thirdValue() > playerToCompare.thirdValue()) {
+                        return 1;
+                    } else if (playerToCompare.thirdValue() > thirdValue()) {
+                        return -1;
+                    } else {
+                        if (highCardValue(4, playerToCompare.makeMadeHand()) == 1) {
+                            return 1;
+                        } else if (highCardValue(4, playerToCompare.makeMadeHand(board)) == -1) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
+            } else if (madeHandName.equals("PAIR")) {
+                if (firstValue() > playerToCompare.firstValue()) {
+                    return 1;
+                } else if (playerToCompare.firstValue() > firstValue()) {
+                    return -1;
+                } else {
+                    if (highCardValue(2, playerToCompare.makeMadeHand()) == 1) {
+                        return 1;
+                    } else if (highCardValue(2, playerToCompare.makeMadeHand()) == -1) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else {
+                if (highCardValue(0, playerToCompare.makeMadeHand()) == 1) {
+                    return 1;
+                } else if (highCardValue(0, playerToCompare.makeMadeHand()) == -1) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    }*/
 }
