@@ -4,13 +4,14 @@ public class Game {
 
         //create a new array of players
         Player[] players = new Player[3];
-        for(int i = 0; i < players.length; i++) {
+        for (int i = 0; i < players.length; i++) {
             players[i] = new Player(i + 1, deck);
         }
 
         //draw cards in both the board and the player hands
         Card[] board = new Card[5];
-        for(Player player : players) {
+
+        for (Player player : players) {
             player.drawHand();
         }
         dealFlop(board, deck);
@@ -19,56 +20,64 @@ public class Game {
 
         //print board and hands
         printBoard(board);
-        for(Player player : players) {
+        for (Player player : players) {
             player.printHand();
         }
 
         boolean[] winners = Evaluator.findWinner(players, board);
         int winnerCount = 0;
 
-        for(boolean winner : winners) {
-            if(winner) {
+        for (boolean winner : winners) {
+            if (winner) {
                 winnerCount++;
             }
         }
 
-        if(winnerCount == 1) {
-            for(int i = 0; i < winners.length; i++) {
-                if(winners[i]) {
+        if (winnerCount == 1) {
+            for (int i = 0; i < winners.length; i++) {
+                if (winners[i]) {
                     System.out.println("Player " + players[i].getPlayerNum() + " wins!");
                 }
             }
         } else {
             System.out.println("Split pot between:");
-            for(int i = 0; i < winners.length; i++) {
-                if(winners[i]) {
+            for (int i = 0; i < winners.length; i++) {
+                if (winners[i]) {
                     System.out.println("Player " + players[i].getPlayerNum());
                 }
             }
         }
     }
+
+
     public static void dealFlop(Card[] board, Deck deck) {
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             board[i] = deck.drawCard();
         }
     }
+
     public static void dealFlop(Card[] board, Deck deck, String value1, String suit1, String value2, String suit2, String value3, String suit3) {
         board[0] = deck.drawCard(value1, suit1);
         board[1] = deck.drawCard(value2, suit2);
         board[2] = deck.drawCard(value3, suit3);
     }
+
     public static void dealTurn(Card[] board, Deck deck) {
         board[3] = deck.drawCard();
     }
+
     public static void dealTurn(Card[] board, Deck deck, String value1, String suit1) {
         board[3] = deck.drawCard(value1, suit1);
     }
+
     public static void dealRiver(Card[] board, Deck deck) {
         board[4] = deck.drawCard();
     }
+
     public static void dealRiver(Card[] board, Deck deck, String value1, String suit1) {
         board[4] = deck.drawCard(value1, suit1);
     }
+
     public static void printBoard(Card[] board) {
         System.out.println("Board:");
         for (Card card : board) {
@@ -78,11 +87,12 @@ public class Game {
         }
         System.out.println();
     }
+
     public static void equityCalculator(Player player1, String value1, String suit1, String value2, String suit2, Player player2, Card[] board, Deck deck) {
         double player1Wins = 0;
         double player2Wins = 0;
         double ties = 0;
-        for(int i = 0; i < 1000000; i++){
+        for (int i = 0; i < 1000000; i++) {
             player1.drawHand(value1, suit1, value2, suit2);
             player2.drawHand();
             dealFlop(board, deck);
