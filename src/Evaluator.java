@@ -1,4 +1,7 @@
+import java.lang.reflect.Array;
 import java.util.Arrays;
+
+import static java.util.Arrays.fill;
 
 public class Evaluator {
     /* still struggling with comparing ties among more than two players. if you have 3 paired hands, say 1 pair of queens,
@@ -22,14 +25,19 @@ public class Evaluator {
 
         boolean[] winners = new boolean[players.length];
         Card[][] madeHands = new Card[players.length][5];
+
+        for(int i = 0; i < madeHands.length; i++) {
+            madeHands[i] = players[i].makeMadeHand(board);
+            //TESTING READOUT:
+            players[i].printMadeHand();
+        }
+
         int winningHandValue = -1;
         int winnerCount = 1;
 
         for (int i = 0; i < handValues.length; i++) {
             if (handValues[i] > winningHandValue) {
-                Arrays.fill(madeHands, null);
-                Arrays.fill(winners, false);
-                madeHands[i] = players[i].makeMadeHand(board);
+                fill(winners, false);
                 winners[i] = true;
                 winningHandValue = handValues[i];
                 winnerCount = 1;
@@ -40,107 +48,25 @@ public class Evaluator {
             }
         }
 
-        if (winnerCount > 1) {
-            Arrays.fill(winners, false);
-            if (winningHandValue == 9) {
+        for(int i = 0; i < handValues.length; i++) {
+            if(!winners[i]) {
+                handValues[i] = -1;
+            }
+        }
 
-            } else if (winningHandValue == 8) {
-
-            } else if (winningHandValue == 7) {
-
-            } else if (winningHandValue == 6) {
-
-            } else if (winningHandValue == 5) {
-
-            } else if (winningHandValue == 4) {
-                int highStraightValue = -1;
-                for(int i = 0; i < madeHands.length; i++ ) {
-                    if(handValues[i] == 4) {
-                        if(madeHands[i][0].getValue() > highStraightValue) {
-                            highStraightValue = madeHands[i][0].getValue();
-                            Arrays.fill(winners, false);
-                            winners[i] = true;
-                        } else if(madeHands[i][0].getValue() == highStraightValue) {
-                            winners[i] = true;
-                        }
-                    }
-                }
-            } else if (winningHandValue == 3) {
-
-            } else if (winningHandValue == 2) {
-                //IF THE TIE(S) ARE BETWEEN 2 PAIRS:
-                int firstPairValue = -1;
-                int secondPairValue = -1;
-                //TESTING READOUT:
-                for (int i = 0; i < madeHands.length; i++) {
-                    if (handValues[i] == 2) {
-                        players[i].printMadeHand();
-                    }
-                }
-                //ACTUAL LOGIC:
-                for (int i = 0; i < madeHands.length; i++) {
-                    if (handValues[i] == 2) {
-                        if (madeHands[i][0].getValue() > firstPairValue) {
-                            firstPairValue = madeHands[i][0].getValue();
-                            secondPairValue = madeHands[i][2].getValue();
-                            Arrays.fill(winners, false);
-                            winners[i] = true;
-                        } else if (madeHands[i][0].getValue() == firstPairValue && madeHands[i][2].getValue() > secondPairValue) {
-                            secondPairValue = madeHands[i][2].getValue();
-                            Arrays.fill(winners, false);
-                            winners[i] = true;
-                        } else if (madeHands[i][0].getValue() == firstPairValue && madeHands[i][2].getValue() == secondPairValue) {
-                            for(int j = 0; j < winners.length; j++) {
-                                if (highCardCheck(4, 1, handValues, madeHands)[j] == 1) {
-                                    winners[j] = true;
-                                } else {
-                                    winners[j] = false;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (winningHandValue == 1) {
-                //IF THE TIE(S) ARE BETWEEN SINGLE PAIRS:
-                int winningPairValue = -1;
-                //TESTING READOUT:
-                for (int i = 0; i < madeHands.length; i++) {
-                    if (handValues[i] == 1) {
-                        players[i].printMadeHand();
-                    }
-                }
-                //ACTUAL LOGIC:
-                for (int i = 0; i < madeHands.length; i++) {
-                    if (handValues[i] == 1) {
-                        if (madeHands[i][0].getValue() > winningPairValue) {
-                            winningPairValue = madeHands[i][0].getValue();
-                            Arrays.fill(winners, false);
-                            winners[i] = true;
-                        } else if (madeHands[i][0].getValue() == winningPairValue) {
-                            for(int j = 0; j < winners.length; j++) {
-                                if (highCardCheck(2, 1, handValues, madeHands)[j] == 1) {
-                                    winners[j] = true;
-                                } else {
-                                    winners[j] = false;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                //IF THE TIE(S) ARE BETWEEN HIGH CARD HANDS:
-                //TESTING READOUT:
-                for (int i = 0; i < madeHands.length; i++) {
-                    if (handValues[i] == 0) {
-                        players[i].printMadeHand();
-                    }
-                }
-                //ACTUAL LOGIC:
-                for (int i = 0; i < winners.length; i++) {
-                    if (highCardCheck(0, 0, handValues, madeHands)[i] == 1) {
-                        winners[i] = true;
-                    }
-                }
+        if(winnerCount > 1) {
+            if(winningHandValue == 5) {
+                winners = findWinnerFlush(madeHands, handValues);
+            } else if(winningHandValue == 4) {
+                winners = findWinnerStraight(madeHands, handValues);
+            } else if(winningHandValue == 3) {
+                winners = findWinnerThree(madeHands, handValues);
+            } else if(winningHandValue == 2) {
+                winners = findWinnerTwoPair(madeHands, handValues);
+            } else if(winningHandValue == 1) {
+                winners = findWinnerPair(madeHands, handValues);
+            } else if(winningHandValue == 0) {
+                winners = findWinnerHighCards(madeHands, 0);
             }
         }
 
@@ -150,48 +76,131 @@ public class Evaluator {
         }
         System.out.println();
 
-
         return Arrays.copyOf(winners, winners.length);
     }
 
-    private static int[] highCardCheck(int startingIndex, int handValue, int[] handValues, Card[][] madeHands) {
-        int highCardValue = 0;
-        int[] winners = new int[handValues.length];
-        /*for (int i = 0; i < madeHands.length; i++) {
-            if (handValues[i] == handValue) {
-                for (int j = startingIndex; j < madeHands[i].length; j++) {
-                    if (madeHands[i][j].getValue() > highCardValue) {
-                        highCardValue = madeHands[i][j].getValue();
-                        Arrays.fill(winners, 0);
-                        winners[i] = 1;
-                    } else if (madeHands[i][j].getValue() == highCardValue) {
-                        highCardValue = -1;
-                        winners[i] = 1;
-                    }
-                }
-            }
-        }*/
+    private static boolean[] findWinnerFlush(Card[][] madeHands, int[] handValues) {
+        boolean[] winners = new boolean[madeHands.length];
 
-        for(int j = startingIndex; j < 5; j++) {
-            for(int i = 0; i < madeHands.length; i++) {
-                if(handValues[i] == handValue) {
-                    if(madeHands[i][j].getValue() > highCardValue) {
-                        highCardValue = madeHands[i][j].getValue();
-                        Arrays.fill(winners, 0);
-                        winners[i] = 1;
-                    } else if(madeHands[i][j].getValue() == highCardValue) {
-                        highCardValue = -1;
-                        winners[i] = 1;
-                        break;
-                    }
+        for(int i = 0; i < madeHands.length; i++) {
+            if(handValues[i] == 5) {
+                winners = findWinnerHighCards(madeHands, 0);
+            }
+        }
+
+        return winners;
+    }
+
+    private static boolean[] findWinnerStraight(Card[][] madeHands, int[] handValues) {
+        int highStraightValue = -1;
+        boolean[] winners = new boolean[madeHands.length];
+
+        for(int i = 0; i < madeHands.length; i++) {
+            if(handValues[i] == 4) {
+                if(madeHands[i][0].getValue() > highStraightValue) {
+                    highStraightValue = madeHands[i][0].getValue();
+                    Arrays.fill(winners, false);
+                    winners[i] = true;
+                } else if(madeHands[i][0].getValue() == highStraightValue) {
+                    winners[i] = true;
                 }
             }
         }
 
-        for (int i : winners) {
-            System.out.println(i);
+        return winners;
+    }
+
+    private static boolean[] findWinnerThree(Card[][] madeHands, int[] handValues) {
+        int highThreeValue = -1;
+        boolean[] winners = new boolean[madeHands.length];
+
+        for(int i = 0; i < madeHands.length; i++) {
+            if(handValues[i] == 3) {
+                if(madeHands[i][0].getValue() > highThreeValue) {
+                    highThreeValue = madeHands[i][0].getValue();
+                    Arrays.fill(winners, false);
+                    winners[i] = true;
+                } else if(madeHands[i][0].getValue() == highThreeValue) {
+                    winners = findWinnerHighCards(madeHands, 3);
+                }
+            }
         }
-        System.out.println();
+
+        return winners;
+    }
+
+    private static boolean[] findWinnerTwoPair(Card[][] madeHands, int[] handValues) {
+        int highFirstPairValue = -1;
+        int highSecondPairValue = -1;
+        boolean[] winners = new boolean[madeHands.length];
+
+        for(int i = 0; i < madeHands.length; i++) {
+            if(handValues[i] == 2) {
+                if(madeHands[i][0].getValue() > highFirstPairValue) {
+                    highFirstPairValue = madeHands[i][0].getValue();
+                    highSecondPairValue = madeHands[i][2].getValue();
+                    Arrays.fill(winners, false);
+                    winners[i] = true;
+                } else if(madeHands[i][0].getValue() == highFirstPairValue && madeHands[i][2].getValue() > highSecondPairValue) {
+                    highSecondPairValue = madeHands[i][2].getValue();
+                    Arrays.fill(winners, false);
+                    winners[i] = true;
+                } else if(madeHands[i][0].getValue() == highFirstPairValue && madeHands[i][2].getValue() == highSecondPairValue) {
+                    winners = findWinnerHighCards(madeHands, 4);
+                }
+            }
+        }
+
+        return winners;
+    }
+
+    private static boolean[] findWinnerPair(Card[][] madeHands, int[] handValues) {
+        int highPairValue = -1;
+        boolean[] winners = new boolean[madeHands.length];
+
+        for(int i = 0; i < madeHands.length; i++) {
+            if(handValues[i] == 1) {
+                if(madeHands[i][0].getValue() > highPairValue) {
+                    highPairValue = madeHands[i][0].getValue();
+                    Arrays.fill(winners,false);
+                    winners[i] = true;
+                } else if(madeHands[i][0].getValue() == highPairValue) {
+                    winners = findWinnerHighCards(madeHands, 2);
+                }
+            }
+        }
+
+        return winners;
+    }
+
+    private static boolean[] findWinnerHighCards(Card[][] madeHands, int cardLevel) {
+        boolean[] winners = new boolean[madeHands.length];
+
+        for(int i = cardLevel; i < 5; i++) {
+            int highCardValue = -1;
+            int winnerCount = 0;
+
+            for(int j = 0; j < madeHands.length; j++) {
+                if(madeHands[j][cardLevel].getValue() > highCardValue) {
+                    highCardValue = madeHands[j][cardLevel].getValue();
+                    Arrays.fill(winners, false);
+                    winners[j] = true;
+                } else if(madeHands[j][cardLevel].getValue() == highCardValue) {
+                    winners[j] = true;
+                }
+            }
+
+            for(boolean winner : winners) {
+                if(winner) {
+                    winnerCount++;
+                }
+            }
+
+            if(winnerCount == 1) {
+                break;
+            }
+        }
+
         return winners;
     }
 
@@ -290,10 +299,10 @@ public class Evaluator {
 
     private static void createToolArrays(Card[] possCards, int[] counter, int[] suitCounter, int[][] specialCounter) {
         //reset all these arrays
-        Arrays.fill(counter, 0);
-        Arrays.fill(suitCounter, 0);
+        fill(counter, 0);
+        fill(suitCounter, 0);
         for (int i = 0; i < suitCounter.length; i++) {
-            Arrays.fill(specialCounter[i], 0);
+            fill(specialCounter[i], 0);
         }
 
         for (int i = 0; i < possCards.length; i++) {
