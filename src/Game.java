@@ -10,7 +10,6 @@ public class Game {
 
         //draw cards in both the board and the player hands
         Card[] board = new Card[5];
-
         for (Player player : players) {
             player.drawHand();
         }
@@ -48,7 +47,6 @@ public class Game {
             }
         }
     }
-
 
     public static void dealFlop(Card[] board, Deck deck) {
         for (int i = 0; i < 3; i++) {
