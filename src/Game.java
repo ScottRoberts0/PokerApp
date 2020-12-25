@@ -1,9 +1,11 @@
 public class Game {
     public static void main(String[] args) {
-        Deck deck = new Deck();
+        testHands("FULL HOUSE", 100000, 3);
+
+        /*Deck deck = new Deck();
 
         //create a new array of players
-        Player[] players = new Player[3];
+        Player[] players = new Player[4];
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player(i + 1, deck);
         }
@@ -45,6 +47,81 @@ public class Game {
                     System.out.println("Player " + players[i].getPlayerNum());
                 }
             }
+        }*/
+    }
+
+    public static void testHands(String handToTest, int numLoops, int numPlayers) {
+        int a = 1;
+
+        Deck deck = new Deck();
+        Player[] players = new Player[numPlayers];
+        for (int i = 0; i < players.length; i++) {
+            players[i] = new Player(i + 1, deck);
+        }
+
+        Card[] board = new Card[5];
+
+        while(a < numLoops) {
+            dealFlop(board, deck);
+            dealTurn(board, deck);
+            dealRiver(board, deck);
+
+            for(Player player : players) {
+                player.drawHand();
+                player.makeMadeHand(board);
+            }
+
+            int handCount = 0;
+            for(Player player : players) {
+                if(player.getMadeHandName().equals(handToTest)) {
+                    handCount++;
+                }
+            }
+
+            boolean display = false;
+            if(handCount == 2) {
+                display = true;
+            }
+
+            if(display == true) {
+                printBoard(board);
+                for (Player player : players) {
+                    player.printHand();
+                }
+                for (Player player : players) {
+                    player.printMadeHand();
+                }
+
+                boolean[] winners = Evaluator.findWinner(players, board);
+                int winnerCount = 0;
+
+                for (boolean winner : winners) {
+                    if (winner) {
+                        winnerCount++;
+                    }
+                }
+
+                if (winnerCount == 1) {
+                    for (int i = 0; i < winners.length; i++) {
+                        if (winners[i]) {
+                            System.out.println("Player " + players[i].getPlayerNum() + " wins!");
+                        }
+                    }
+                } else {
+                    System.out.println("Split pot between:");
+                    for (int i = 0; i < winners.length; i++) {
+                        if (winners[i]) {
+                            System.out.println("Player " + players[i].getPlayerNum());
+                        }
+                    }
+                }
+
+                System.out.println("================================");
+                System.out.println();
+            }
+
+            deck.shuffle();
+            a++;
         }
     }
 
