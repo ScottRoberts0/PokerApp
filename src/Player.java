@@ -1,11 +1,16 @@
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Player {
     private int playerNum;
+    private int stack;
     private Deck deck;
+
     private Card[] hand;
     private Card[] possCards;
     private Card[] madeHand;
+    private boolean hasFolded;
+    //various utility arrays
     private int[] counter = new int[15];
     private int[] suitCounter = new int[4];
     private int[][] specialCounter = new int[4][15];
@@ -16,7 +21,63 @@ public class Player {
         madeHand = new Card[5];
         this.playerNum = playerNum;
         this.deck = deck;
+        this.hasFolded = false;
     }
+
+    public Player(int playerNum, Deck deck, int stack) {
+        hand = new Card[2];
+        possCards = new Card[7];
+        madeHand = new Card[5];
+        this.playerNum = playerNum;
+        this.deck = deck;
+        this.stack = stack;
+        this.hasFolded = false;
+    }
+
+
+    public void action(char action) {
+        Scanner input = new Scanner(System.in);
+
+        if(action == 'f') {
+            fold();
+            this.hasFolded = true;
+        } else if(action == 'c') {
+            check();
+        } else if(action =='r') {
+            System.out.println("Raise size: ");
+            raise(input.nextInt());
+            System.out.println(toString());
+            System.out.println();
+        } else if(action == 'b') {
+            System.out.print("Bet size: ");
+            bet(input.nextInt());
+            System.out.println(toString());
+            System.out.println();
+        }
+    }
+
+    public void fold() {
+        System.out.println("Player " + getPlayerNum() + " folds");
+
+    }
+
+    public void check() {
+        System.out.println("Player " + getPlayerNum() + " checks");
+    }
+
+    public void raise(int betSize) {
+        System.out.println(("Player " + getPlayerNum() + " raises to " + betSize));
+        stack -= betSize;
+        Game.addToPot(betSize);
+    }
+
+    public void bet(int betSize) {
+        System.out.println("Player " + getPlayerNum() + " bets " + betSize);
+        stack -= betSize;
+        Game.addToPot(betSize);
+    }
+
+
 
     public Card[] makeMadeHand(Card[] board) {
         Arrays.fill(madeHand, null);
@@ -41,6 +102,8 @@ public class Player {
     public int getMadeHandValue() {
         return Evaluator.getMadeHandValue(madeHand);
     }
+
+
 
     public void createPossCards(Card[] board) {
         Arrays.fill(possCards, null);
@@ -81,6 +144,8 @@ public class Player {
         System.out.println();
     }
 
+
+
     public void drawHand() {
         hand[0] = deck.drawCard();
         hand[1] = deck.drawCard();
@@ -99,7 +164,21 @@ public class Player {
         System.out.println();
     }
 
+
+
     public int getPlayerNum() {
         return playerNum;
+    }
+
+    public int getStack() {
+        return stack;
+    }
+
+    public String toString() {
+        return "Player " + getPlayerNum() + " stack: " + getStack();
+    }
+
+    public boolean hasFolded() {
+        return hasFolded;
     }
 }

@@ -1,54 +1,7 @@
+import java.util.Scanner;
+
 public class Game {
-    public static void main(String[] args) {
-        testHands("TWO PAIR", 1000, 6, 3);
-
-        /*Deck deck = new Deck();
-
-        //create a new array of players
-        Player[] players = new Player[4];
-        for (int i = 0; i < players.length; i++) {
-            players[i] = new Player(i + 1, deck);
-        }
-
-        //draw cards in both the board and the player hands
-        Card[] board = new Card[5];
-        for (Player player : players) {
-            player.drawHand();
-        }
-        dealFlop(board, deck);
-        dealTurn(board, deck);
-        dealRiver(board, deck);
-
-        //print board and hands
-        printBoard(board);
-        for (Player player : players) {
-            player.printHand();
-        }
-
-        boolean[] winners = Evaluator.findWinner(players, board);
-        int winnerCount = 0;
-
-        for (boolean winner : winners) {
-            if (winner) {
-                winnerCount++;
-            }
-        }
-
-        if (winnerCount == 1) {
-            for (int i = 0; i < winners.length; i++) {
-                if (winners[i]) {
-                    System.out.println("Player " + players[i].getPlayerNum() + " wins!");
-                }
-            }
-        } else {
-            System.out.println("Split pot between:");
-            for (int i = 0; i < winners.length; i++) {
-                if (winners[i]) {
-                    System.out.println("Player " + players[i].getPlayerNum());
-                }
-            }
-        }*/
-    }
+    private static int pot;
 
     /**
      * Tests hands over a given number of games.
@@ -204,6 +157,50 @@ public class Game {
         }
     }
 
+
+    public static void preflop (Player[] players) {
+        Scanner input = new Scanner(System.in);
+        pot = 0;
+
+        for(Player player : players) {
+            player.drawHand();
+            player.printHand();
+        }
+
+        for(Player player : players) {
+            if(!player.hasFolded()) {
+                System.out.println("Player " + player.getPlayerNum() + " input action: ");
+                player.action(input.next().charAt(0));
+            }
+        }
+    }
+
+    public static void flop (Deck deck, Card[] board, Player[] players) {
+        Scanner input = new Scanner(System.in);
+        dealFlop(board, deck);
+        boolean bettingClosed = false;
+
+        System.out.println();
+        printBoard(board);
+
+        //need to find a way to close betting on each street
+        while (!bettingClosed) {
+            for (Player player : players) {
+                if (!player.hasFolded()) {
+                    System.out.println("Player " + player.getPlayerNum() + " input action: ");
+                    player.action(input.next().charAt(0));
+                }
+            }
+        }
+    }
+
+
+    public static void addToPot(int betSize) {
+        pot += betSize;
+        System.out.println("Pot size: " + pot);
+    }
+
+
     public static void dealFlop(Card[] board, Deck deck) {
         for (int i = 0; i < 3; i++) {
             board[i] = deck.drawCard();
@@ -241,6 +238,8 @@ public class Game {
         }
         System.out.println();
     }
+
+
 
     public static void equityCalculator(Player player1, String value1, String suit1, String value2, String suit2, Player player2, Card[] board, Deck deck) {
         double player1Wins = 0;
