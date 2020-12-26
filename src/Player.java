@@ -21,7 +21,6 @@ public class Player {
     public Card[] makeMadeHand(Card[] board) {
         Arrays.fill(madeHand, null);
         createPossCards(board);
-        //printPossCards();
         madeHand = Evaluator.makeMadeHand(possCards);
 
         return Arrays.copyOf(madeHand, madeHand.length);

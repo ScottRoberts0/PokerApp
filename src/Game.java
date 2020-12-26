@@ -1,6 +1,6 @@
 public class Game {
     public static void main(String[] args) {
-        testHands("FULL HOUSE", 100000, 3);
+        testHands("TWO PAIR", 1000, 6, 3);
 
         /*Deck deck = new Deck();
 
@@ -50,7 +50,13 @@ public class Game {
         }*/
     }
 
-    public static void testHands(String handToTest, int numLoops, int numPlayers) {
+    /**
+     * Tests hands over a given number of games.
+     *
+     * @param numLoops   Number of games to test over
+     * @param numPlayers Number of players to test
+     */
+    public static void testHands(int numLoops, int numPlayers) {
         int a = 1;
 
         Deck deck = new Deck();
@@ -61,29 +67,102 @@ public class Game {
 
         Card[] board = new Card[5];
 
-        while(a < numLoops) {
+        while (a < numLoops) {
             dealFlop(board, deck);
             dealTurn(board, deck);
             dealRiver(board, deck);
 
-            for(Player player : players) {
+            for (Player player : players) {
+                player.drawHand();
+                player.makeMadeHand(board);
+            }
+            printBoard(board);
+            for (Player player : players) {
+                player.printHand();
+            }
+            for (Player player : players) {
+                player.printMadeHand();
+            }
+
+            boolean[] winners = Evaluator.findWinner(players, board);
+            int winnerCount = 0;
+
+            for (boolean winner : winners) {
+                if (winner) {
+                    winnerCount++;
+                }
+            }
+
+            if (winnerCount == 1) {
+                for (int i = 0; i < winners.length; i++) {
+                    if (winners[i]) {
+                        System.out.println("Player " + players[i].getPlayerNum() + " wins with a " + players[i].getMadeHandName() + "!");
+                    }
+                }
+            } else {
+                System.out.println("Split pot between:");
+                for (int i = 0; i < winners.length; i++) {
+                    if (winners[i]) {
+                        System.out.println("Player " + players[i].getPlayerNum());
+                    }
+                }
+            }
+
+            System.out.println("================================");
+            System.out.println();
+
+            deck.shuffle();
+            a++;
+        }
+    }
+
+    /**
+     * Tests hands over a given number of games.
+     *
+     * @param handToTest String value, all caps, of what hand you want to be looking at. Eg. "PAIR" or "FOUR OF A KIND"
+     * @param numLoops   Number of games to test over
+     * @param numPlayers Number of players to test
+     * @param ties       The number of ties you want to test. Eg. if you have 3 players and you want to look at cases where all three players
+     *                   have the same hand, you will call testHands(handToTest, numLoops, 3, 3);
+     */
+    public static void testHands(String handToTest, int numLoops, int numPlayers, int ties) {
+        int a = 1;
+
+        if (ties > numPlayers) {
+            ties = numPlayers;
+        }
+
+        Deck deck = new Deck();
+        Player[] players = new Player[numPlayers];
+        for (int i = 0; i < players.length; i++) {
+            players[i] = new Player(i + 1, deck);
+        }
+
+        Card[] board = new Card[5];
+
+        while (a < numLoops) {
+            dealFlop(board, deck);
+            dealTurn(board, deck);
+            dealRiver(board, deck);
+
+            for (Player player : players) {
                 player.drawHand();
                 player.makeMadeHand(board);
             }
 
             int handCount = 0;
-            for(Player player : players) {
-                if(player.getMadeHandName().equals(handToTest)) {
+            for (Player player : players) {
+                if (player.getMadeHandName().equals(handToTest)) {
                     handCount++;
                 }
             }
 
             boolean display = false;
-            if(handCount == 2) {
+            if (handCount >= ties) {
                 display = true;
             }
 
-            if(display == true) {
+            if (display == true) {
                 printBoard(board);
                 for (Player player : players) {
                     player.printHand();
@@ -104,7 +183,7 @@ public class Game {
                 if (winnerCount == 1) {
                     for (int i = 0; i < winners.length; i++) {
                         if (winners[i]) {
-                            System.out.println("Player " + players[i].getPlayerNum() + " wins!");
+                            System.out.println("Player " + players[i].getPlayerNum()+ " wins with a " + players[i].getMadeHandName() + "!");
                         }
                     }
                 } else {

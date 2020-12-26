@@ -419,7 +419,7 @@ public class Evaluator {
                 if (madeHands[i][0].getValue() > highThreeValue) {
                     for (int j = 0; j < madeHands.length; j++) {
                         //excludes full houses that are lower than the new highThreeValue from future searches
-                        if (i != j && madeHands[j][0].getValue() == highThreeValue) {
+                        if (j != i && madeHands[j][0].getValue() < madeHands[i][0].getValue()) {
                             handValues[j] = -1;
                         }
                     }
@@ -430,7 +430,7 @@ public class Evaluator {
                 } else if (madeHands[i][0].getValue() == highThreeValue && madeHands[i][3].getValue() > highTwoValue) {
                     for (int j = 0; j < madeHands.length; j++) {
                         //excludes full houses that are lower than the new highTwoValue from future searches
-                        if (i != j && madeHands[j][3].getValue() == highTwoValue) {
+                        if (j != i && madeHands[j][3].getValue() < madeHands[i][3].getValue()) {
                             handValues[j] = -1;
                         }
                         highTwoValue = madeHands[i][3].getValue();
@@ -607,7 +607,7 @@ public class Evaluator {
                 if (madeHands[i][0].getValue() > highThreeValue) {
                     for (int j = 0; j < madeHands.length; j++) {
                         //need to exclude hands that have a highThreeValue of the old one from future searches
-                        if (i != j && madeHands[j][0].getValue() == highThreeValue) {
+                        if (j != i && madeHands[j][0].getValue() < madeHands[i][2].getValue()) {
                             handValues[j] = -1;
                         }
                     }
@@ -679,7 +679,7 @@ public class Evaluator {
             if (handValues[i] == 2) {
                 if (madeHands[i][0].getValue() > highFirstPairValue) {
                     for (int j = 0; j < madeHands.length; j++) {
-                        if (i != j && madeHands[j][0].getValue() == highFirstPairValue) {
+                        if (j != i && madeHands[j][0].getValue() < madeHands[i][0].getValue()) {
                             handValues[j] = -1;
                         }
                     }
@@ -689,7 +689,7 @@ public class Evaluator {
                     winners[i] = true;
                 } else if (madeHands[i][0].getValue() == highFirstPairValue && madeHands[i][2].getValue() > highSecondPairValue) {
                     for (int j = 0; j < madeHands.length; j++) {
-                        if (i != j && madeHands[j][0].getValue() == highSecondPairValue) {
+                        if (j != i && madeHands[j][0].getValue() < madeHands[i][2].getValue()) {
                             handValues[j] = -1;
                         }
                     }
@@ -700,6 +700,10 @@ public class Evaluator {
                     winners = findWinnerHighCards(madeHands, 4, handValues, 2);
                 }
             }
+        }
+
+        for(int x : handValues) {
+            System.out.println(x);
         }
 
         return winners;
@@ -745,7 +749,7 @@ public class Evaluator {
             if (handValues[i] == 1) {
                 if (madeHands[i][0].getValue() > highPairValue) {
                     for (int j = 0; j < madeHands.length; j++) {
-                        if (i != j && madeHands[j][0].getValue() == highPairValue) {
+                        if (j != i && madeHands[j][0].getValue() < madeHands[i][0].getValue()) {
                             handValues[j] = -1;
                         }
                     }
