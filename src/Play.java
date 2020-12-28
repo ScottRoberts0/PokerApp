@@ -2,22 +2,25 @@ import java.util.Scanner;
 
 public class Play {
     public static void main(String[] args) {
-        //Game.testHands(1000, 3);
+        //Game.testHands("FULL HOUSE", 1000, 3, 2);
+
         Scanner input = new Scanner(System.in);
         Deck deck = new Deck();
         Card[] board = new Card[5];
+        Player[] players = Game.createPlayers(5, deck, 25000);
+        Game.pickRandomDealer(players);
 
-        //System.out.println("Number of players: ");
-        int numPlayers = /*input.nextInt();*/ 5;
-        Player[] players = new Player[numPlayers];
+        //Let's start really simple... just get blinds posted and hands dealt first.
+        for(int i = 0; i < 10; i++) {
+            Game.preFlop(players, 25, 50);
+            Game.flop(players, board, deck);
+            Game.turn(players, board, deck);
+            Game.river(players, board, deck);
 
-        //System.out.println("Starting stack size: ");
-        int startingStacks = /*input.nextInt();*/ 10000;
-        for(int i = 0; i < players.length; i++) {
-            players[i] = new Player(i + 1, deck, startingStacks);
+            Game.nextDealer(players);
+            deck.shuffle();
+
+            System.out.println("==========================");
         }
-
-        Game.preflop(players);
-        Game.flop(deck, board, players);
     }
 }

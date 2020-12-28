@@ -10,6 +10,8 @@ public class Player {
     private Card[] possCards;
     private Card[] madeHand;
     private boolean hasFolded;
+    private int lastVPIP;
+
     //various utility arrays
     private int[] counter = new int[15];
     private int[] suitCounter = new int[4];
@@ -35,46 +37,56 @@ public class Player {
     }
 
 
-    public void action(char action) {
-        Scanner input = new Scanner(System.in);
 
-        if(action == 'f') {
-            fold();
-            this.hasFolded = true;
-        } else if(action == 'c') {
-            check();
-        } else if(action =='r') {
-            System.out.println("Raise size: ");
-            raise(input.nextInt());
-            System.out.println(toString());
-            System.out.println();
+    public char askAction(char action) {
+        if(action == 'c') {
+            return 'c';
+        } else if(action == 'f') {
+            return 'f';
+        } else if(action == 'x') {
+            return 'x';
+        } else if(action == 'r') {
+            return 'r';
         } else if(action == 'b') {
-            System.out.print("Bet size: ");
-            bet(input.nextInt());
-            System.out.println(toString());
-            System.out.println();
+            return 'b';
+        } else {
+            return 'z';
         }
     }
 
-    public void fold() {
-        System.out.println("Player " + getPlayerNum() + " folds");
+    public void bet(int betSize) {
+        stack -= betSize - lastVPIP;
+        Game.addToPot(betSize - lastVPIP);
+        lastVPIP = betSize - lastVPIP;
+    }
 
+    public void raise(int betSize) {
+
+    }
+
+    public void call() {
+        stack -= Game.getAmountToCall();
+        lastVPIP = Game.getAmountToCall();
+        Game.addToPot(lastVPIP);
+        System.out.println("Player " + getPlayerNum() + " calls " + lastVPIP);
     }
 
     public void check() {
         System.out.println("Player " + getPlayerNum() + " checks");
     }
 
-    public void raise(int betSize) {
-        System.out.println(("Player " + getPlayerNum() + " raises to " + betSize));
-        stack -= betSize;
-        Game.addToPot(betSize);
+    public void fold() {
+        hasFolded = true;
+
+        System.out.println("Player " + getPlayerNum() + " folds");
     }
 
-    public void bet(int betSize) {
-        System.out.println("Player " + getPlayerNum() + " bets " + betSize);
-        stack -= betSize;
-        Game.addToPot(betSize);
+    public int getLastVPIP() {
+        return lastVPIP;
+    }
+
+    public void win(int pot) {
+        stack += pot;
     }
 
 
@@ -147,11 +159,15 @@ public class Player {
 
 
     public void drawHand() {
+        this.hasFolded = false;
+        this.lastVPIP = 0;
         hand[0] = deck.drawCard();
         hand[1] = deck.drawCard();
     }
 
     public void drawHand(String value1, String suit1, String value2, String suit2) {
+        this.hasFolded = false;
+        this.lastVPIP = 0;
         hand[0] = deck.drawCard(value1, suit1);
         hand[1] = deck.drawCard(value2, suit2);
     }

@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import static java.util.Arrays.fill;
@@ -12,7 +11,11 @@ public class Evaluator {
 
         int[] handValues = new int[players.length];
         for (int i = 0; i < handValues.length; i++) {
-            handValues[i] = players[i].getMadeHandValue();
+            if (!players[i].hasFolded()) {
+                handValues[i] = players[i].getMadeHandValue();
+            } else {
+                handValues[i] = -1;
+            }
         }
 
         //TESTING READOUT:
