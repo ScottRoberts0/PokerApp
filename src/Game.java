@@ -171,7 +171,12 @@ public class Game {
         return players;
     }
 
-    //find a way to loop through players starting at actionIndex and ending at to the right of actionIndex
+    //debugging. put street logic into a method and call it from each street
+    //check stack math
+    //all in situations
+    //not allowing stacks to go below 0
+    //checking seems buggy
+    
     public static void preFlop(Player[] players, int smallBlind, int bigBlind) {
         pot = 0;
 
@@ -191,19 +196,7 @@ public class Game {
             bets[i] = players[i].getLastVPIP();
         }
 
-        do {
-            if(!players[currentActionIndex].hasFolded()) {
-                printPlayers(players);
-                playerAction(players, bets);
-                printHands(players);
-            }
-            updateCurrentActionIndex(players);
-
-            //TESTING READOUT BETS:
-            for (int bet : bets) {
-                System.out.println(bet);
-            }
-        } while (!checkStreetCompleted(players, bets));
+        bettingRound(players, bets, 0);
     }
 
     public static void flop(Player[] players, Card[] board, Deck deck) {
@@ -216,23 +209,11 @@ public class Game {
 
         int[] bets = new int[players.length];
 
-        do {
-            if(!players[currentActionIndex].hasFolded()) {
-                printPlayers(players);
-                playerAction(players, bets);
-                printHands(players);
-            }
-            updateCurrentActionIndex(players);
-
-            //TESTING READOUT BETS:
-            for (int bet : bets) {
-                System.out.println(bet);
-            }
-        } while (!checkStreetCompleted(players, bets));
+        bettingRound(players, bets, 1);
     }
 
     public static void turn(Player[] players, Card[] board, Deck deck) {
-        setStartingActionIndex(players, 1);
+        setStartingActionIndex(players, 2);
         currentActionIndex = startingActionIndex;
         amountToCall = 0;
 
@@ -240,24 +221,11 @@ public class Game {
         printBoard(board);
 
         int[] bets = new int[players.length];
-
-        do {
-            if(!players[currentActionIndex].hasFolded()) {
-                printPlayers(players);
-                playerAction(players, bets);
-                printHands(players);
-            }
-            updateCurrentActionIndex(players);
-
-            //TESTING READOUT BETS:
-            for (int bet : bets) {
-                System.out.println(bet);
-            }
-        } while (!checkStreetCompleted(players, bets));
+        bettingRound(players, bets, 2);
     }
 
     public static void river(Player[] players, Card[] board, Deck deck) {
-        setStartingActionIndex(players, 1);
+        setStartingActionIndex(players, 3);
         currentActionIndex = startingActionIndex;
         amountToCall = 0;
 
@@ -265,20 +233,7 @@ public class Game {
         printBoard(board);
 
         int[] bets = new int[players.length];
-
-        do {
-            if(!players[currentActionIndex].hasFolded()) {
-                printPlayers(players);
-                playerAction(players, bets);
-                printHands(players);
-            }
-            updateCurrentActionIndex(players);
-
-            //TESTING READOUT BETS:
-            for (int bet : bets) {
-                System.out.println(bet);
-            }
-        } while (!checkStreetCompleted(players, bets));
+        bettingRound(players, bets, 3);
 
         boolean[] winners = Evaluator.findWinner(players, board);
 
@@ -292,9 +247,32 @@ public class Game {
         for (int i = 0; i < players.length; i++) {
             if (winners[i]) {
                 players[i].win(pot / winnerCount);
-                System.out.println("Player " + players[i].getPlayerNum() + " wins " + (pot / winnerCount));
+                System.out.println("Player " + players[i].getPlayerNum() + " wins " + (pot / winnerCount) + " with a " + players[i].getMadeHandName());
             }
         }
+    }
+
+    private static void bettingRound(Player[] players, int[] bets, int street) {
+        for(Player player : players) {
+            if(street != 0) {
+                player.resetVPIP();
+            }
+        }
+
+        do {
+            if(!players[currentActionIndex].hasFolded()) {
+                printPlayers(players);
+                playerAction(players, bets);
+                printHands(players);
+
+                //TESTING READOUT BETS:
+                System.out.println(pot);
+                for (int bet : bets) {
+                    System.out.println(bet);
+                }
+            }
+            updateCurrentActionIndex(players);
+        } while (!checkStreetCompleted(players, bets, street));
     }
 
     private static int amountToCall(int[] bets) {
@@ -331,7 +309,7 @@ public class Game {
         }
     }
 
-    private static boolean checkStreetCompleted(Player[] players, int[] bets) {
+    private static boolean checkStreetCompleted(Player[] players, int[] bets, int street) {
         int count = 0;
         for (Player player : players) {
             if (player.hasFolded()) {
@@ -343,9 +321,9 @@ public class Game {
             }
         }
 
-        int highestBet = 0;
+        int highestBet = -1;
         for (int bet : bets) {
-            if (bet > highestBet) {
+            if (bet > highestBet && bet != 0) {
                 highestBet = bet;
             }
         }
@@ -357,7 +335,13 @@ public class Game {
             }
         }
 
-        if (calledCount == players.length - count && currentActionIndex != bigBlindIndex) {
+        if (calledCount == players.length - count && currentActionIndex != bigBlindIndex && street == 0) {
+            return true;
+        } else if (calledCount == players.length - count && street != 0) {
+            return true;
+        }
+
+        if(street != 0 && currentActionIndex == startingActionIndex) {
             return true;
         }
 

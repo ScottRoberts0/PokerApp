@@ -55,9 +55,9 @@ public class Player {
     }
 
     public void bet(int betSize) {
-        stack -= betSize - lastVPIP;
+        this.stack -= betSize - lastVPIP;
         Game.addToPot(betSize - lastVPIP);
-        lastVPIP = betSize - lastVPIP;
+        this.lastVPIP = betSize - lastVPIP;
     }
 
     public void raise(int betSize) {
@@ -65,8 +65,8 @@ public class Player {
     }
 
     public void call() {
-        stack -= Game.getAmountToCall();
-        lastVPIP = Game.getAmountToCall();
+        this.stack -= Game.getAmountToCall();
+        this.lastVPIP = Game.getAmountToCall();
         Game.addToPot(lastVPIP);
         System.out.println("Player " + getPlayerNum() + " calls " + lastVPIP);
     }
@@ -76,14 +76,18 @@ public class Player {
     }
 
     public void fold() {
-        hasFolded = true;
-
+        this.hasFolded = true;
         System.out.println("Player " + getPlayerNum() + " folds");
+    }
+
+    public void resetVPIP() {
+        this.lastVPIP = 0;
     }
 
     public int getLastVPIP() {
         return lastVPIP;
     }
+
 
     public void win(int pot) {
         stack += pot;
