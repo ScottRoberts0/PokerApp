@@ -175,7 +175,6 @@ public class Game {
     //check stack math
     //all in situations
     //not allowing stacks to go below 0
-    //checking seems buggy
     
     public static void preFlop(Player[] players, int smallBlind, int bigBlind) {
         pot = 0;
@@ -275,40 +274,6 @@ public class Game {
         } while (!checkStreetCompleted(players, bets, street));
     }
 
-    private static int amountToCall(int[] bets) {
-        int highestBet = 0;
-        for (int bet : bets) {
-            if (bet > highestBet) {
-                highestBet = bet;
-            }
-        }
-        amountToCall = highestBet - bets[currentActionIndex];
-        return highestBet - bets[currentActionIndex];
-    }
-
-    public static int getAmountToCall() {
-        return amountToCall;
-    }
-
-    private static void playerAction(Player[] players, int[] bets) {
-        Scanner input = new Scanner(System.in);
-
-        char action = players[currentActionIndex].askAction(input.next().charAt(0));
-        if (action == 'c') {
-            bets[currentActionIndex] += amountToCall(bets);
-            players[currentActionIndex].call();
-        } else if (action == 'b') {
-            System.out.print("Bet size: ");
-            int betSize = input.nextInt();
-            bets[currentActionIndex] = betSize;
-            players[currentActionIndex].bet(betSize);
-        } else if (action == 'x') {
-            players[currentActionIndex].check();
-        } else {
-            players[currentActionIndex].fold();
-        }
-    }
-
     private static boolean checkStreetCompleted(Player[] players, int[] bets, int street) {
         int count = 0;
         for (Player player : players) {
@@ -348,16 +313,51 @@ public class Game {
         return false;
     }
 
+
+    private static void playerAction(Player[] players, int[] bets) {
+        Scanner input = new Scanner(System.in);
+
+        char action = players[currentActionIndex].askAction(input.next().charAt(0));
+        if (action == 'c') {
+            bets[currentActionIndex] += amountToCall(bets);
+            players[currentActionIndex].call();
+        } else if (action == 'b') {
+            System.out.print("Bet size: ");
+            int betSize = input.nextInt();
+            bets[currentActionIndex] = betSize;
+            players[currentActionIndex].bet(betSize);
+        } else if (action == 'x') {
+            players[currentActionIndex].check();
+        } else {
+            players[currentActionIndex].fold();
+        }
+    }
+
     private static boolean checkValidIndex(Player[] players, int numToCheck) {
         return numToCheck <= players.length - 1;
     }
 
-    public static void dealHands(Player[] players) {
-        for (Player player : players) {
-            player.drawHand();
-            player.printHand();
-        }
+    public static void addToPot(int betSize) {
+        pot += betSize;
+        System.out.println("POT: " + pot);
     }
+
+    private static int amountToCall(int[] bets) {
+        int highestBet = 0;
+        for (int bet : bets) {
+            if (bet > highestBet) {
+                highestBet = bet;
+            }
+        }
+        amountToCall = highestBet - bets[currentActionIndex];
+        return highestBet - bets[currentActionIndex];
+    }
+
+    public static int getAmountToCall() {
+        return amountToCall;
+    }
+
+
 
     public static void pickRandomDealer(Player[] players) {
         if (players.length == 2) {
@@ -412,12 +412,9 @@ public class Game {
         }
     }
 
-    public static void addToPot(int betSize) {
-        pot += betSize;
-        System.out.println("POT: " + pot);
-    }
 
-    public static void printPlayers(Player[] players) {
+
+    private static void printPlayers(Player[] players) {
         for (int i = 0; i < players.length; i++) {
             String output = "";
             if (i == currentActionIndex) {
@@ -437,7 +434,14 @@ public class Game {
         System.out.println();
     }
 
-    public static void printHands(Player[] players) {
+    private static void dealHands(Player[] players) {
+        for (Player player : players) {
+            player.drawHand();
+            player.printHand();
+        }
+    }
+
+    private static void printHands(Player[] players) {
         for(Player player : players) {
             if(!player.hasFolded()) {
                 player.printHand();
@@ -445,12 +449,7 @@ public class Game {
         }
     }
 
-    private static void updateCurrentActionIndex(Player[] players) {
-        currentActionIndex++;
-        if (!checkValidIndex(players, currentActionIndex)) {
-            currentActionIndex = 0;
-        }
-    }
+
 
     /**
      * @param players
@@ -474,36 +473,44 @@ public class Game {
         }
     }
 
+    private static void updateCurrentActionIndex(Player[] players) {
+        currentActionIndex++;
+        if (!checkValidIndex(players, currentActionIndex)) {
+            currentActionIndex = 0;
+        }
+    }
 
-    public static void dealFlop(Card[] board, Deck deck) {
+
+
+    private static void dealFlop(Card[] board, Deck deck) {
         for (int i = 0; i < 3; i++) {
             board[i] = deck.drawCard();
         }
     }
 
-    public static void dealFlop(Card[] board, Deck deck, String value1, String suit1, String value2, String suit2, String value3, String suit3) {
+    private static void dealFlop(Card[] board, Deck deck, String value1, String suit1, String value2, String suit2, String value3, String suit3) {
         board[0] = deck.drawCard(value1, suit1);
         board[1] = deck.drawCard(value2, suit2);
         board[2] = deck.drawCard(value3, suit3);
     }
 
-    public static void dealTurn(Card[] board, Deck deck) {
+    private static void dealTurn(Card[] board, Deck deck) {
         board[3] = deck.drawCard();
     }
 
-    public static void dealTurn(Card[] board, Deck deck, String value1, String suit1) {
+    private static void dealTurn(Card[] board, Deck deck, String value1, String suit1) {
         board[3] = deck.drawCard(value1, suit1);
     }
 
-    public static void dealRiver(Card[] board, Deck deck) {
+    private static void dealRiver(Card[] board, Deck deck) {
         board[4] = deck.drawCard();
     }
 
-    public static void dealRiver(Card[] board, Deck deck, String value1, String suit1) {
+    private static void dealRiver(Card[] board, Deck deck, String value1, String suit1) {
         board[4] = deck.drawCard(value1, suit1);
     }
 
-    public static void printBoard(Card[] board) {
+    private static void printBoard(Card[] board) {
         System.out.println("Board:");
         for (Card card : board) {
             if (card != null) {
