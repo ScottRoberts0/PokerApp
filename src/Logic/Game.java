@@ -1,3 +1,5 @@
+package Logic;
+
 import java.util.Scanner;
 
 public class Game {
@@ -55,14 +57,14 @@ public class Game {
             if (winnerCount == 1) {
                 for (int i = 0; i < winners.length; i++) {
                     if (winners[i]) {
-                        System.out.println("Player " + players[i].getPlayerNum() + " wins with a " + players[i].getMadeHandName() + "!");
+                        System.out.println("Logic.Player " + players[i].getPlayerNum() + " wins with a " + players[i].getMadeHandName() + "!");
                     }
                 }
             } else {
                 System.out.println("Split pot between:");
                 for (int i = 0; i < winners.length; i++) {
                     if (winners[i]) {
-                        System.out.println("Player " + players[i].getPlayerNum());
+                        System.out.println("Logic.Player " + players[i].getPlayerNum());
                     }
                 }
             }
@@ -142,14 +144,14 @@ public class Game {
                 if (winnerCount == 1) {
                     for (int i = 0; i < winners.length; i++) {
                         if (winners[i]) {
-                            System.out.println("Player " + players[i].getPlayerNum() + " wins with a " + players[i].getMadeHandName() + "!");
+                            System.out.println("Logic.Player " + players[i].getPlayerNum() + " wins with a " + players[i].getMadeHandName() + "!");
                         }
                     }
                 } else {
                     System.out.println("Split pot between:");
                     for (int i = 0; i < winners.length; i++) {
                         if (winners[i]) {
-                            System.out.println("Player " + players[i].getPlayerNum());
+                            System.out.println("Logic.Player " + players[i].getPlayerNum());
                         }
                     }
                 }
@@ -181,9 +183,9 @@ public class Game {
 
         //post blinds and deal hands
         dealHands(players);
-        System.out.println("Player " + players[smallBlindIndex].getPlayerNum() + " posts small blind");
+        System.out.println("Logic.Player " + players[smallBlindIndex].getPlayerNum() + " posts small blind");
         players[smallBlindIndex].bet(smallBlind);
-        System.out.println("Player " + players[bigBlindIndex].getPlayerNum() + " posts big blind");
+        System.out.println("Logic.Player " + players[bigBlindIndex].getPlayerNum() + " posts big blind");
         players[bigBlindIndex].bet(bigBlind);
 
         setStartingActionIndex(players, 0);
@@ -246,7 +248,7 @@ public class Game {
         for (int i = 0; i < players.length; i++) {
             if (winners[i]) {
                 players[i].win(pot / winnerCount);
-                System.out.println("Player " + players[i].getPlayerNum() + " wins " + (pot / winnerCount) + " with a " + players[i].getMadeHandName());
+                System.out.println("Logic.Player " + players[i].getPlayerNum() + " wins " + (pot / winnerCount) + " with a " + players[i].getMadeHandName());
             }
         }
     }
@@ -549,11 +551,11 @@ public class Game {
         double p1Equity = player1Wins / (player1Wins + player2Wins + ties);
         double p2Equity = player2Wins / (player1Wins + player2Wins + ties);
 
-        System.out.println("Player one wins: " + player1Wins);
+        System.out.println("Logic.Player one wins: " + player1Wins);
         System.out.println("Plyaer two wins: " + player2Wins);
         System.out.println("Hands ending in a tie: " + ties);
         System.out.println();
-        System.out.println("Player one equity: " + p1Equity + "%");
+        System.out.println("Logic.Player one equity: " + p1Equity + "%");
         System.out.println("Plyaer two equity: " + p2Equity + "%");
     }
 }

@@ -1,8 +1,8 @@
 package UI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
-import UI.Components.CardComponent;
 import UI.Components.TableComponent;
 
 import java.awt.*;
@@ -11,12 +11,13 @@ import java.awt.image.BufferedImage;
 public class Table {
 
     private JFrame mainFrame;
+    private JPanel mainPanel;
     private TableComponent table;
 
     private final int WINDOW_WIDTH = 1000;
     private final int WINDOW_HEIGHT = 800;
 
-    CardComponent[][] playerCards;
+    private JButton checkButton, callButton, foldButton, raiseButton;
 
     private Dimension windowCenter;
 
@@ -25,42 +26,54 @@ public class Table {
 
         drawTable();
 
-        Image im = GraphicalHelpers.getCardsImage();
+        drawButtons();
 
         showWindow();
     }
 
     private void drawTable(){
+        Point p;
+
         // create the table
         table = new TableComponent();
 
-        // center it in the window
-        table.setLocation(GraphicalHelpers.getTopLeftFromCenter(table, GraphicalHelpers.getCenter(mainFrame)));
-
-        Point p;
-
-        playerCards = new CardComponent[9][9];
-        // Create some cards
-        for(int i = 0; i < 9; i++){
-            playerCards[0][i] = new CardComponent(0, 15);
-            p = GraphicalHelpers.getTopLeftFromCenter(playerCards[0][i], GraphicalHelpers.addPoints(GraphicalHelpers.getCenter(table), table.getPlayerPosition(i)));
-            playerCards[0][i].setLocation(p);
-        }
-
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = 5;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.weighty = 1;
+        c.weightx = 1;
 
         // add components to the table to the window
-        mainFrame.add(table);
-        for(int i = 0; i < 9; i++){
-            mainFrame.add(playerCards[0][i]);
-        }
+        mainPanel.add(table, c);
+
+    }
+
+    private void drawButtons(){
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        foldButton = new JButton("Fold");
+        //foldButton.setLocation(10, WINDOW_HEIGHT - foldButton.getHeight() - 10);
+        foldButton.setLocation(100, 100);
+        foldButton.setVisible(true);
+
+        buttonPanel.add(foldButton);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridy = 1;
+
+        mainPanel.add(buttonPanel, c);
     }
 
     private void createWindow(){
-        mainFrame = new JFrame();//creating instance of JFrame
+        mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        mainFrame.setLayout(null);
 
-        mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);//400 width and 500 height
+        mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        mainFrame.add(mainPanel);
     }
 
     private void showWindow(){

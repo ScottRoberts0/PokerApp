@@ -1,6 +1,8 @@
+package Logic;
+
 public class Play {
     public static void main(String[] args) {
-        //Game.testHands("FULL HOUSE", 1000, 3, 2);
+        //Logic.Game.testHands("FULL HOUSE", 1000, 3, 2);
 
         Deck deck = new Deck();
         Card[] board = new Card[5];

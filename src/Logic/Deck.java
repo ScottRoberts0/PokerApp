@@ -1,3 +1,5 @@
+package Logic;
+
 import java.util.Arrays;
 
 public class Deck {
