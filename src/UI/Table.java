@@ -6,36 +6,42 @@ import javax.swing.border.EmptyBorder;
 import UI.Components.TableComponent;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Table {
+public class Table implements ActionListener {
 
+    // constants
+    private static final int WINDOW_WIDTH = 1000;
+    private static final int WINDOW_HEIGHT = 650;
+
+    // components
     private JFrame mainFrame;
     private JPanel mainPanel;
     private TableComponent table;
-
-    private final int WINDOW_WIDTH = 1000;
-    private final int WINDOW_HEIGHT = 800;
-
     private JButton checkButton, callButton, foldButton, raiseButton;
 
-    private Dimension windowCenter;
+    // misc vars
+    private int numPlayers;
 
-    public Table() {
+    public Table(int numPlayers) {
+        this.numPlayers = numPlayers;
+
         createWindow();
 
         drawTable();
 
         drawButtons();
 
-        showWindow();
+        // show zee vindow
+        mainFrame.setVisible(true);//making the frame visible
     }
 
     private void drawTable(){
         Point p;
 
         // create the table
-        table = new TableComponent();
+        table = new TableComponent(this.numPlayers);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = 5;
@@ -52,11 +58,26 @@ public class Table {
     private void drawButtons(){
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         foldButton = new JButton("Fold");
-        //foldButton.setLocation(10, WINDOW_HEIGHT - foldButton.getHeight() - 10);
-        foldButton.setLocation(100, 100);
-        foldButton.setVisible(true);
+        foldButton.setActionCommand("Fold");
+        foldButton.addActionListener(this);
+
+        checkButton = new JButton("Check");
+        checkButton.setActionCommand("Check");
+        checkButton.addActionListener(this);
+
+        raiseButton = new JButton("Raise");
+        raiseButton.setActionCommand("Raise");
+        raiseButton.addActionListener(this);
+
+        callButton = new JButton("Call");
+        callButton.setActionCommand("Call");
+        callButton.addActionListener(this);
+
 
         buttonPanel.add(foldButton);
+        buttonPanel.add(checkButton);
+        buttonPanel.add(raiseButton);
+        buttonPanel.add(callButton);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 1;
@@ -67,6 +88,7 @@ public class Table {
     private void createWindow(){
         mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        mainFrame.setResizable(false);
 
         mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -76,7 +98,20 @@ public class Table {
         mainFrame.add(mainPanel);
     }
 
-    private void showWindow(){
-        mainFrame.setVisible(true);//making the frame visible
+    public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
+        table.setPlayerCard(playerNum, cardNum, cardValue, cardSuit);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getActionCommand().equals("Fold")){
+            Main.foldAction();
+        }else if(e.getActionCommand().equals("Check")){
+            Main.checkAction();
+        }else if(e.getActionCommand().equals("Raise")){
+            Main.raiseAction();
+        }else if(e.getActionCommand().equals("Call")){
+            Main.callAction();
+        }
     }
 }

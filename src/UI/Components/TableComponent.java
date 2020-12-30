@@ -11,26 +11,39 @@ public class TableComponent extends JPanel {
 
     private static final int TABLE_WIDTH = 650;
     private static final int TABLE_HEIGHT = 300;
+    private static final int TABLE_Y_BUFFER = 25;
     private static final int CARD_RADIUS_INCREASE = 75;
     private static final int CARD_Y_BUFFER = 15;
     private static final int CARD_X_BUFFER = 10;
+    private static final int TABLE_CARD_SPACER = 5;
 
     private static final int CARD_WIDTH = 52;
     private static final int CARD_HEIGHT = 76;
 
-    Card[][] playerCards;
+    private int numPlayers;
+    private Card[][] playerCards;
+    private Card[] tableCards;
 
-    public TableComponent() {
+    public TableComponent(int numPlayers) {
         super(null);
+
+        this.numPlayers = numPlayers;
 
         this.setOpaque(false);
 
-        playerCards = new Card[9][2];
+        playerCards = new Card[numPlayers][2];
+        tableCards = new Card[5];
 
-        for (int i = 0; i < 9; i++) {
+        // create player cards
+        for (int i = 0; i < numPlayers; i++) {
             for (int j = 0; j < 2; j++) {
                 playerCards[i][j] = new Card(0, 0);
             }
+        }
+
+        // create table cards
+        for (int i = 0; i < 3; i++) {
+            tableCards[i] = new Card(0, 0);
         }
     }
 
@@ -42,20 +55,29 @@ public class TableComponent extends JPanel {
         g.drawOval(((this.getWidth() - TABLE_WIDTH) / 2) + ins.left, ((this.getHeight() - TABLE_HEIGHT) / 2) + ins.top, TABLE_WIDTH - ins.left - ins.right - 5,
                 TABLE_HEIGHT - ins.top - ins.bottom - 5);
 
-        // draw cards
-        for (int i = 0; i < 9; i++) {
+        // draw player cards
+        for (int i = 0; i < numPlayers; i++) {
             for (int j = 0; j < 2; j++) {
-                drawCards(g, i, j);
+                drawPlayerCards(g, i, j);
             }
         }
+
+        // create table cards
+        drawTableCards(g);
     }
 
-    public Point getPlayerPosition(int playerNum) {
-        double angle = (Math.PI * 2 / 9) * (double) playerNum;
+    public Point getPlayerPosition(int playerNum){
+        if(playerNum >= this.numPlayers){
+            //throw new InvalidPlayerNumException("Player number requested is more than total players in the game");
+            System.out.println("Player number requested is more than total players in the game");
+            return new Point(0,0);
+        }
 
-        double radius = (TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
+        double angle = (Math.PI * 2 / numPlayers) * (double) playerNum;
+
+        double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
                 Math.sqrt(
-                        (Math.pow(TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) + (Math.pow(TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
+                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) + (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
                 );
 
         radius += CARD_RADIUS_INCREASE;
@@ -66,7 +88,7 @@ public class TableComponent extends JPanel {
         return new Point((int) x, (int) y);
     }
 
-    public void drawCards(Graphics g, int player, int cardNum) {
+    public void drawPlayerCards(Graphics g, int player, int cardNum) {
         Point p = getPlayerPosition(player);
 
         // grab the center of this panel
@@ -78,9 +100,53 @@ public class TableComponent extends JPanel {
                 (CARD_HEIGHT * playerCards[player][cardNum].getSuitValue()),
                 CARD_WIDTH, CARD_HEIGHT);
 
-        Point CardLocation = GraphicalHelpers.addPoints(p, panelCenter);
+        Point cardLoc;
 
-        g.drawImage(cardImage, CardLocation.x, CardLocation.y, null);
+        if(cardNum == 0){
+            cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+            cardLoc.x -= 15;
+            cardLoc.y -= 10;
+        }else{
+            cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+        }
+
+        g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+    }
+
+    public void drawTableCards(Graphics g) {
+        int cardCount = 0;
+        int totalCards = 0;
+        Point p;
+
+        for(int i = 0; i < 5; i ++){
+            if(tableCards[i] != null)
+                totalCards ++;
+            else
+                break;
+        }
+
+        // grab the center of this panel
+        Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
+
+        // grab the card image
+        for(int i = 0; i < totalCards; i ++) {
+            BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                    (CARD_WIDTH * (tableCards[i].getValue() - 2)),
+                    (CARD_HEIGHT * tableCards[i].getSuitValue()),
+                    CARD_WIDTH, CARD_HEIGHT);
+
+            p = new Point((CARD_WIDTH * i) - (totalCards * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
+
+            Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+
+            g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+        }
+    }
+
+    public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
+        playerCards[playerNum][cardNum] = new Card(cardValue, cardSuit);
+
+        this.repaint();
     }
 }
 
