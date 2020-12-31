@@ -144,6 +144,12 @@ public class TableComponent extends JPanel {
         }
     }
 
+    public void setTableCards(Card[] cards){
+        tableCards = cards;
+
+        repaint();
+    }
+
     public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
         playerCards[playerNum][cardNum] = new Card(cardValue, cardSuit);
 
@@ -151,8 +157,9 @@ public class TableComponent extends JPanel {
     }
 
     public void setPlayerCard(Player player){
-        Card[] cards = player.getHand;
-        playerCards[player.getPlayerNum()][0] = new Card(cardValue, cardSuit);
+        Card[] cards = player.getHand();
+        playerCards[player.getPlayerNum()][0] = new Card(cards[0].getValue(), cards[0].getSuitValue());
+        playerCards[player.getPlayerNum()][1] = new Card(cards[1].getValue(), cards[1].getSuitValue());
 
         this.repaint();
     }
