@@ -1,3 +1,5 @@
+package Logic;
+
 import java.util.Arrays;
 
 public class Player {
@@ -55,12 +57,29 @@ public class Player {
         int callSize = highestBet - bets[playerNum - 1];
         Game.addToPot(callSize);
 
+<<<<<<< HEAD:src/Player.java
         bets[playerNum - 1] = highestBet;
         playerHasActed[playerNum - 1] = true;
 
         stack -= callSize;
 
         System.out.println("Player " + playerNum + " calls " + callSize);
+=======
+    public void call() {
+        this.stack -= Game.getAmountToCall();
+        this.lastVPIP = Game.getAmountToCall();
+        Game.addToPot(lastVPIP);
+        System.out.println("Logic.Player " + getPlayerNum() + " calls " + lastVPIP);
+    }
+
+    public void check() {
+        System.out.println("Logic.Player " + getPlayerNum() + " checks");
+    }
+
+    public void fold() {
+        this.hasFolded = true;
+        System.out.println("Logic.Player " + getPlayerNum() + " folds");
+>>>>>>> 0cb59e5747c2fad198742113c2ab411c2d67edd7:src/Logic/Player.java
     }
 
     public void fold(int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
@@ -90,7 +109,7 @@ public class Player {
     }
 
     public void printMadeHand() {
-        System.out.println("Player " + playerNum + " made hand: " + getMadeHandName());
+        System.out.println("Logic.Player " + playerNum + " made hand: " + getMadeHandName());
         for (int i = 0; i < madeHand.length; i++) {
             System.out.println(madeHand[i]);
         }
@@ -136,7 +155,7 @@ public class Player {
     }
 
     public void printPossCards() {
-        System.out.println("Player " + playerNum + " possible cards:");
+        System.out.println("Logic.Player " + playerNum + " possible cards:");
         for (int i = 0; i < possCards.length; i++) {
             if (possCards[i] != null) {
                 System.out.println(possCards[i]);
@@ -157,7 +176,7 @@ public class Player {
     }
 
     public void printHand() {
-        System.out.println("Player " + playerNum + " hand:");
+        System.out.println("Logic.Player " + playerNum + " hand:");
         for (int i = 0; i < hand.length; i++) {
             System.out.println(hand[i]);
         }
@@ -174,6 +193,6 @@ public class Player {
     }
 
     public String toString() {
-        return "Player " + getPlayerNum() + " stack: " + getStack();
+        return "Logic.Player " + getPlayerNum() + " stack: " + getStack();
     }
 }
