@@ -23,12 +23,7 @@ public class Main {
             Game.pickRandomDealer(players);
 
             for (int i = 0; i < 10; i++) {
-                Game.preFlop(players, 25, 50);
-                Game.flop(players, board, deck);
-                Game.turn(players, board, deck);
-                Game.river(players, board, deck);
-
-                Game.nextDealer(players);
+                Game.hand(players, board, deck, 25, 50);
                 deck.shuffle();
 
                 System.out.println("==========================");
