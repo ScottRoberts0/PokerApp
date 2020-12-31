@@ -82,6 +82,11 @@ public class Player {
     }
 
 
+
+    public Card[] getHand() {
+        return Arrays.copyOf(hand, hand.length);
+    }
+
     public Card[] makeMadeHand(Card[] board) {
         Arrays.fill(madeHand, null);
         createPossCards(board);
