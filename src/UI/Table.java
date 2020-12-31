@@ -52,7 +52,6 @@ public class Table implements ActionListener {
 
         // add components to the table to the window
         mainPanel.add(table, c);
-
     }
 
     private void drawButtons(){
