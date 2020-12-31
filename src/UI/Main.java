@@ -16,10 +16,8 @@ public class Main {
             Card[] board = new Card[5];
             Player[] players = Game.createPlayers(5, deck, 25000);
 
-            Game.pickRandomDealer(players);
-            Game.hand(players, board, deck, 25, 50);
-
-            gameTable.setPlayerCard(0,0, players[0]);
+            Game.dealHands(players);
+            Game.dealFlop(board, deck);
         } else {
             //Logic.Game.testHands("FULL HOUSE", 1000, 3, 2);
             Deck deck = new Deck();

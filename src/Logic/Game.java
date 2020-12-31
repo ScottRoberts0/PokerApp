@@ -173,7 +173,7 @@ public class Game {
     public static Player[] createPlayers(int numPlayers, Deck deck, int stackSize) {
         Player[] players = new Player[numPlayers];
         for (int i = 0; i < players.length; i++) {
-            players[i] = new Player(i + 1, deck, stackSize);
+            players[i] = new Player(i, deck, stackSize);
         }
         return players;
     }
@@ -425,13 +425,13 @@ public class Game {
 
 
 
-    private static void dealHands(Player[] players) {
+    public static void dealHands(Player[] players) {
         for (Player player : players) {
             player.drawHand();
         }
     }
 
-    private static void dealFlop(Card[] board, Deck deck) {
+    public static void dealFlop(Card[] board, Deck deck) {
         for (int i = 0; i < 3; i++) {
             board[i] = deck.drawCard();
         }
@@ -443,7 +443,7 @@ public class Game {
         board[2] = deck.drawCard(value3, suit3);
     }
 
-    private static void dealTurn(Card[] board, Deck deck) {
+    public static void dealTurn(Card[] board, Deck deck) {
         board[3] = deck.drawCard();
     }
 
@@ -451,7 +451,7 @@ public class Game {
         board[3] = deck.drawCard(value1, suit1);
     }
 
-    private static void dealRiver(Card[] board, Deck deck) {
+    public static void dealRiver(Card[] board, Deck deck) {
         board[4] = deck.drawCard();
     }
 
