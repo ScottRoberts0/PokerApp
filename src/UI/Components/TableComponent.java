@@ -1,6 +1,7 @@
 package UI.Components;
 
 import Logic.Card;
+import Logic.Player;
 import UI.GraphicalHelpers;
 
 import javax.swing.*;
@@ -145,6 +146,13 @@ public class TableComponent extends JPanel {
 
     public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
         playerCards[playerNum][cardNum] = new Card(cardValue, cardSuit);
+
+        this.repaint();
+    }
+
+    public void setPlayerCard(Player player){
+        Card[] cards = player.getHand;
+        playerCards[player.getPlayerNum()][0] = new Card(cardValue, cardSuit);
 
         this.repaint();
     }

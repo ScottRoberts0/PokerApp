@@ -19,22 +19,18 @@ public class Main {
     }
 
     public static void callAction(){
-        System.out.println("Call");
-        gameTable.setPlayerCard(0, 0, 0, 1);
+
     }
 
     public static void foldAction(){
-        System.out.println("Fold");
-        gameTable.setPlayerCard(0, 1, 0, 2);
+
     }
 
     public static void raiseAction(){
-        System.out.println("Raise");
-        gameTable.setPlayerCard(0, 0, 0, 0);
+
     }
 
     public static void checkAction(){
-        System.out.println("Check");
-        gameTable.setPlayerCard(0, 1, 0, 3);
+
     }
 }
