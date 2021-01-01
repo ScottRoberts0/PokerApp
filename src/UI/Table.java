@@ -110,6 +110,10 @@ public class Table implements ActionListener {
         this.players = players;
     }
 
+    public void updateButtons(){
+        
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Fold")){

@@ -23,25 +23,25 @@ public class TableComponent extends JPanel {
     private int numPlayers;
     private Player[] players;
     private Card[] tableCards;
-    private int[] playerBets;
-    private int[] playerStacks;
     private int pot;
+    private Point[] playerPositions;
 
     public TableComponent(Player[] players) {
         super(null);
         this.setOpaque(false);
 
+        // store a reference to the players
         this.players = players;
         numPlayers = players.length;
-        playerBets = new int[numPlayers];
-        playerStacks = new int[numPlayers];
+
+        // initialize arrays
+        tableCards = new Card[5];
         pot = 0;
 
-        tableCards = new Card[5];
-
-        // create table cards
-        for (int i = 0; i < 3; i++) {
-            tableCards[i] = new Card(0, 0);
+        // grab the positions of the players and store them so we don't have to recalculate every frame
+        playerPositions = new Point[numPlayers];
+        for(int i = 0; i < numPlayers; i ++){
+            playerPositions[i] = getPlayerPosition(i);
         }
     }
 
@@ -56,19 +56,37 @@ public class TableComponent extends JPanel {
         // draw player cards
         drawPlayerCards(g);
 
-
         // draw table cards
         drawTableCards(g);
 
-        // draw text
+        // update labels
         drawText(g);
-
     }
 
     private void drawText(Graphics g){
+        // get the table center to determine which side of the board the player is on
+        Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
         // draw player stacks and bets
         for(int i = 0; i < numPlayers; i ++){
+            int stack = players[i].getStack();
+            // grab the string width
+            int stringWidth = g.getFontMetrics().stringWidth(stack + "");
+            int stringHeight = g.getFont().getSize();
 
+            // draw player stack on outside
+            if(playerPositions[i].x > 0){
+                // player is on the left side of the board, put the stack on the left and bet to the right
+                g.drawString(stack + "",
+                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH + 30,
+                        (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
+            }else{
+                // player is on the left side of the board, put the stack on the left and bet to the right
+                int x = (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - 30 - stringWidth;
+                int y = (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2);
+                g.drawString(stack + "",
+                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - 30 - stringWidth,
+                        (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
+            }
         }
     }
 
@@ -83,7 +101,8 @@ public class TableComponent extends JPanel {
 
         double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
                 Math.sqrt(
-                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) + (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
+                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) +
+                         (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
                 );
 
         radius += CARD_RADIUS_INCREASE;
@@ -96,8 +115,12 @@ public class TableComponent extends JPanel {
 
     public void drawPlayerCards(Graphics g) {
         for (int player = 0; player < numPlayers; player++) {
+            if(players[player].getHand()[0] == null){
+                // this player has no cards. Draw nothing.
+                continue;
+            }
             for (int cardNum = 0; cardNum < 2; cardNum++) {
-                Point p = getPlayerPosition(player);
+                Point p = playerPositions[player];
 
                 // grab the center of this panel
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
@@ -108,14 +131,20 @@ public class TableComponent extends JPanel {
                         (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
                         CARD_WIDTH, CARD_HEIGHT);
 
-                Point cardLoc;
+                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                cardLoc.y -= (CARD_HEIGHT / 2);
 
-                if(cardNum == 0){
+                if(cardNum == 0 && p.x > 0){
                     cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
                     cardLoc.x -= 15;
-                    cardLoc.y -= 10;
-                }else{
+                    cardLoc.y -= 5;
+                }else if (cardNum == 1 && p.x < 0){
                     cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.x -= 15;
+                }else if (cardNum == 0 && p.x < 0){
+                    cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.x -= CARD_WIDTH;
+                    cardLoc.y -= 5;
                 }
 
                 g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
@@ -156,14 +185,6 @@ public class TableComponent extends JPanel {
         tableCards = cards;
 
         repaint();
-    }
-
-    public void setPot(int pot){
-        this.pot = pot;
-    }
-
-    public void setStack(int playerNum, int stack){
-
     }
 
     public void updatePlayers(Player[] players){
