@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class Player {
     private int playerNum;
+    private int moneyInPot;
     private int stack;
     private Deck deck;
 
@@ -25,6 +26,8 @@ public class Player {
         this.deck = deck;
     }
 
+    //create a method that will return player's current money in pot
+
     public Player(int playerNum, Deck deck, int stack) {
         hand = new Card[2];
         possCards = new Card[7];
@@ -38,6 +41,10 @@ public class Player {
         stack -= betSize;
         Main.addToPot(betSize);
         bets[playerNum] = betSize;
+    }
+
+    public int getMoneyInPot() {
+        return moneyInPot;
     }
 
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
@@ -54,6 +61,7 @@ public class Player {
         Main.addToPot(raiseSize - bets[playerNum]);
 
         bets[playerNum] = raiseSize;
+        moneyInPot = raiseSize;
         playerHasActed[playerNum] = true;
 
         System.out.println("Player " + playerNum + " raises to " + raiseSize);
@@ -72,6 +80,8 @@ public class Player {
         Main.addToPot(callSize);
 
         bets[playerNum] = highestBet;
+        moneyInPot = highestBet;
+
         playerHasActed[playerNum] = true;
 
         stack -= callSize;
@@ -81,6 +91,7 @@ public class Player {
 
     public void fold(int[] bets, boolean[] playersInHand) {
         bets[playerNum] = 0;
+        moneyInPot = 0;
         playersInHand[playerNum] = false;
         //Arrays.fill(hand, null);
         System.out.println("Player " + playerNum + " folds");

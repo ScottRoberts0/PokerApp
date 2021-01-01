@@ -106,6 +106,8 @@ public class Main {
             }
         }
         Game.printPlayers(players, bets, playersInHand);
+
+        gameTable.updateButtons(players, bets, 0);
     }
 
     public static void foldButtonAction() {
@@ -121,6 +123,8 @@ public class Main {
             }
         }
         Game.printPlayers(players, bets, playersInHand);
+
+        gameTable.updateButtons(players, bets, 0);
     }
 
     public static void raiseButtonAction() {
@@ -135,6 +139,8 @@ public class Main {
             }
         }
         Game.printPlayers(players, bets, playersInHand);
+
+        gameTable.updateButtons(players, bets, 50);
     }
 
     public static void checkButtonAction() {
@@ -148,6 +154,8 @@ public class Main {
                 Game.updateCurrentAction(players, playersInHand);
             }
         }
+
+        gameTable.updateButtons(players, bets, 0);
     }
 
     public static void resetButtonAction(){
