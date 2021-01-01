@@ -25,7 +25,6 @@ public class Main {
 
     public static void main(String argsp[]){
         if(argsp.length > 0) {
-            gameTable = new Table(5);
             deck = new Deck();
             board = new Card[5];
             players = Game.createPlayers(5, deck, 25000);
@@ -148,9 +147,6 @@ public class Main {
         Game.pickRandomDealer(players);
 
         Game.dealHands(players);
-        for(int i = 0; i < players.length; i++) {
-            gameTable.setPlayerCard(players[i]);
-        }
 
         Game.setStartingActionIndex(players, playersInHand, 0, bets, sb, bb);
 
@@ -159,5 +155,7 @@ public class Main {
         }
 
         gameState = GAMESTATE_WAIT_ACTION;
+
+        gameTable = new Table(players);
     }
 }

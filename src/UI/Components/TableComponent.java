@@ -84,7 +84,7 @@ public class TableComponent extends JPanel {
         double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
                 Math.sqrt(
                         (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) + (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
-                );d
+                );
 
         radius += CARD_RADIUS_INCREASE;
 
