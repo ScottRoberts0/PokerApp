@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import Logic.Card;
+import Logic.Game;
 import Logic.Player;
 import UI.Components.TableComponent;
 
@@ -110,8 +111,11 @@ public class Table implements ActionListener {
         this.players = players;
     }
 
-    public void updateButtons(){
-        
+    public void updateButtons(Player[] players, int[] bets, int betSize){
+        checkButton.setEnabled(Game.checkCallAllowed(bets));
+        foldButton.setEnabled(Game.checkFoldAllowed(bets));
+        callButton.setEnabled(Game.checkCallAllowed(bets));
+        raiseButton.setEnabled(Game.checkRaiseAllowed(players, betSize));
     }
 
     @Override
