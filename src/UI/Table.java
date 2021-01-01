@@ -3,6 +3,8 @@ package UI;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import Logic.Card;
+import Logic.Player;
 import UI.Components.TableComponent;
 
 import java.awt.*;
@@ -99,6 +101,14 @@ public class Table implements ActionListener {
 
     public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
         table.setPlayerCard(playerNum, cardNum, cardValue, cardSuit);
+    }
+
+    public void setPlayerCard(Player player){
+        table.setPlayerCard(player);
+    }
+
+    public void setTableCards(Card[] cards){
+        table.setTableCards(cards);
     }
 
     @Override
