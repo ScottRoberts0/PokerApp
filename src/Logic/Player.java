@@ -42,6 +42,10 @@ public class Player {
         bets[playerNum] = betSize;
     }
 
+    public int getMoneyInPot(int[] bets) {
+        return bets[playerNum];
+    }
+
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
         int highestBet = -1;
         for(int bet : bets) {
