@@ -63,18 +63,18 @@ public class Main {
         Arrays.fill(playerHasActed, false);
         street++;
         if(street == 1) {
-            Game.setStartingActionIndex(players, playersInHand, 1, bets, sb, bb);
+            Game.setStartingActionIndex(players, playersInHand, 1);
             Game.dealFlop(board, deck);
             gameTable.setTableCards(board);
         } else if(street == 2) {
-            Game.setStartingActionIndex(players, playersInHand, 2, bets, sb, bb);
+            Game.setStartingActionIndex(players, playersInHand, 2);
             Game.dealTurn(board, deck);
             gameTable.setTableCards(board);
         } else if(street == 3) {
-            Game.setStartingActionIndex(players, playersInHand, 3, bets, sb, bb);
+            Game.setStartingActionIndex(players, playersInHand, 3);
             Game.dealRiver(board, deck);
             gameTable.setTableCards(board);
-        } else if(street == 4) {
+        } else if(street >= 4) {
             boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
 
             int winnerCount = 0;
@@ -87,16 +87,19 @@ public class Main {
             for(int i = 0; i < winners.length; i++) {
                 if(winners[i]) {
                     players[i].win(pot / winnerCount);
-                    System.out.println("Player " + players[i].getPlayerNum() + " wins " + (pot / winnerCount));
                 }
             }
+
+            endGame();
         }
     }
 
     public static void callAction(){
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].call(bets, playerHasActed);
-            if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            if(Game.checkFolds(players, playersInHand)) {
+                endGame();
+            } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
                 Game.updateCurrentAction(players, playersInHand);
@@ -108,7 +111,10 @@ public class Main {
     public static void foldAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
-            if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            gameTable.updatePlayer(players);
+            if(Game.checkFolds(players, playersInHand)) {
+                endGame();
+            } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
                 Game.updateCurrentAction(players, playersInHand);
@@ -120,7 +126,9 @@ public class Main {
     public static void raiseAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].bet(50, bets, playerHasActed);
-            if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            if(Game.checkFolds(players, playersInHand)) {
+                endGame();
+            } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
                 Game.updateCurrentAction(players, playersInHand);
@@ -132,7 +140,9 @@ public class Main {
     public static void checkAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].check(playerHasActed);
-            if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            if(Game.checkFolds(players, playersInHand)) {
+                endGame();
+            } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
                 Game.updateCurrentAction(players, playersInHand);
@@ -141,21 +151,45 @@ public class Main {
     }
 
     public static void startGame() {
-        Arrays.fill(board, null);
-        Arrays.fill(playersInHand, true);
+            Arrays.fill(board, null);
+            Arrays.fill(playersInHand, true);
 
-        Game.pickRandomDealer(players);
+            Game.pickRandomDealer(players);
 
-        Game.dealHands(players);
+            Game.dealHands(players);
 
-        Game.setStartingActionIndex(players, playersInHand, 0, bets, sb, bb);
+            Game.setStartingActionIndex(players, playersInHand, street);
+            players[Game.getSmallBlindIndex()].postBlind(sb, bets);
+            players[Game.getBigBlindIndex()].postBlind(bb, bets);
 
-        for(int bet : bets) {
-            System.out.println(bet);
+            for (int bet : bets) {
+                System.out.println(bet);
+            }
+
+            gameState = GAMESTATE_WAIT_ACTION;
+
+            gameTable = new Table(players);
+    }
+
+    public static void endGame() {
+        if(Game.checkFolds(players, playersInHand)) {
+            for (int i = 0; i < playersInHand.length; i++) {
+                if (playersInHand[i]) {
+                    players[i].win(pot);
+                    break;
+                }
+            }
         }
 
-        gameState = GAMESTATE_WAIT_ACTION;
-
-        gameTable = new Table(players);
+        //reset the game state for the next hand
+        pot = 0;
+        street = 0;
+        deck.shuffle();
+        Arrays.fill(playerHasActed, false);
+        Arrays.fill(playersInHand, true);
+        Arrays.fill(board, null);
+        Arrays.fill(bets, 0);
+        Game.nextDealer(players);
+        Game.setStartingActionIndex(players, playersInHand, street);
     }
 }

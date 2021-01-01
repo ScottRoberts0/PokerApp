@@ -302,14 +302,15 @@ public class Game {
 
     public static boolean checkBettingRoundCompleted(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         //check if all but one has folded
+        if(checkFolds(players, playersInHand)) {
+            return true;
+        }
+
         int foldCount = 0;
         for(boolean player : playersInHand) {
             if(!player) {
                 foldCount++;
             }
-        }
-        if(foldCount == players.length - 1) {
-            return true;
         }
 
         //check that all players left in the hand match the highest bet
@@ -339,9 +340,73 @@ public class Game {
         return false;
     }
 
+    public static boolean checkFolds(Player[] players, boolean[] playersInHand) {
+        //check if all but one has folded
+        int foldCount = 0;
+        for(boolean player : playersInHand) {
+            if(!player) {
+                foldCount++;
+            }
+        }
+        if(foldCount == players.length - 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public static int getSmallBlindIndex() {
+        return smallBlindIndex;
+    }
+
+    public static int getBigBlindIndex() {
+        return bigBlindIndex;
+    }
+
+    public static boolean checkCheckAllowed(int[] bets) {
+        if(bets[currentActionIndex] < getHighestBet(bets)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean checkRaiseAllowed(Player[] players, int betSize) {
+        if(players[currentActionIndex].getStack() - betSize < 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean checkCallAllowed(int[] bets) {
+        if(bets[currentActionIndex] == getHighestBet(bets)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean checkFoldAllowed(int[] bets) {
+        if(bets[currentActionIndex] == getHighestBet(bets)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static int getHighestBet(int[] bets) {
+        int highestBet = -1;
+        for(int bet : bets) {
+            if (bet > highestBet) {
+                highestBet = bet;
+            }
+        }
+        return highestBet;
+    }
 
 
-    public static void setStartingActionIndex(Player[] players, boolean[] playersInHand, int street, int[] bets, int sb, int bb) {
+
+    public static void setStartingActionIndex(Player[] players, boolean[] playersInHand, int street) {
         if(street == 0) {
             currentActionIndex = bigBlindIndex + 1;
             if(currentActionIndex > players.length - 1) {
@@ -356,11 +421,6 @@ public class Game {
             if(currentActionIndex > players.length - 1) {
                 currentActionIndex = 0;
             }
-        }
-
-        if(street == 0) {
-            players[smallBlindIndex].postBlind(sb, bets);
-            players[bigBlindIndex].postBlind(bb, bets);
         }
     }
 
