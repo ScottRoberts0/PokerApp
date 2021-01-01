@@ -82,6 +82,7 @@ public class Player {
     public void fold(int[] bets, boolean[] playersInHand) {
         bets[playerNum] = 0;
         playersInHand[playerNum] = false;
+        //Arrays.fill(hand, null);
         System.out.println("Player " + playerNum + " folds");
     }
 
