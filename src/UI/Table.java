@@ -22,12 +22,14 @@ public class Table implements ActionListener {
     private JPanel mainPanel;
     private TableComponent table;
     private JButton checkButton, callButton, foldButton, raiseButton;
+    private Player[] players;
 
     // misc vars
     private int numPlayers;
 
-    public Table(int numPlayers) {
-        this.numPlayers = numPlayers;
+    public Table(Player[] players) {
+        this.players = players;
+        numPlayers = players.length;
 
         createWindow();
 
@@ -43,7 +45,7 @@ public class Table implements ActionListener {
         Point p;
 
         // create the table
-        table = new TableComponent(this.numPlayers);
+        table = new TableComponent(players);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = 5;
@@ -58,6 +60,7 @@ public class Table implements ActionListener {
 
     private void drawButtons(){
         JPanel buttonPanel = new JPanel(new GridBagLayout());
+
         foldButton = new JButton("Fold");
         foldButton.setActionCommand("Fold");
         foldButton.addActionListener(this);
@@ -99,16 +102,12 @@ public class Table implements ActionListener {
         mainFrame.add(mainPanel);
     }
 
-    public void setPlayerCard(int playerNum, int cardNum, int cardValue, int cardSuit){
-        table.setPlayerCard(playerNum, cardNum, cardValue, cardSuit);
-    }
-
-    public void setPlayerCard(Player player){
-        table.setPlayerCard(player);
-    }
-
     public void setTableCards(Card[] cards){
         table.setTableCards(cards);
+    }
+
+    public void updatePlayer(Player[] players){
+        this.players = players;
     }
 
     @Override

@@ -95,8 +95,6 @@ public class Player {
         System.out.println("Player " + playerNum + " wins " + potSize + "!");
     }
 
-
-
     public Card[] getHand() {
         return Arrays.copyOf(hand, hand.length);
     }
@@ -184,7 +182,6 @@ public class Player {
         System.out.println();
     }
 
-
     public int getPlayerNum() {
         return playerNum;
     }
@@ -194,6 +191,6 @@ public class Player {
     }
 
     public String toString() {
-        return "Player " + getPlayerNum() + " stack: " + getStack();
+        return "Player " + getPlayerNum() + " stack: " + getStack() + " cards: " + hand[0].toString() + ", " + hand[1].toString();
     }
 }
