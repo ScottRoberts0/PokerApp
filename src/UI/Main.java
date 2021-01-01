@@ -146,12 +146,10 @@ public class Main {
         Arrays.fill(playersInHand, true);
 
         Game.pickRandomDealer(players);
-
         Game.dealHands(players);
         for(int i = 0; i < players.length; i++) {
             gameTable.setPlayerCard(players[i]);
         }
-
         Game.setStartingActionIndex(players, playersInHand, 0, bets, sb, bb);
 
         for(int bet : bets) {
