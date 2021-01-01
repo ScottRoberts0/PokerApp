@@ -1,4 +1,6 @@
 package Logic;
+import UI.Main;
+
 import java.util.Arrays;
 
 public class Player {
@@ -34,15 +36,27 @@ public class Player {
 
     public void postBlind(int betSize, int[] bets) {
         stack -= betSize;
-        Game.addToPot(betSize);
-        bets[playerNum - 1] = betSize;
+        Main.addToPot(betSize);
+        bets[playerNum] = betSize;
     }
 
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
-        stack -= betSize;
-        Game.addToPot(betSize);
-        bets[playerNum - 1] = betSize;
-        playerHasActed[playerNum - 1] = true;
+        int highestBet = -1;
+        for(int bet : bets) {
+            if(bet > highestBet) {
+                highestBet = bet;
+            }
+        }
+
+        int raiseSize = highestBet + betSize;
+        stack -= raiseSize - bets[playerNum];
+
+        Main.addToPot(raiseSize - bets[playerNum]);
+
+        bets[playerNum] = raiseSize;
+        playerHasActed[playerNum] = true;
+
+        System.out.println("Player " + playerNum + " raises to " + raiseSize);
     }
 
     public void call(int[] bets, boolean[] playerHasActed) {
@@ -53,26 +67,26 @@ public class Player {
             }
         }
 
-        int callSize = highestBet - bets[playerNum - 1];
-        Game.addToPot(callSize);
 
-        bets[playerNum - 1] = highestBet;
-        playerHasActed[playerNum - 1] = true;
+        int callSize = highestBet - bets[playerNum];
+        Main.addToPot(callSize);
+
+        bets[playerNum] = highestBet;
+        playerHasActed[playerNum] = true;
 
         stack -= callSize;
 
         System.out.println("Player " + playerNum + " calls " + callSize);
     }
 
-    public void fold(int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        bets[playerNum - 1] = 0;
-        playersInHand[playerNum - 1] = false;
-        //playerHasActed[playerNum - 1] = true;
+    public void fold(int[] bets, boolean[] playersInHand) {
+        bets[playerNum] = 0;
+        playersInHand[playerNum] = false;
         System.out.println("Player " + playerNum + " folds");
     }
 
     public void check(boolean[] playerHasActed) {
-        playerHasActed[playerNum - 1] = true;
+        playerHasActed[playerNum] = true;
         System.out.println("Player " + playerNum + " checks");
     }
 

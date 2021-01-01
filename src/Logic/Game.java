@@ -1,5 +1,7 @@
 package Logic;
 
+import UI.Main;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -16,7 +18,7 @@ public class Game {
      * @param numLoops   Number of games to test over
      * @param numPlayers Number of players to test
      */
-    public static void testHands(int numLoops, int numPlayers) {
+    public static void testHands(int numLoops, int numPlayers, boolean[] playersInHand) {
         int a = 1;
 
         Deck deck = new Deck();
@@ -44,7 +46,7 @@ public class Game {
                 player.printMadeHand();
             }
 
-            boolean[] winners = Evaluator.findWinner(players, board);
+            boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
             int winnerCount = 0;
 
             for (boolean winner : winners) {
@@ -85,7 +87,7 @@ public class Game {
      * @param ties       The number of ties you want to test. Eg. if you have 3 players and you want to look at cases where all three players
      *                   have the same hand, you will call testHands(handToTest, numLoops, 3, 3);
      */
-    public static void testHands(String handToTest, int numLoops, int numPlayers, int ties) {
+    public static void testHands(String handToTest, int numLoops, int numPlayers, int ties, boolean[] playersInHand) {
         int a = 1;
 
         if (ties > numPlayers) {
@@ -131,7 +133,7 @@ public class Game {
                     player.printMadeHand();
                 }
 
-                boolean[] winners = Evaluator.findWinner(players, board);
+                boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
                 int winnerCount = 0;
 
                 for (boolean winner : winners) {
@@ -192,7 +194,7 @@ public class Game {
         }
     }
 
-    private static void nextDealer(Player[] players) {
+    public static void nextDealer(Player[] players) {
         dealerIndex++;
         if(dealerIndex > players.length - 1) {
             dealerIndex = 0;
@@ -229,12 +231,12 @@ public class Game {
         nextDealer(players);
     }
 
-    private static void preFlop(Player[] players, int [] bets, boolean[] playersInHand, boolean[] playerHasActed, int sb, int bb) {
+    public static void preFlop(Player[] players, int [] bets, boolean[] playersInHand, boolean[] playerHasActed, int sb, int bb) {
         System.out.println(">>>>>>>>>>>>>> PREFLOP <<<<<<<<<<<<<");
         dealHands(players);
         printHands(players, playersInHand);
 
-        setStartingActionIndex(players, playersInHand, 0);
+        //setStartingActionIndex(players, playersInHand, 0);
 
         players[smallBlindIndex].postBlind(sb, bets);
         players[bigBlindIndex].postBlind(bb, bets);
@@ -244,7 +246,7 @@ public class Game {
         bettingRound(players, bets, playersInHand, playerHasActed);
     }
 
-    private static void flop(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
+    public static void flop(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         Arrays.fill(bets, 0);
         Arrays.fill(playerHasActed, false);
 
@@ -252,14 +254,14 @@ public class Game {
         dealFlop(board, deck);
         printBoard(board);
 
-        setStartingActionIndex(players, playersInHand, 1);
+        //setStartingActionIndex(players, playersInHand, 1);
 
         printPlayers(players, bets, playersInHand);
 
         bettingRound(players, bets, playersInHand, playerHasActed);
     }
 
-    private static void turn(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
+    public static void turn(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         Arrays.fill(bets, 0);
         Arrays.fill(playerHasActed, false);
 
@@ -267,14 +269,14 @@ public class Game {
         dealTurn(board, deck);
         printBoard(board);
 
-        setStartingActionIndex(players, playersInHand, 2);
+        //setStartingActionIndex(players, playersInHand, 2);
 
         printPlayers(players, bets, playersInHand);
 
         bettingRound(players, bets, playersInHand, playerHasActed);
     }
 
-    private static void river(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
+    public static void river(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         Arrays.fill(bets, 0);
         Arrays.fill(playerHasActed, false);
 
@@ -282,14 +284,14 @@ public class Game {
         dealRiver(board, deck);
         printBoard(board);
 
-        setStartingActionIndex(players, playersInHand, 3);
+        //setStartingActionIndex(players, playersInHand, 3);
 
         printPlayers(players, bets, playersInHand);
 
         bettingRound(players, bets, playersInHand, playerHasActed);
     }
 
-    private static void bettingRound(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
+    public static void bettingRound(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         while (!checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
             playerAction(players, bets, playersInHand, playerHasActed);
             printHands(players, playersInHand);
@@ -298,7 +300,7 @@ public class Game {
         }
     }
 
-    private static boolean checkBettingRoundCompleted(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
+    public static boolean checkBettingRoundCompleted(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         //check if all but one has folded
         int foldCount = 0;
         for(boolean player : playersInHand) {
@@ -339,7 +341,7 @@ public class Game {
 
 
 
-    private static void setStartingActionIndex(Player[] players, boolean[] playersInHand, int street) {
+    public static void setStartingActionIndex(Player[] players, boolean[] playersInHand, int street, int[] bets, int sb, int bb) {
         if(street == 0) {
             currentActionIndex = bigBlindIndex + 1;
             if(currentActionIndex > players.length - 1) {
@@ -355,9 +357,14 @@ public class Game {
                 currentActionIndex = 0;
             }
         }
+
+        if(street == 0) {
+            players[smallBlindIndex].postBlind(sb, bets);
+            players[bigBlindIndex].postBlind(bb, bets);
+        }
     }
 
-    private static void updateCurrentAction(Player[] players, boolean[] playersInHand) {
+    public static void updateCurrentAction(Player[] players, boolean[] playersInHand) {
         currentActionIndex++;
         if(currentActionIndex > players.length - 1) {
             currentActionIndex = 0;
@@ -369,6 +376,10 @@ public class Game {
                 currentActionIndex = 0;
             }
         }
+    }
+
+    public static int getCurrentActionIndex() {
+        return currentActionIndex;
     }
 
     public static void addToPot(int betSize) {
@@ -389,11 +400,11 @@ public class Game {
         } else if(action == 'x') {
             players[currentActionIndex].check(playerHasActed);
         } else {
-            players[currentActionIndex].fold(bets, playersInHand, playerHasActed);
+            players[currentActionIndex].fold(bets, playersInHand);
         }
     }
 
-    private static void printPlayers(Player[] players, int[] bets, boolean[] playersInHand) {
+    public static void printPlayers(Player[] players, int[] bets, boolean[] playersInHand) {
         for(int i = 0; i < players.length; i++) {
             String info = "";
 
@@ -411,11 +422,11 @@ public class Game {
                     + players[i].getStack() + " " + info);
         }
         System.out.println();
-        System.out.println("POT: " + pot);
+        System.out.println("POT: " + Main.getPot());
         System.out.println();
     }
 
-    private static void printHands(Player[] players, boolean[] playersInHand) {
+    public static void printHands(Player[] players, boolean[] playersInHand) {
         for(int i = 0; i < players.length; i++) {
             if(playersInHand[i]) {
                 players[i].printHand();

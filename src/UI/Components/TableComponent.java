@@ -83,7 +83,7 @@ public class TableComponent extends JPanel {
 
         radius += CARD_RADIUS_INCREASE;
 
-        double x = (Math.sin(angle) * radius) - CARD_X_BUFFER;
+        double x = ((Math.sin(angle) * radius) - CARD_X_BUFFER) * -1;
         double y = (Math.cos(angle) * radius) - CARD_Y_BUFFER;
 
         return new Point((int) x, (int) y);

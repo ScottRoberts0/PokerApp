@@ -5,14 +5,18 @@ import static java.util.Arrays.fill;
 
 public class Evaluator {
 
-    public static boolean[] findWinner(Player[] players, Card[] board) {
+    public static boolean[] findWinner(Player[] players, Card[] board, boolean[] playersInHand) {
         for (Player player : players) {
             player.makeMadeHand(board);
         }
 
         int[] handValues = new int[players.length];
         for (int i = 0; i < handValues.length; i++) {
-            handValues[i] = players[i].getMadeHandValue();
+            if(playersInHand[i]) {
+                handValues[i] = players[i].getMadeHandValue();
+            } else {
+                handValues[i] = -1;
+            }
         }
 
         //TESTING READOUT:
