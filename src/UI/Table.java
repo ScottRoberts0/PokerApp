@@ -22,7 +22,7 @@ public class Table implements ActionListener {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private TableComponent table;
-    private JButton checkButton, callButton, foldButton, raiseButton;
+    private JButton checkButton, callButton, foldButton, raiseButton, resetButton;
     private Player[] players;
 
     // misc vars
@@ -78,11 +78,16 @@ public class Table implements ActionListener {
         callButton.setActionCommand("Call");
         callButton.addActionListener(this);
 
+        resetButton = new JButton("Reset");
+        resetButton.setActionCommand("Reset");
+        resetButton.addActionListener(this);
+
 
         buttonPanel.add(foldButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(raiseButton);
         buttonPanel.add(callButton);
+        buttonPanel.add(resetButton);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 1;
@@ -112,22 +117,26 @@ public class Table implements ActionListener {
     }
 
     public void updateButtons(Player[] players, int[] bets, int betSize){
-        checkButton.setEnabled(Game.checkCallAllowed(bets));
+        checkButton.setEnabled(Game.checkCheckAllowed(bets));
         foldButton.setEnabled(Game.checkFoldAllowed(bets));
         callButton.setEnabled(Game.checkCallAllowed(bets));
         raiseButton.setEnabled(Game.checkRaiseAllowed(players, betSize));
+
+        table.repaint();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Fold")){
-            Main.foldAction();
+            Main.foldButtonAction();
         }else if(e.getActionCommand().equals("Check")){
-            Main.checkAction();
+            Main.checkButtonAction();
         }else if(e.getActionCommand().equals("Raise")){
-            Main.raiseAction();
+            Main.raiseButtonAction();
         }else if(e.getActionCommand().equals("Call")){
-            Main.callAction();
+            Main.callButtonAction();
+        }else if(e.getActionCommand().equals("Reset")){
+            Main.resetButtonAction();
         }
     }
 }
