@@ -23,6 +23,8 @@ public class Main {
     private static int sb;
     private static int bb;
 
+    //TODO: implement resetting the game
+
     public static void main(String argsp[]){
         if(argsp.length > 0) {
             deck = new Deck();

@@ -26,8 +26,6 @@ public class Player {
         this.deck = deck;
     }
 
-    //create a method that will return player's current money in pot
-
     public Player(int playerNum, Deck deck, int stack) {
         hand = new Card[2];
         possCards = new Card[7];
