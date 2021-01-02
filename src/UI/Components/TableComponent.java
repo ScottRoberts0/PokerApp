@@ -69,23 +69,32 @@ public class TableComponent extends JPanel {
         // draw player stacks and bets
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
+            int bet = 0;
             // grab the string width
-            int stringWidth = g.getFontMetrics().stringWidth(stack + "");
+            int stackStringWidth = g.getFontMetrics().stringWidth(stack + "");
+            int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
             int stringHeight = g.getFont().getSize();
 
-            // draw player stack on outside
+            // TODO: Stack above/below cards. Put bets on the table using the radius maths.
+            // draw player stack and bet on outside
             if(playerPositions[i].x > 0){
-                // player is on the left side of the board, put the stack on the left and bet to the right
+                // player is on the right side of the board, put the stack on the right and bet to the left
                 g.drawString(stack + "",
-                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH + 30,
+                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
                         (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
+
+                g.drawString(bet + "",
+                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - betStringWidth,
+                        (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
             }else{
                 // player is on the left side of the board, put the stack on the left and bet to the right
-                int x = (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - 30 - stringWidth;
-                int y = (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2);
                 g.drawString(stack + "",
-                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - 30 - stringWidth,
+                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - stackStringWidth,
                         (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
+
+                g.drawString(bet + "",
+                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
+                        (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
             }
         }
     }

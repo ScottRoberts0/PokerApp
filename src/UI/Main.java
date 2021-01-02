@@ -96,7 +96,7 @@ public class Main {
         }
     }
 
-    public static void callAction(){
+    public static void callButtonAction(){
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].call(bets, playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
@@ -112,7 +112,7 @@ public class Main {
         gameTable.updateButtons(players, bets, 0);
     }
 
-    public static void foldAction() {
+    public static void foldButtonAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
             gameTable.updatePlayer(players);
@@ -129,7 +129,7 @@ public class Main {
         gameTable.updateButtons(players, bets, 0);
     }
 
-    public static void raiseAction() {
+    public static void raiseButtonAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].bet(50, bets, playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
@@ -145,7 +145,7 @@ public class Main {
         gameTable.updateButtons(players, bets, 50);
     }
 
-    public static void checkAction() {
+    public static void checkButtonAction() {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].check(playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
@@ -158,6 +158,11 @@ public class Main {
         }
 
         gameTable.updateButtons(players, bets, 0);
+    }
+
+    public static void resetButtonAction(){
+        //TODO: Reset, motherfucker.
+        System.out.println("Reset Pressed");
     }
 
     public static void startGame() {
