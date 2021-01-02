@@ -1,0 +1,9 @@
+[ ] dealer button
+[ ] highlight the player who has current action
+[ ] display player bets on table
+[x] update buttons so that checking isn't allowed by first player preflop
+[x] automate next hand
+[ ] side pots
+    - big job
+[ ] display player number / name
+    [x] create overloaded constructor for player class wherein we can give a player a string name

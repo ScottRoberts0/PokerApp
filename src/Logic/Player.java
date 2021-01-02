@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class Player {
     private int playerNum;
+    private String playerName;
     private int moneyInPot;
     private int stack;
     private Deck deck;
@@ -33,6 +34,17 @@ public class Player {
         this.playerNum = playerNum;
         this.deck = deck;
         this.stack = stack;
+        this.playerName = "Player " + playerNum;
+    }
+
+    public Player(int playerNum, Deck deck, int stack, String playerName) {
+        hand = new Card[2];
+        possCards = new Card[7];
+        madeHand = new Card[5];
+        this.playerNum = playerNum;
+        this.deck = deck;
+        this.stack = stack;
+        this.playerName = playerName;
     }
 
     public void postBlind(int betSize, int[] bets) {
@@ -193,6 +205,10 @@ public class Player {
 
     public int getStack() {
         return stack;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 
     public String toString() {

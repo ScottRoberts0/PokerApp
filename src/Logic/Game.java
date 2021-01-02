@@ -479,7 +479,7 @@ public class Game {
                 info = " >> BB";
             }
 
-            System.out.println(playersInHand[i] + " " + bets[i] + " PLAYER " + players[i].getPlayerNum() + " STACK: "
+            System.out.println(playersInHand[i] + " " + bets[i] + " " + players[i].getPlayerName() + " STACK: "
                     + players[i].getStack() + " " + info);
         }
         System.out.println();
