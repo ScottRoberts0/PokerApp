@@ -120,8 +120,12 @@ public class Table implements ActionListener {
         checkButton.setEnabled(Game.checkCheckAllowed(bets));
         foldButton.setEnabled(Game.checkFoldAllowed(bets));
         callButton.setEnabled(Game.checkCallAllowed(bets));
-        raiseButton.setEnabled(Game.checkRaiseAllowed(players, betSize));
+        raiseButton.setEnabled(Game.checkRaiseAllowed(players, bets, betSize));
 
+        table.repaint();
+    }
+
+    public void updateTable(){
         table.repaint();
     }
 

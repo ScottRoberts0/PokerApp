@@ -46,14 +46,10 @@ public class Player {
     }
 
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
-        int highestBet = -1;
-        for(int bet : bets) {
-            if(bet > highestBet) {
-                highestBet = bet;
-            }
-        }
+        int highestBet = Game.getHighestBet(bets);
 
         int raiseSize = highestBet + betSize;
+
         stack -= raiseSize - bets[playerNum];
 
         Main.addToPot(raiseSize - bets[playerNum]);
@@ -66,15 +62,14 @@ public class Player {
     }
 
     public void call(int[] bets, boolean[] playerHasActed) {
-        int highestBet = -1;
-        for(int bet : bets) {
-            if(bet > highestBet) {
-                highestBet = bet;
-            }
+        int highestBet = Game.getHighestBet(bets);
+        
+        int callSize = highestBet - bets[playerNum];
+
+        if(stack - callSize < 0) {
+            callSize = stack;
         }
 
-
-        int callSize = highestBet - bets[playerNum];
         Main.addToPot(callSize);
 
         bets[playerNum] = highestBet;

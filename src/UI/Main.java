@@ -18,6 +18,7 @@ public class Main {
     private static boolean[] playerHasActed;
     private static boolean[] playersInHand;
     private static int pot;
+    private static int limitRaiseSize;
 
     private static int gameState;
     private static int sb;
@@ -37,6 +38,7 @@ public class Main {
             sb = 25;
             bb = 50;
             pot = 0;
+            limitRaiseSize = 500;
 
             startGame();
         } else {
@@ -92,7 +94,7 @@ public class Main {
                 }
             }
 
-            endGame();
+            endHand();
         }
     }
 
@@ -100,7 +102,7 @@ public class Main {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].call(bets, playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
-                endGame();
+                endHand();
             } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
@@ -117,7 +119,7 @@ public class Main {
             players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
             gameTable.updatePlayer(players);
             if(Game.checkFolds(players, playersInHand)) {
-                endGame();
+                endHand();
             } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
@@ -130,10 +132,11 @@ public class Main {
     }
 
     public static void raiseButtonAction() {
+        gameTable.updateButtons(players, bets, 0);
         if(gameState == GAMESTATE_WAIT_ACTION) {
-            players[Game.getCurrentActionIndex()].bet(50, bets, playerHasActed);
+            players[Game.getCurrentActionIndex()].bet(limitRaiseSize, bets, playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
-                endGame();
+                endHand();
             } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
@@ -149,7 +152,7 @@ public class Main {
         if(gameState == GAMESTATE_WAIT_ACTION) {
             players[Game.getCurrentActionIndex()].check(playerHasActed);
             if(Game.checkFolds(players, playersInHand)) {
-                endGame();
+                endHand();
             } else if(Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
                 nextStreet();
             } else {
@@ -157,12 +160,28 @@ public class Main {
             }
         }
 
+        Game.printPlayers(players, bets, playersInHand);
+
         gameTable.updateButtons(players, bets, 0);
     }
 
     public static void resetButtonAction(){
-        //TODO: Reset, motherfucker.
+        pot = 0;
+        street = 0;
+        deck.shuffle();
+        Arrays.fill(playerHasActed, false);
+        Arrays.fill(playersInHand, true);
+        Arrays.fill(board, null);
+        Arrays.fill(bets, 0);
+        Game.nextDealer(players);
+        Game.setStartingActionIndex(players, playersInHand, street);
+        Game.dealHands(players);
         System.out.println("Reset Pressed");
+        players[Game.getSmallBlindIndex()].postBlind(sb, bets);
+        players[Game.getBigBlindIndex()].postBlind(bb, bets);
+        gameTable.updateButtons(players, bets, 0);
+        gameTable.updateTable();
+        Game.printPlayers(players, bets, playersInHand);
     }
 
     public static void startGame() {
@@ -186,7 +205,7 @@ public class Main {
             gameTable = new Table(players);
     }
 
-    public static void endGame() {
+    public static void endHand() {
         if(Game.checkFolds(players, playersInHand)) {
             for (int i = 0; i < playersInHand.length; i++) {
                 if (playersInHand[i]) {
