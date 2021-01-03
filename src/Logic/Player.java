@@ -4,11 +4,11 @@ import UI.Main;
 import java.util.Arrays;
 
 public class Player {
-    private int playerNum;
+    private final int playerNum;
     private String playerName;
     private int moneyInPot;
     private int stack;
-    private Deck deck;
+    private final Deck deck;
 
     private Card[] hand;
     private Card[] possCards;
@@ -47,19 +47,19 @@ public class Player {
         this.playerName = playerName;
     }
 
+    public void resetMoneyInPot() {
+        moneyInPot = 0;
+    }
+
     public void postBlind(int betSize, int[] bets) {
         stack -= betSize;
         Main.addToPot(betSize);
         bets[playerNum] = betSize;
-    }
-
-    public int getMoneyInPot() {
-        return moneyInPot;
+        moneyInPot = betSize;
     }
 
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
         int highestBet = Game.getHighestBet(bets);
-
         int raiseSize = highestBet + betSize;
 
         stack -= raiseSize - bets[playerNum];
@@ -70,7 +70,8 @@ public class Player {
         moneyInPot = raiseSize;
         playerHasActed[playerNum] = true;
 
-        System.out.println("Player " + playerNum + " raises to " + raiseSize);
+        System.out.println(playerName + " raises to " + raiseSize);
+        System.out.println();
     }
 
     public void call(int[] bets, boolean[] playerHasActed) {
@@ -91,7 +92,8 @@ public class Player {
 
         stack -= callSize;
 
-        System.out.println("Player " + playerNum + " calls " + callSize);
+        System.out.println(playerName + " calls " + callSize);
+        System.out.println();
     }
 
     public void fold(int[] bets, boolean[] playersInHand) {
@@ -99,17 +101,20 @@ public class Player {
         moneyInPot = 0;
         playersInHand[playerNum] = false;
         //Arrays.fill(hand, null);
-        System.out.println("Player " + playerNum + " folds");
+        System.out.println(playerName + " folds");
+        System.out.println();
     }
 
     public void check(boolean[] playerHasActed) {
         playerHasActed[playerNum] = true;
-        System.out.println("Player " + playerNum + " checks");
+        System.out.println(playerName + " checks");
+        System.out.println();
     }
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println("Player " + playerNum + " wins " + potSize + "!");
+        System.out.println(playerName + " wins " + potSize + "!");
+        System.out.println();
     }
 
     public Card[] getHand() {
@@ -125,7 +130,7 @@ public class Player {
     }
 
     public void printMadeHand() {
-        System.out.println("Player " + playerNum + " made hand: " + getMadeHandName());
+        System.out.println(playerName + " made hand: " + getMadeHandName());
         for (int i = 0; i < madeHand.length; i++) {
             System.out.println(madeHand[i]);
         }
@@ -171,7 +176,7 @@ public class Player {
     }
 
     public void printPossCards() {
-        System.out.println("Player " + playerNum + " possible cards:");
+        System.out.println(playerName + " possible cards:");
         for (int i = 0; i < possCards.length; i++) {
             if (possCards[i] != null) {
                 System.out.println(possCards[i]);
@@ -192,7 +197,7 @@ public class Player {
     }
 
     public void printHand() {
-        System.out.println("Player " + playerNum + " hand:");
+        System.out.println(playerName + " hand:");
         for (int i = 0; i < hand.length; i++) {
             System.out.println(hand[i]);
         }
@@ -209,6 +214,10 @@ public class Player {
 
     public String getPlayerName() {
         return playerName;
+    }
+
+    public int getMoneyInPot() {
+        return moneyInPot;
     }
 
     public String toString() {

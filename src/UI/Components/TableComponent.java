@@ -1,6 +1,7 @@
 package UI.Components;
 
 import Logic.Card;
+import Logic.Game;
 import Logic.Player;
 import UI.GraphicalHelpers;
 
@@ -69,7 +70,8 @@ public class TableComponent extends JPanel {
         // draw player stacks and bets
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
-            int bet = 0;
+            int bet = players[i].getMoneyInPot();
+            String name = players[i].getPlayerName();
             // grab the string width
             int stackStringWidth = g.getFontMetrics().stringWidth(stack + "");
             int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
@@ -86,6 +88,10 @@ public class TableComponent extends JPanel {
                 g.drawString(bet + "",
                         (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - betStringWidth,
                         (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
+
+                g.drawString(name + "",
+                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - betStringWidth,
+                        (this.getHeight() / 2) + playerPositions[i].y + 20);
             }else{
                 // player is on the left side of the board, put the stack on the left and bet to the right
                 g.drawString(stack + "",
@@ -95,6 +101,10 @@ public class TableComponent extends JPanel {
                 g.drawString(bet + "",
                         (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
                         (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
+
+                g.drawString(name + "",
+                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
+                        (this.getHeight() / 2) + playerPositions[i].y + 10);
             }
         }
     }
