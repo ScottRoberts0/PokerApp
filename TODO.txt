@@ -1,12 +1,17 @@
-[ ] dealer button
-[ ] highlight the player who has current action
-[x] display player bets
-    [ ] position player bets
+============= Logic =============
 [x] update buttons so that checking isn't allowed by first player preflop
 [x] automate next hand
 [ ] side pots
     - big job
-[x] display player number / name
-    [x] create overloaded constructor for player class wherein we can give a player a string name
-    [ ] position player name
-[ ] disappear cards when a player folds (or set to display card back?)
+
+
+============= UI =============
+1 [ ] Textbox
+  [x] dealer button
+  [x] highlight the player who has current action
+  [x] display player bets
+      [x] position player bets
+  [ ] display player number / name
+      [ ] create overloaded constructor for player class wherein we can give a player a string name
+      [ ] position player name
+2 [ ] disappear cards when a player folds (or set to display card back?)

@@ -120,7 +120,6 @@ public class TableComponent extends JPanel {
             int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
             int stringHeight = g.getFont().getSize();
 
-            // TODO: Stack above/below cards. Put bets on the table using the radius maths.
             // stack below cards
             g.drawString(stack + "",
                     (this.getWidth() / 2) + playerPositions[i].x,
@@ -181,6 +180,8 @@ public class TableComponent extends JPanel {
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
                 // grab the card image
+                // TODO: Draw card backs instead of card value if the player has folded
+                // TODO: After next git pull, there should be a players[player].getHasFolded() function
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                         (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
                         (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
