@@ -1,12 +1,12 @@
 package Logic;
 
 import UI.Main;
+import UI.Table;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Game {
-    private static int pot;
     private static int dealerIndex;
     private static int smallBlindIndex;
     private static int bigBlindIndex;
@@ -211,8 +211,43 @@ public class Game {
         }
     }
 
+    public static void flop(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        Game.setStartingActionIndex(players, playersInHand, 1);
+        Game.dealFlop(board, deck);
+        gameTable.setTableCards(board);
+    }
 
-    public static void hand(Player[] players, Card[] board, Deck deck, int sb, int bb) {
+    public static void turn(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        Game.setStartingActionIndex(players, playersInHand, 2);
+        Game.dealTurn(board, deck);
+        gameTable.setTableCards(board);
+    }
+
+    public static void river(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        Game.setStartingActionIndex(players, playersInHand, 3);
+        Game.dealRiver(board, deck);
+        gameTable.setTableCards(board);
+    }
+
+    public static void getWinners(Player[] players, Card[] board, boolean[] playersInHand, int pot) {
+        boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
+
+        int winnerCount = 0;
+        for (boolean winner : winners) {
+            if (winner) {
+                winnerCount++;
+            }
+        }
+
+        for (int i = 0; i < winners.length; i++) {
+            if (winners[i]) {
+                players[i].win(pot / winnerCount);
+            }
+        }
+    }
+
+
+    /*public static void hand(Player[] players, Card[] board, Deck deck, int sb, int bb) {
         pot = 0;
         Arrays.fill(board, null);
 
@@ -228,9 +263,9 @@ public class Game {
         turn(players, board, deck, bets, playersInHand, playerHasActed);
         river(players, board, deck, bets, playersInHand, playerHasActed);
         nextDealer(players);
-    }
+    }*/
 
-    public static void preFlop(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed, int sb, int bb) {
+    /*public static void preFlop(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed, int sb, int bb) {
         System.out.println(">>>>>>>>>>>>>> PREFLOP <<<<<<<<<<<<<");
         dealHands(players);
         printHands(players, playersInHand);
@@ -297,7 +332,7 @@ public class Game {
             updateCurrentAction(players, playersInHand);
             printPlayers(players, bets, playersInHand);
         }
-    }
+    }*/
 
     public static boolean checkBettingRoundCompleted(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
         //check if all but one has folded
@@ -406,6 +441,16 @@ public class Game {
         return highestBet;
     }
 
+    public static void resetBets(Player[] players, int[] bets) {
+        for(Player player : players) {
+            player.resetMoneyInPot();
+        }
+
+        for(int i = 0; i < bets.length; i++) {
+            bets[i] = 0;
+        }
+    }
+
 
     public static void setStartingActionIndex(Player[] players, boolean[] playersInHand, int street) {
         if (street == 0) {
@@ -443,26 +488,8 @@ public class Game {
         return currentActionIndex;
     }
 
-    public static void addToPot(int betSize) {
-        pot += betSize;
-    }
-
-    private static void playerAction(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        Scanner input = new Scanner(System.in);
-
-        System.out.print("Player " + players[currentActionIndex].getPlayerNum() + " action: ");
-        char action = input.next().charAt(0);
-
-        if (action == 'b') {
-            System.out.print("Enter bet size: ");
-            players[currentActionIndex].bet(input.nextInt(), bets, playerHasActed);
-        } else if (action == 'c') {
-            players[currentActionIndex].call(bets, playerHasActed);
-        } else if (action == 'x') {
-            players[currentActionIndex].check(playerHasActed);
-        } else {
-            players[currentActionIndex].fold(bets, playersInHand);
-        }
+    public static int getDealerIndex() {
+        return dealerIndex;
     }
 
     public static void printPlayers(Player[] players, int[] bets, boolean[] playersInHand) {
@@ -531,7 +558,7 @@ public class Game {
         board[4] = deck.drawCard(value1, suit1);
     }
 
-    private static void printBoard(Card[] board) {
+    public static void printBoard(Card[] board) {
         System.out.println("Board:");
         for (Card card : board) {
             if (card != null) {

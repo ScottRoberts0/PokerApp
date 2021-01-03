@@ -1,6 +1,9 @@
 package UI;
 
-import Logic.*;
+import Logic.Card;
+import Logic.Deck;
+import Logic.Game;
+import Logic.Player;
 
 import java.util.Arrays;
 
@@ -8,7 +11,6 @@ public class Main {
 
     private static int street;
     private static final int GAMESTATE_WAIT_ACTION = 1;
-    private static final int GAMESTATE_PLAYER_ACTION = 2;
 
     private static Table gameTable;
     private static Deck deck;
@@ -24,42 +26,28 @@ public class Main {
     private static int sb;
     private static int bb;
 
-    //TODO: implement resetting the game
-
     public static void main(String argsp[]) {
-        if (argsp.length > 0) {
-            deck = new Deck();
-            board = new Card[5];
+        deck = new Deck();
+        board = new Card[5];
 
-            //players = Game.createPlayers(5, deck, 25000);
-            players = new Player[5];
-            players[0] = new Player(0, deck, 25000, "Reid");
-            players[1] = new Player(1, deck, 25000, "Tyler");
-            players[2] = new Player(2, deck, 50000);
-            players[3] = new Player(3, deck, 30000);
-            players[4] = new Player(4, deck, 43251, "Dan");
+        //players = Game.createPlayers(5, deck, 25000);
+        players = new Player[5];
+        players[0] = new Player(0, deck, 25000, "Reid");
+        players[1] = new Player(1, deck, 25000, "Tyler");
+        players[2] = new Player(2, deck, 25000);
+        players[3] = new Player(3, deck, 25000);
+        players[4] = new Player(4, deck, 25000, "Dan");
 
-            bets = new int[players.length];
-            playerHasActed = new boolean[players.length];
-            playersInHand = new boolean[players.length];
-            street = 0;
-            sb = 25;
-            bb = 50;
-            pot = 0;
-            limitRaiseSize = 500;
+        bets = new int[players.length];
+        playerHasActed = new boolean[players.length];
+        playersInHand = new boolean[players.length];
+        street = 0;
+        sb = 250;
+        bb = 500;
+        pot = 0;
+        limitRaiseSize = 500;
 
-            startGame();
-        } else {
-            //Logic.Game.testHands("FULL HOUSE", 1000, 3, 2);
-            Deck deck = new Deck();
-            Card[] board = new Card[5];
-            Player[] players = Game.createPlayers(5, deck, 25000);
-
-            Game.pickRandomDealer(players);
-            for (int i = 0; i < 10; i++) {
-                Game.hand(players, board, deck, 25, 50);
-            }
-        }
+        startGame();
     }
 
     public static void addToPot(int betSize) {
@@ -71,101 +59,75 @@ public class Main {
     }
 
     private static void nextStreet() {
-        Arrays.fill(bets, 0);
         Arrays.fill(playerHasActed, false);
+        Game.resetBets(players, bets);
         street++;
         if (street == 1) {
-            Game.setStartingActionIndex(players, playersInHand, 1);
-            Game.dealFlop(board, deck);
-            gameTable.setTableCards(board);
+            Game.flop(players, board, deck, playersInHand, gameTable);
         } else if (street == 2) {
-            Game.setStartingActionIndex(players, playersInHand, 2);
-            Game.dealTurn(board, deck);
-            gameTable.setTableCards(board);
+            Game.turn(players, board, deck, playersInHand, gameTable);
         } else if (street == 3) {
-            Game.setStartingActionIndex(players, playersInHand, 3);
-            Game.dealRiver(board, deck);
-            gameTable.setTableCards(board);
+            Game.river(players, board, deck, playersInHand, gameTable);
         } else if (street >= 4) {
-            boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
-
-            int winnerCount = 0;
-            for (boolean winner : winners) {
-                if (winner) {
-                    winnerCount++;
-                }
-            }
-
-            for (int i = 0; i < winners.length; i++) {
-                if (winners[i]) {
-                    players[i].win(pot / winnerCount);
-                }
-            }
-
+            Game.getWinners(players, board, playersInHand, pot);
             endHand();
         }
     }
 
     public static void callButtonAction() {
-        if (gameState == GAMESTATE_WAIT_ACTION) {
-            players[Game.getCurrentActionIndex()].call(bets, playerHasActed);
-            if (Game.checkFolds(players, playersInHand)) {
-                endHand();
-            } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
-                nextStreet();
-            } else {
-                Game.updateCurrentAction(players, playersInHand);
-            }
+        players[Game.getCurrentActionIndex()].call(bets, playerHasActed);
+        if (Game.checkFolds(players, playersInHand)) {
+            endHand();
+        } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            nextStreet();
+        } else {
+            Game.updateCurrentAction(players, playersInHand);
         }
+
         Game.printPlayers(players, bets, playersInHand);
 
         gameTable.updateButtons(players, bets, 0);
     }
 
     public static void foldButtonAction() {
-        if (gameState == GAMESTATE_WAIT_ACTION) {
-            players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
-            gameTable.updatePlayer(players);
-            if (Game.checkFolds(players, playersInHand)) {
-                endHand();
-            } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
-                nextStreet();
-            } else {
-                Game.updateCurrentAction(players, playersInHand);
-            }
+        players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
+        gameTable.updatePlayer(players);
+        if (Game.checkFolds(players, playersInHand)) {
+            endHand();
+        } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            nextStreet();
+        } else {
+            Game.updateCurrentAction(players, playersInHand);
         }
+
         Game.printPlayers(players, bets, playersInHand);
 
         gameTable.updateButtons(players, bets, 0);
     }
 
     public static void raiseButtonAction() {
-        gameTable.updateButtons(players, bets, 0);
-        if (gameState == GAMESTATE_WAIT_ACTION) {
-            players[Game.getCurrentActionIndex()].bet(limitRaiseSize, bets, playerHasActed);
-            if (Game.checkFolds(players, playersInHand)) {
-                endHand();
-            } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
-                nextStreet();
-            } else {
-                Game.updateCurrentAction(players, playersInHand);
-            }
+        players[Game.getCurrentActionIndex()].bet(limitRaiseSize, bets, playerHasActed);
+        if (Game.checkFolds(players, playersInHand)) {
+            endHand();
+        } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            nextStreet();
+        } else {
+            Game.updateCurrentAction(players, playersInHand);
         }
+
         Game.printPlayers(players, bets, playersInHand);
 
         gameTable.updateButtons(players, bets, 50);
     }
 
     public static void checkButtonAction() {
-        if (gameState == GAMESTATE_WAIT_ACTION) {
-            players[Game.getCurrentActionIndex()].check(playerHasActed);
-            if (Game.checkFolds(players, playersInHand)) {
-                endHand();
-            } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
-                nextStreet();
-            } else {
-                Game.updateCurrentAction(players, playersInHand);
-            }
+        players[Game.getCurrentActionIndex()].check(playerHasActed);
+        if (Game.checkFolds(players, playersInHand)) {
+            endHand();
+        } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
+            nextStreet();
+        } else {
+            Game.updateCurrentAction(players, playersInHand);
         }
 
         Game.printPlayers(players, bets, playersInHand);
@@ -174,27 +136,14 @@ public class Main {
     }
 
     public static void resetButtonAction() {
-        pot = 0;
-        street = 0;
-        deck.shuffle();
-        Arrays.fill(playerHasActed, false);
-        Arrays.fill(playersInHand, true);
-        Arrays.fill(board, null);
-        Arrays.fill(bets, 0);
-        Game.nextDealer(players);
-        Game.setStartingActionIndex(players, playersInHand, street);
-        Game.dealHands(players);
+        resetHand();
         System.out.println("Reset Pressed");
-        players[Game.getSmallBlindIndex()].postBlind(sb, bets);
-        players[Game.getBigBlindIndex()].postBlind(bb, bets);
-        gameTable.updateButtons(players, bets, 0);
-        gameTable.updateTable();
-        Game.printPlayers(players, bets, playersInHand);
     }
 
     public static void startGame() {
         Arrays.fill(board, null);
         Arrays.fill(playersInHand, true);
+        Game.resetBets(players, bets);
 
         Game.pickRandomDealer(players);
 
@@ -204,11 +153,7 @@ public class Main {
         players[Game.getSmallBlindIndex()].postBlind(sb, bets);
         players[Game.getBigBlindIndex()].postBlind(bb, bets);
 
-        for (int bet : bets) {
-            System.out.println(bet);
-        }
-
-        gameState = GAMESTATE_WAIT_ACTION;
+        Game.printPlayers(players, bets, playersInHand);
 
         gameTable = new Table(players);
         gameTable.updateButtons(players, bets, 0);
@@ -224,14 +169,20 @@ public class Main {
             }
         }
 
-        //reset the game state for the next hand
+        resetHand();
+    }
+
+    public static void resetHand() {
+        Game.printHands(players, playersInHand);
+        Game.printBoard(board);
+
         pot = 0;
         street = 0;
         deck.shuffle();
         Arrays.fill(playerHasActed, false);
         Arrays.fill(playersInHand, true);
         Arrays.fill(board, null);
-        Arrays.fill(bets, 0);
+        Game.resetBets(players, bets);
         Game.nextDealer(players);
         Game.setStartingActionIndex(players, playersInHand, street);
         Game.dealHands(players);
@@ -239,6 +190,5 @@ public class Main {
         players[Game.getBigBlindIndex()].postBlind(bb, bets);
         gameTable.updateButtons(players, bets, 0);
         gameTable.updateTable();
-        Game.printPlayers(players, bets, playersInHand);
     }
 }
