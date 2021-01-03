@@ -3,11 +3,17 @@ package UI.Components;
 import Logic.Card;
 import Logic.Game;
 import Logic.Player;
+import UI.Animation.Animatable;
+import UI.Animation.AnimationThread;
 import UI.GraphicalHelpers;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.Point;
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class TableComponent extends JPanel {
 
@@ -30,6 +36,7 @@ public class TableComponent extends JPanel {
     private Card[] tableCards;
     private int pot;
     private Point[] playerPositions;
+    private CardComponent[][] playerCards;
 
     public TableComponent(Player[] players) {
         super(null);
@@ -48,10 +55,18 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < numPlayers; i ++){
             playerPositions[i] = getPlayerPosition(i);
         }
+
+        // test out animation system
+        // create and start the animation thread
+        new AnimationThread(this);
+        AnimationThread.getInstance().start();
     }
 
     public void paint(Graphics g) {
         super.paint(g);
+
+        // paint the animation components
+        AnimationThread.getInstance().paint(g);
 
         // draw the table itself
         Insets ins = getInsets();
@@ -167,6 +182,44 @@ public class TableComponent extends JPanel {
         return new Point((int) x, (int) y);
     }
 
+    public void createPlayerCards(){
+        playerCards = new CardComponent[numPlayers][2];
+
+        for (int player = 0; player < numPlayers; player++) {
+            if(players[player].getHand()[0] == null){
+                // this player has no cards. Draw nothing.
+                continue;
+            }
+            for (int cardNum = 0; cardNum < 2; cardNum++) {
+                Point p = playerPositions[player];
+
+                // grab the center of this panel
+                Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
+
+                // grab the card image
+                // TODO: Draw card backs instead of card value if the player has folded
+                //       After next git pull, there should be a players[player].getHasFolded() function
+                BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                        (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
+                        (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
+                        CARD_WIDTH, CARD_HEIGHT);
+
+                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                cardLoc.y -= (CARD_HEIGHT / 2);
+
+                if(cardNum == 0) {
+                    cardLoc.x -= CARD_X_STAGGER;
+                    cardLoc.y -= CARD_Y_STAGGER;
+                }
+
+                playerCards[player][cardNum] = new CardComponent(-CARD_WIDTH, -CARD_HEIGHT, players[player].getHand());
+                playerCards[player][cardNum].moveTo(cardLoc.x, cardLoc.y, 500, false);
+
+                AnimationThread.getInstance().addAnimatableObject(playerCards[player][cardNum]);
+            }
+        }
+    }
+
     public void drawPlayerCards(Graphics g) {
         for (int player = 0; player < numPlayers; player++) {
             if(players[player].getHand()[0] == null){
@@ -181,7 +234,7 @@ public class TableComponent extends JPanel {
 
                 // grab the card image
                 // TODO: Draw card backs instead of card value if the player has folded
-                // TODO: After next git pull, there should be a players[player].getHasFolded() function
+                //       After next git pull, there should be a players[player].getHasFolded() function
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                         (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
                         (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
@@ -237,6 +290,17 @@ public class TableComponent extends JPanel {
 
     public void updatePlayers(Player[] players){
         this.players = players;
+    }
+
+    private int count = 0;
+    CardComponent animCard;
+
+    public void testAnimation(){
+        List<Animatable> cards = AnimationThread.getInstance().getAnimationObjects();
+
+        for(int i = 0; i < cards.size(); i++ ){
+            cards.get(i).setAnimating(true);
+        }
     }
 }
 

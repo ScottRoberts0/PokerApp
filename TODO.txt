@@ -16,3 +16,4 @@
       [ ] position player name
 3 [ ] disappear cards when a player folds (or set to display card back?)
 2 [ ] Display total pot
+4 [ ] Begin animaion framework

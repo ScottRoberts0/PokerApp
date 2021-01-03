@@ -22,7 +22,7 @@ public class Table implements ActionListener {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private TableComponent table;
-    private JButton checkButton, callButton, foldButton, raiseButton, resetButton;
+    private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton;
     private Player[] players;
 
     // misc vars
@@ -40,6 +40,9 @@ public class Table implements ActionListener {
 
         // show zee vindow
         mainFrame.setVisible(true);//making the frame visible
+
+        // create some cards
+        table.createPlayerCards();
     }
 
     private void drawTable(){
@@ -82,12 +85,17 @@ public class Table implements ActionListener {
         resetButton.setActionCommand("Reset");
         resetButton.addActionListener(this);
 
+        testButton = new JButton("Test");
+        testButton.setActionCommand("Test");
+        testButton.addActionListener(this);
+
 
         buttonPanel.add(foldButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(raiseButton);
         buttonPanel.add(callButton);
         buttonPanel.add(resetButton);
+        buttonPanel.add(testButton);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 1;
@@ -141,6 +149,10 @@ public class Table implements ActionListener {
             Main.callButtonAction();
         }else if(e.getActionCommand().equals("Reset")){
             Main.resetButtonAction();
+        }else if(e.getActionCommand().equals("Test")){
+            Main.testButtonAction();
+
+            table.testAnimation();
         }
     }
 }
