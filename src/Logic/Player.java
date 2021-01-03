@@ -9,6 +9,7 @@ public class Player {
     private int moneyInPot;
     private int stack;
     private final Deck deck;
+    private boolean hasFolded;
 
     private Card[] hand;
     private Card[] possCards;
@@ -50,6 +51,8 @@ public class Player {
     public void resetMoneyInPot() {
         moneyInPot = 0;
     }
+
+    public void resetFolded() { this.hasFolded = false; }
 
     public void postBlind(int betSize, int[] bets) {
         stack -= betSize;
@@ -100,6 +103,7 @@ public class Player {
         bets[playerNum] = 0;
         moneyInPot = 0;
         playersInHand[playerNum] = false;
+        this.hasFolded = true;
         //Arrays.fill(hand, null);
         System.out.println(playerName + " folds");
         System.out.println();
@@ -218,6 +222,10 @@ public class Player {
 
     public int getMoneyInPot() {
         return moneyInPot;
+    }
+
+    public boolean getHasFolded() {
+        return hasFolded;
     }
 
     public String toString() {

@@ -441,9 +441,10 @@ public class Game {
         return highestBet;
     }
 
-    public static void resetBets(Player[] players, int[] bets) {
+    public static void resetPlayerAttributes(Player[] players, int[] bets) {
         for(Player player : players) {
             player.resetMoneyInPot();
+            player.resetFolded();
         }
 
         for(int i = 0; i < bets.length; i++) {

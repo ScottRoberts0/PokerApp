@@ -60,7 +60,7 @@ public class Main {
 
     private static void nextStreet() {
         Arrays.fill(playerHasActed, false);
-        Game.resetBets(players, bets);
+        Game.resetPlayerAttributes(players, bets);
         street++;
         if (street == 1) {
             Game.flop(players, board, deck, playersInHand, gameTable);
@@ -143,7 +143,7 @@ public class Main {
     public static void startGame() {
         Arrays.fill(board, null);
         Arrays.fill(playersInHand, true);
-        Game.resetBets(players, bets);
+        Game.resetPlayerAttributes(players, bets);
 
         Game.pickRandomDealer(players);
 
@@ -182,7 +182,7 @@ public class Main {
         Arrays.fill(playerHasActed, false);
         Arrays.fill(playersInHand, true);
         Arrays.fill(board, null);
-        Game.resetBets(players, bets);
+        Game.resetPlayerAttributes(players, bets);
         Game.nextDealer(players);
         Game.setStartingActionIndex(players, playersInHand, street);
         Game.dealHands(players);
