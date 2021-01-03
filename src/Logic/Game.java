@@ -212,18 +212,21 @@ public class Game {
     }
 
     public static void flop(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        System.out.println(">>>>>>>>>> FLOP <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 1);
         Game.dealFlop(board, deck);
         gameTable.setTableCards(board);
     }
 
     public static void turn(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        System.out.println(">>>>>>>>>> TURN <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 2);
         Game.dealTurn(board, deck);
         gameTable.setTableCards(board);
     }
 
     public static void river(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+        System.out.println(">>>>>>>>>> RIVER <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 3);
         Game.dealRiver(board, deck);
         gameTable.setTableCards(board);
@@ -405,17 +408,20 @@ public class Game {
     }
 
     public static boolean checkRaiseAllowed(Player[] players, int[] bets, int betSize) {
-        int highestBet = getHighestBet(bets);
-        int raiseSize = highestBet - bets[currentActionIndex] + betSize;
+        int raiseSize = getHighestBet(bets) - bets[currentActionIndex] + betSize;
         if (players[currentActionIndex].getStack() - raiseSize < 0) {
+            return false;
+        } else if(players[currentActionIndex].getStack() == 0) {
             return false;
         }
 
         return true;
     }
 
-    public static boolean checkCallAllowed(int[] bets) {
+    public static boolean checkCallAllowed(Player[] players, int[] bets) {
         if (bets[currentActionIndex] == getHighestBet(bets)) {
+            return false;
+        } else if(players[currentActionIndex].getStack() == 0) {
             return false;
         }
 
@@ -441,14 +447,19 @@ public class Game {
         return highestBet;
     }
 
-    public static void resetPlayerAttributes(Player[] players, int[] bets) {
+    public static void resetBets(Player[] players, int[] bets) {
         for(Player player : players) {
             player.resetMoneyInPot();
-            player.resetFolded();
         }
 
         for(int i = 0; i < bets.length; i++) {
             bets[i] = 0;
+        }
+    }
+
+    public static void resetFolds(Player[] players) {
+        for(Player player : players) {
+            player.resetFolded();
         }
     }
 

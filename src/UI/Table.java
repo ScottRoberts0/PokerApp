@@ -119,7 +119,7 @@ public class Table implements ActionListener {
     public void updateButtons(Player[] players, int[] bets, int betSize){
         checkButton.setEnabled(Game.checkCheckAllowed(bets));
         foldButton.setEnabled(Game.checkFoldAllowed(bets));
-        callButton.setEnabled(Game.checkCallAllowed(bets));
+        callButton.setEnabled(Game.checkCallAllowed(players, bets));
         raiseButton.setEnabled(Game.checkRaiseAllowed(players, bets, betSize));
 
         table.repaint();

@@ -65,12 +65,18 @@ public class Player {
         int highestBet = Game.getHighestBet(bets);
         int raiseSize = highestBet + betSize;
 
-        stack -= raiseSize - bets[playerNum];
+        if(stack - raiseSize < 0) {
+            stack -= raiseSize;
+            Main.addToPot(stack);
+            bets[playerNum] = highestBet + stack;
+            moneyInPot = highestBet + stack;
+        } else {
+            stack -= raiseSize - bets[playerNum];
+            Main.addToPot(raiseSize - bets[playerNum]);
+            bets[playerNum] = raiseSize;
+            moneyInPot = raiseSize;
+        }
 
-        Main.addToPot(raiseSize - bets[playerNum]);
-
-        bets[playerNum] = raiseSize;
-        moneyInPot = raiseSize;
         playerHasActed[playerNum] = true;
 
         System.out.println(playerName + " raises to " + raiseSize);
@@ -104,7 +110,6 @@ public class Player {
         moneyInPot = 0;
         playersInHand[playerNum] = false;
         this.hasFolded = true;
-        //Arrays.fill(hand, null);
         System.out.println(playerName + " folds");
         System.out.println();
     }
@@ -117,7 +122,7 @@ public class Player {
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println(playerName + " wins " + potSize + "!");
+        System.out.println(playerName + " wins " + potSize + " satoshis!");
         System.out.println();
     }
 

@@ -50,6 +50,7 @@ public class TableComponent extends JPanel {
         }
     }
 
+    //TODO ask tyler: this method never seems to be called, so how does it draw all the shit?
     public void paint(Graphics g) {
         super.paint(g);
 
@@ -120,7 +121,6 @@ public class TableComponent extends JPanel {
             int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
             int stringHeight = g.getFont().getSize();
 
-            // TODO: Stack above/below cards. Put bets on the table using the radius maths.
             // stack below cards
             g.drawString(stack + "",
                     (this.getWidth() / 2) + playerPositions[i].x,
@@ -181,20 +181,39 @@ public class TableComponent extends JPanel {
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
                 // grab the card image
-                BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
-                        (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
-                        (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
-                        CARD_WIDTH, CARD_HEIGHT);
+                // TODO: Draw card backs instead of card value if the player has folded
+                // TODO: After next git pull, there should be a players[player].getHasFolded() function
+                if(!players[player].getHasFolded()) {
+                    BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                            (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
+                            (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
+                            CARD_WIDTH, CARD_HEIGHT);
 
-                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-                cardLoc.y -= (CARD_HEIGHT / 2);
 
-                if(cardNum == 0) {
-                    cardLoc.x -= CARD_X_STAGGER;
-                    cardLoc.y -= CARD_Y_STAGGER;
+                    Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.y -= (CARD_HEIGHT / 2);
+
+                    if (cardNum == 0) {
+                        cardLoc.x -= CARD_X_STAGGER;
+                        cardLoc.y -= CARD_Y_STAGGER;
+                    }
+
+                    g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+                } else {
+                    BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                            0, CARD_HEIGHT * 4, CARD_WIDTH, CARD_HEIGHT);
+
+
+                    Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.y -= (CARD_HEIGHT / 2);
+
+                    if (cardNum == 0) {
+                        cardLoc.x -= CARD_X_STAGGER;
+                        cardLoc.y -= CARD_Y_STAGGER;
+                    }
+
+                    g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
                 }
-
-                g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
             }
         }
     }
