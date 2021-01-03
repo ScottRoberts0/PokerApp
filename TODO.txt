@@ -3,16 +3,18 @@
 [x] automate next hand
 [ ] side pots
     - big job
+[ ] redo raising logic, it's fucked for players that would be all in, allows negative stacks
+[ ] redo checking raises allowed, it's fucked, allows negative stacks
 
 
-============= UI =============
+============= UI ================
 1 [ ] Textbox
   [x] dealer button
   [x] highlight the player who has current action
   [x] display player bets
       [x] position player bets
   [ ] display player number / name
-      [ ] create overloaded constructor for player class wherein we can give a player a string name
+      [x] create overloaded constructor for player class wherein we can give a player a string name
       [ ] position player name
 3 [ ] disappear cards when a player folds (or set to display card back?)
 2 [ ] Display total pot

@@ -62,6 +62,7 @@ public class TableComponent extends JPanel {
         AnimationThread.getInstance().start();
     }
 
+    //TODO ask tyler: this method never seems to be called, so how does it draw all the shit?
     public void paint(Graphics g) {
         super.paint(g);
 
@@ -239,16 +240,38 @@ public class TableComponent extends JPanel {
                         (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
                         (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
                         CARD_WIDTH, CARD_HEIGHT);
+                // TODO: After next git pull, there should be a players[player].getHasFolded() function
+                if(!players[player].getHasFolded()) {
+                    BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                            (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
+                            (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
+                            CARD_WIDTH, CARD_HEIGHT);
 
-                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-                cardLoc.y -= (CARD_HEIGHT / 2);
 
-                if(cardNum == 0) {
-                    cardLoc.x -= CARD_X_STAGGER;
-                    cardLoc.y -= CARD_Y_STAGGER;
+                    Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.y -= (CARD_HEIGHT / 2);
+
+                    if (cardNum == 0) {
+                        cardLoc.x -= CARD_X_STAGGER;
+                        cardLoc.y -= CARD_Y_STAGGER;
+                    }
+
+                    g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+                } else {
+                    BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                            0, CARD_HEIGHT * 4, CARD_WIDTH, CARD_HEIGHT);
+
+
+                    Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                    cardLoc.y -= (CARD_HEIGHT / 2);
+
+                    if (cardNum == 0) {
+                        cardLoc.x -= CARD_X_STAGGER;
+                        cardLoc.y -= CARD_Y_STAGGER;
+                    }
+
+                    g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
                 }
-
-                g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
             }
         }
     }

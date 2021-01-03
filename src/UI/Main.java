@@ -31,12 +31,13 @@ public class Main {
         board = new Card[5];
 
         //players = Game.createPlayers(5, deck, 25000);
-        players = new Player[5];
+        players = new Player[6];
         players[0] = new Player(0, deck, 25000, "Reid");
         players[1] = new Player(1, deck, 25000, "Tyler");
         players[2] = new Player(2, deck, 25000);
         players[3] = new Player(3, deck, 25000);
         players[4] = new Player(4, deck, 25000, "Dan");
+        players[5] = new Player(5, deck, 2000, "Cody");
 
         bets = new int[players.length];
         playerHasActed = new boolean[players.length];
@@ -59,6 +60,7 @@ public class Main {
     }
 
     private static void nextStreet() {
+        //i'd like to do something better with this method maybe
         Arrays.fill(playerHasActed, false);
         Game.resetBets(players, bets);
         street++;
@@ -186,6 +188,7 @@ public class Main {
         Arrays.fill(playerHasActed, false);
         Arrays.fill(playersInHand, true);
         Arrays.fill(board, null);
+        Game.resetFolds(players);
         Game.resetBets(players, bets);
         Game.nextDealer(players);
         Game.setStartingActionIndex(players, playersInHand, street);

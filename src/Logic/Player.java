@@ -9,6 +9,7 @@ public class Player {
     private int moneyInPot;
     private int stack;
     private final Deck deck;
+    private boolean hasFolded;
 
     private Card[] hand;
     private Card[] possCards;
@@ -51,6 +52,8 @@ public class Player {
         moneyInPot = 0;
     }
 
+    public void resetFolded() { this.hasFolded = false; }
+
     public void postBlind(int betSize, int[] bets) {
         stack -= betSize;
         Main.addToPot(betSize);
@@ -62,12 +65,18 @@ public class Player {
         int highestBet = Game.getHighestBet(bets);
         int raiseSize = highestBet + betSize;
 
-        stack -= raiseSize - bets[playerNum];
+        if(stack - raiseSize < 0) {
+            stack -= raiseSize;
+            Main.addToPot(stack);
+            bets[playerNum] = highestBet + stack;
+            moneyInPot = highestBet + stack;
+        } else {
+            stack -= raiseSize - bets[playerNum];
+            Main.addToPot(raiseSize - bets[playerNum]);
+            bets[playerNum] = raiseSize;
+            moneyInPot = raiseSize;
+        }
 
-        Main.addToPot(raiseSize - bets[playerNum]);
-
-        bets[playerNum] = raiseSize;
-        moneyInPot = raiseSize;
         playerHasActed[playerNum] = true;
 
         System.out.println(playerName + " raises to " + raiseSize);
@@ -100,7 +109,7 @@ public class Player {
         bets[playerNum] = 0;
         moneyInPot = 0;
         playersInHand[playerNum] = false;
-        //Arrays.fill(hand, null);
+        this.hasFolded = true;
         System.out.println(playerName + " folds");
         System.out.println();
     }
@@ -113,7 +122,7 @@ public class Player {
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println(playerName + " wins " + potSize + "!");
+        System.out.println(playerName + " wins " + potSize + " satoshis!");
         System.out.println();
     }
 
@@ -218,6 +227,10 @@ public class Player {
 
     public int getMoneyInPot() {
         return moneyInPot;
+    }
+
+    public boolean getHasFolded() {
+        return hasFolded;
     }
 
     public String toString() {
