@@ -1,6 +1,7 @@
 package UI.Components;
 
 import Logic.Card;
+import Logic.Game;
 import Logic.Player;
 import UI.GraphicalHelpers;
 
@@ -12,9 +13,13 @@ public class TableComponent extends JPanel {
 
     private static final int TABLE_WIDTH = 650;
     private static final int TABLE_HEIGHT = 300;
-    private static final int CARD_RADIUS_INCREASE = 75;
-    private static final int CARD_Y_BUFFER = 30;
-    private static final int CARD_X_BUFFER = 10;
+    private static final int CARD_RADIUS_BUFFER = 75;
+    private static final int POT_RADIUS_BUFFER = 45;
+    private static final int CARD_Y_BUFFER = 0;
+    private static final int CARD_X_BUFFER = 0;
+    private static final int CARD_Y_STAGGER = 10;
+    private static final int CARD_X_STAGGER = 25;
+    private static final int STACK_BUFFER = 15;
     private static final int TABLE_CARD_SPACER = 5;
 
     private static final int CARD_WIDTH = 52;
@@ -61,6 +66,46 @@ public class TableComponent extends JPanel {
 
         // update labels
         drawText(g);
+
+        // draw action indicator
+        drawActionIndicators(g);
+    }
+
+    /**
+     * Draws dealer button, action index, and blind indicators
+     *
+     * @param g
+     */
+    private void drawActionIndicators(Graphics g){
+        // store the default colour to switch back at the end of this function
+        Color currentColour = g.getColor();
+
+        // draw action indicator (red)
+        g.setColor(Color.RED);
+        Point playerPosition = getPlayerPosition(Game.getCurrentActionIndex());
+        g.fillOval((this.getWidth() / 2) + playerPosition.x - CARD_WIDTH - 25, (this.getHeight() / 2) + playerPosition.y, 25, 25);
+
+        // draw dealer button (transparent with a D in the middle)
+        g.setColor(Color.BLACK);
+        int index = Game.getSmallBlindIndex();
+        if(index == 0){
+            index = players.length - 1;
+        }else{
+            index --;
+        }
+        double[] angleRadius = getPlayerAngleRadius(index);
+
+        angleRadius[1] -= POT_RADIUS_BUFFER + 20;
+
+        double x = (Math.sin(angleRadius[0]) * angleRadius[1]) * -1;
+        double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
+
+        g.drawString("D",
+                (this.getWidth() / 2) + (int)x,
+                (this.getHeight() / 2) + (int)y);
+        g.drawOval((this.getWidth() / 2) + (int)x - 5, (this.getHeight() / 2) + (int) y - 15, 20, 20);
+
+        g.setColor(currentColour);
     }
 
     private void drawText(Graphics g){
@@ -69,34 +114,41 @@ public class TableComponent extends JPanel {
         // draw player stacks and bets
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
-            int bet = 0;
+            int bet = players[i].getMoneyInPot();
             // grab the string width
             int stackStringWidth = g.getFontMetrics().stringWidth(stack + "");
             int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
             int stringHeight = g.getFont().getSize();
 
             // TODO: Stack above/below cards. Put bets on the table using the radius maths.
-            // draw player stack and bet on outside
-            if(playerPositions[i].x > 0){
-                // player is on the right side of the board, put the stack on the right and bet to the left
-                g.drawString(stack + "",
-                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
-                        (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
+            // stack below cards
+            g.drawString(stack + "",
+                    (this.getWidth() / 2) + playerPositions[i].x,
+                    (this.getHeight() / 2) + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
 
-                g.drawString(bet + "",
-                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - betStringWidth,
-                        (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
-            }else{
-                // player is on the left side of the board, put the stack on the left and bet to the right
-                g.drawString(stack + "",
-                        (this.getWidth() / 2) + playerPositions[i].x - CARD_WIDTH - stackStringWidth,
-                        (this.getHeight() / 2) + playerPositions[i].y + (stringHeight / 2));
+            // pot in table
+            double[] angleRadius = getPlayerAngleRadius(i);
 
-                g.drawString(bet + "",
-                        (this.getWidth() / 2) + playerPositions[i].x + CARD_WIDTH,
-                        (this.getHeight() / 2) + playerPositions[i].y - (stringHeight / 2));
-            }
+            angleRadius[1] -= POT_RADIUS_BUFFER;
+
+            double x = (Math.sin(angleRadius[0]) * angleRadius[1]) * -1;
+            double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
+
+            g.drawString(bet + "",
+                    (this.getWidth() / 2) + (int)x,
+                    (this.getHeight() / 2) + (int)y);
         }
+    }
+
+    public double[] getPlayerAngleRadius(int playerNum){
+        double angle = (Math.PI * 2 / numPlayers) * (double) playerNum;
+
+        double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
+                Math.sqrt(
+                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) +
+                                (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
+                );
+        return new double[] {angle, radius};
     }
 
     public Point getPlayerPosition(int playerNum){
@@ -106,18 +158,12 @@ public class TableComponent extends JPanel {
             return new Point(0,0);
         }
 
-        double angle = (Math.PI * 2 / numPlayers) * (double) playerNum;
+        double[] angleRadius = getPlayerAngleRadius(playerNum);
 
-        double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
-                Math.sqrt(
-                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) +
-                         (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
-                );
+        angleRadius[1] += CARD_RADIUS_BUFFER;
 
-        radius += CARD_RADIUS_INCREASE;
-
-        double x = ((Math.sin(angle) * radius) - CARD_X_BUFFER) * -1;
-        double y = (Math.cos(angle) * radius) - CARD_Y_BUFFER;
+        double x = ((Math.sin(angleRadius[0]) * angleRadius[1]) - CARD_X_BUFFER) * -1;
+        double y = (Math.cos(angleRadius[0]) * angleRadius[1]) - CARD_Y_BUFFER;
 
         return new Point((int) x, (int) y);
     }
@@ -143,17 +189,9 @@ public class TableComponent extends JPanel {
                 Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
                 cardLoc.y -= (CARD_HEIGHT / 2);
 
-                if(cardNum == 0 && p.x > 0){
-                    cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-                    cardLoc.x -= 15;
-                    cardLoc.y -= 5;
-                }else if (cardNum == 1 && p.x < 0){
-                    cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-                    cardLoc.x -= 15;
-                }else if (cardNum == 0 && p.x < 0){
-                    cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-                    cardLoc.x -= CARD_WIDTH;
-                    cardLoc.y -= 5;
+                if(cardNum == 0) {
+                    cardLoc.x -= CARD_X_STAGGER;
+                    cardLoc.y -= CARD_Y_STAGGER;
                 }
 
                 g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
