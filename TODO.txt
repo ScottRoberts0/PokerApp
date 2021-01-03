@@ -14,4 +14,5 @@
   [ ] display player number / name
       [ ] create overloaded constructor for player class wherein we can give a player a string name
       [ ] position player name
-2 [ ] disappear cards when a player folds (or set to display card back?)
+3 [ ] disappear cards when a player folds (or set to display card back?)
+2 [ ] Display total pot
