@@ -1,4 +1,5 @@
 package Logic;
+
 import UI.Main;
 
 import java.util.Arrays;
@@ -48,11 +49,6 @@ public class Player {
         this.playerName = playerName;
     }
 
-    public void resetMoneyInPot() {
-        moneyInPot = 0;
-    }
-
-    public void resetFolded() { this.hasFolded = false; }
 
     public void postBlind(int betSize, int[] bets) {
         stack -= betSize;
@@ -62,20 +58,23 @@ public class Player {
     }
 
     public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
-        int highestBet = Game.getHighestBet(bets);
-        int raiseSize = highestBet + betSize;
+        int raiseSize = Game.getHighestBet(bets) + betSize - bets[playerNum];
 
-        if(stack - raiseSize < 0) {
+        System.out.println(raiseSize);
+        System.out.println(stack);
+        System.out.println(stack - raiseSize);
+
+        if (stack - raiseSize < 0) {
+            raiseSize = stack;
             stack -= raiseSize;
-            Main.addToPot(stack);
-            bets[playerNum] = highestBet + stack;
-            moneyInPot = highestBet + stack;
+            Main.addToPot(raiseSize);
         } else {
-            stack -= raiseSize - bets[playerNum];
-            Main.addToPot(raiseSize - bets[playerNum]);
-            bets[playerNum] = raiseSize;
-            moneyInPot = raiseSize;
+            stack -= raiseSize;
+            Main.addToPot(raiseSize);
         }
+
+        bets[playerNum] += raiseSize;
+        moneyInPot += raiseSize;
 
         playerHasActed[playerNum] = true;
 
@@ -85,21 +84,29 @@ public class Player {
 
     public void call(int[] bets, boolean[] playerHasActed) {
         int highestBet = Game.getHighestBet(bets);
-        
         int callSize = highestBet - bets[playerNum];
 
-        if(stack - callSize < 0) {
+        System.out.println(callSize);
+        System.out.println(stack);
+        System.out.println(stack - callSize);
+
+        if (stack - callSize < 0) {
             callSize = stack;
         }
 
+        stack -= callSize;
         Main.addToPot(callSize);
 
-        bets[playerNum] = highestBet;
-        moneyInPot = highestBet;
+        if(stack >= 0) {
+            bets[playerNum] = highestBet;
+            moneyInPot = highestBet;
+        } else {
+            bets[playerNum] = callSize;
+            moneyInPot = callSize;
+        }
 
         playerHasActed[playerNum] = true;
 
-        stack -= callSize;
 
         System.out.println(playerName + " calls " + callSize);
         System.out.println();
@@ -126,8 +133,31 @@ public class Player {
         System.out.println();
     }
 
-    public Card[] getHand() {
-        return Arrays.copyOf(hand, hand.length);
+    public void resetMoneyInPot() {
+        moneyInPot = 0;
+    }
+
+    public void resetFolded() {
+        this.hasFolded = false;
+    }
+
+
+    public void drawHand() {
+        hand[0] = deck.drawCard();
+        hand[1] = deck.drawCard();
+    }
+
+    public void drawHand(String value1, String suit1, String value2, String suit2) {
+        hand[0] = deck.drawCard(value1, suit1);
+        hand[1] = deck.drawCard(value2, suit2);
+    }
+
+    public void printHand() {
+        System.out.println(playerName + " hand:");
+        for (int i = 0; i < hand.length; i++) {
+            System.out.println(hand[i]);
+        }
+        System.out.println();
     }
 
     public Card[] makeMadeHand(Card[] board) {
@@ -145,15 +175,6 @@ public class Player {
         }
         System.out.println();
     }
-
-    public String getMadeHandName() {
-        return Evaluator.getMadeHandName(madeHand);
-    }
-
-    public int getMadeHandValue() {
-        return Evaluator.getMadeHandValue(madeHand);
-    }
-
 
     public void createPossCards(Card[] board) {
         Arrays.fill(possCards, null);
@@ -195,22 +216,16 @@ public class Player {
     }
 
 
-    public void drawHand() {
-        hand[0] = deck.drawCard();
-        hand[1] = deck.drawCard();
+    public String getMadeHandName() {
+        return Evaluator.getMadeHandName(madeHand);
     }
 
-    public void drawHand(String value1, String suit1, String value2, String suit2) {
-        hand[0] = deck.drawCard(value1, suit1);
-        hand[1] = deck.drawCard(value2, suit2);
+    public int getMadeHandValue() {
+        return Evaluator.getMadeHandValue(madeHand);
     }
 
-    public void printHand() {
-        System.out.println(playerName + " hand:");
-        for (int i = 0; i < hand.length; i++) {
-            System.out.println(hand[i]);
-        }
-        System.out.println();
+    public Card[] getHand() {
+        return Arrays.copyOf(hand, hand.length);
     }
 
     public int getPlayerNum() {

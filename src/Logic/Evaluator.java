@@ -206,6 +206,7 @@ public class Evaluator {
     }
 
 
+
     private static boolean detectRoyalFlush(int[][] specialCounter) {
         for (int i = 0; i < specialCounter.length; i++) {
             if (specialCounter[i][14] == 1 &&
@@ -296,6 +297,7 @@ public class Evaluator {
     }
 
 
+
     private static boolean detectFour(int[] counter) {
         for (int i = 0; i < counter.length; i++) {
             if (counter[i] == 4) {
@@ -337,6 +339,7 @@ public class Evaluator {
         boolean[] winners = findWinnerHighCards(madeHands, 4, handValues, 7);
         return winners;
     }
+
 
 
     private static boolean detectFullHouse(int[] counter) {
@@ -448,6 +451,7 @@ public class Evaluator {
     }
 
 
+
     private static boolean detectFlush(int[] suitCounter) {
         for (int i = 0; i < suitCounter.length; i++) {
             if (suitCounter[i] >= 5) {
@@ -483,6 +487,7 @@ public class Evaluator {
         boolean[] winners = findWinnerHighCards(madeHands, 0, handValues, 5);
         return winners;
     }
+
 
 
     private static boolean detectStraight(int[] counter) {
@@ -565,6 +570,7 @@ public class Evaluator {
     }
 
 
+
     private static boolean detectThree(int[] counter) {
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] == 3) {
@@ -620,6 +626,7 @@ public class Evaluator {
 
         return winners;
     }
+
 
 
     private static boolean detectTwoPair(int[] counter) {
@@ -707,6 +714,7 @@ public class Evaluator {
     }
 
 
+
     private static boolean detectPair(int[] counter) {
         for (int i = counter.length - 1; i > 1; i--) {
             if (counter[i] == 2) {
@@ -760,6 +768,7 @@ public class Evaluator {
 
         return winners;
     }
+
 
 
     private static void highCard(Card[] possCards, Card[] madeHand) {
@@ -819,7 +828,6 @@ public class Evaluator {
 
         return winners;
     }
-
 
     private static boolean containsCard(Card[] cards, Card card) {
         for (int i = 0; i < cards.length; i++) {
