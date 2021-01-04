@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Beam">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Beam/out/artifacts/Beam_jar/Beam.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

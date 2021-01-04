@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Table implements ActionListener {
+public class MainWindow implements ActionListener {
 
     // constants
     private static final int WINDOW_WIDTH = 1000;
@@ -30,7 +30,7 @@ public class Table implements ActionListener {
     // misc vars
     private int numPlayers;
 
-    public Table(Player[] players) {
+    public MainWindow(Player[] players) {
         this.players = players;
         numPlayers = players.length;
 

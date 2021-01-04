@@ -20,6 +20,13 @@
       [ ] position player name
 3 [ ] disappear cards when a player folds (or set to display card back?)
 2 [x] Display total pot
-4 [ ] Begin animaion framework
+4 [x] Begin animaion framework
   [ ] rebuy button
-  [ ] sit out button
+  [ ] sit out check box
+
+============= Server ================
+
+  [ ] Create a test build configuration for basic server testing using a new argument
+  [ ] Create a server
+  [ ] Create a client
+  [ ] Send some basic data

@@ -1,10 +1,7 @@
 package Logic;
 
 import UI.Main;
-import UI.Table;
-
-import java.util.Arrays;
-import java.util.Scanner;
+import UI.MainWindow;
 
 public class Game {
     private static int dealerIndex;
@@ -211,25 +208,25 @@ public class Game {
         }
     }
 
-    public static void flop(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+    public static void flop(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> FLOP <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 1);
         Game.dealFlop(board, deck);
-        gameTable.setTableCards(board);
+        gameWindow.setTableCards(board);
     }
 
-    public static void turn(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+    public static void turn(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> TURN <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 2);
         Game.dealTurn(board, deck);
-        gameTable.setTableCards(board);
+        gameWindow.setTableCards(board);
     }
 
-    public static void river(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, Table gameTable) {
+    public static void river(Player[] players, Card[] board, Deck deck, boolean[] playersInHand, MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> RIVER <<<<<<<<<<<<<<<<");
         Game.setStartingActionIndex(players, playersInHand, 3);
         Game.dealRiver(board, deck);
-        gameTable.setTableCards(board);
+        gameWindow.setTableCards(board);
     }
 
     public static void getWinners(Player[] players, Card[] board, boolean[] playersInHand, int pot) {
@@ -399,11 +396,11 @@ public class Game {
         return bigBlindIndex;
     }
 
-    public static int getBetValue(int[] bets, Table gameTable, int lastRaiseSize, Player[] players) {
+    public static int getBetValue(int[] bets, MainWindow gameWindow, int lastRaiseSize, Player[] players) {
         int betValue;
 
         try {
-            betValue = Integer.parseInt(gameTable.getRaiseText());
+            betValue = Integer.parseInt(gameWindow.getRaiseText());
         } catch (NumberFormatException e) {
             betValue = lastRaiseSize + getHighestBet(bets);
         }

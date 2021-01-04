@@ -4,15 +4,13 @@ import Logic.Card;
 import Logic.Deck;
 import Logic.Game;
 import Logic.Player;
-import UI.Components.CardComponent;
 
 import java.util.Arrays;
-import java.util.InvalidPropertiesFormatException;
 
 public class Main {
 
     private static int street;
-    private static Table gameTable;
+    private static MainWindow gameWindow;
     private static Deck deck;
     private static Card[] board;
     private static Player[] players;
@@ -27,6 +25,28 @@ public class Main {
     private static int bb;
 
     public static void main(String argsp[]) {
+        if(argsp != null && argsp.length > 0){
+            if(argsp[0].equals("-ui")){
+                beginUI();
+            }else if(argsp[0].equals("-client")){
+                beginClient();
+            }else if(argsp[0].equals("-server")){
+                beginServer();
+            }else{
+                beginUI();
+            }
+        }
+    }
+
+    public static void beginServer(){
+        System.out.println("Server, baby!");
+    }
+
+    public static void beginClient(){
+        System.out.println("Client, baby!");
+    }
+
+    public static void beginUI(){
         deck = new Deck();
         board = new Card[5];
         street = 0;
@@ -71,11 +91,11 @@ public class Main {
         Game.resetBets(players, bets);
         street++;
         if (street == 1) {
-            Game.flop(players, board, deck, playersInHand, gameTable);
+            Game.flop(players, board, deck, playersInHand, gameWindow);
         } else if (street == 2) {
-            Game.turn(players, board, deck, playersInHand, gameTable);
+            Game.turn(players, board, deck, playersInHand, gameWindow);
         } else if (street == 3) {
-            Game.river(players, board, deck, playersInHand, gameTable);
+            Game.river(players, board, deck, playersInHand, gameWindow);
         } else if (street >= 4) {
             Game.getWinners(players, board, playersInHand, pot);
             endHand();
@@ -94,15 +114,15 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets);
+        gameWindow.updateButtons(players, bets);
     }
 
     public static void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
         players[actionIndex].fold(bets, playersInHand);
-        gameTable.getTable().foldPlayer(actionIndex);
+        gameWindow.getTable().foldPlayer(actionIndex);
 
-        gameTable.updatePlayer(players);
+        gameWindow.updatePlayer(players);
         if (Game.checkFolds(players, playersInHand)) {
             endHand();
         } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
@@ -113,12 +133,12 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets);
+        gameWindow.updateButtons(players, bets);
     }
 
     public static void raiseButtonAction() {
         int holder = Game.getHighestBet(bets);
-        int betValue = Game.getBetValue(bets, gameTable, lastRaiseSize, players);
+        int betValue = Game.getBetValue(bets, gameWindow, lastRaiseSize, players);
         lastRaiseSize = betValue - holder;
 
         players[Game.getCurrentActionIndex()].raise(betValue, bets, playerHasActed);
@@ -132,7 +152,7 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets);
+        gameWindow.updateButtons(players, bets);
     }
 
     public static void checkButtonAction() {
@@ -147,7 +167,7 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets);
+        gameWindow.updateButtons(players, bets);
     }
 
     public static void resetButtonAction() {
@@ -174,10 +194,10 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable = new Table(players);
-        gameTable.updateButtons(players, bets);
+        gameWindow = new MainWindow(players);
+        gameWindow.updateButtons(players, bets);
 
-        gameTable.getTable().createPlayerCards(true);
+        gameWindow.getTable().createPlayerCards(true);
     }
 
     public static void endHand() {
@@ -214,10 +234,10 @@ public class Main {
         players[Game.getSmallBlindIndex()].postBlind(sb, bets);
         players[Game.getBigBlindIndex()].postBlind(bb, bets);
         lastRaiseSize = bb;
-        gameTable.updateButtons(players, bets);
+        gameWindow.updateButtons(players, bets);
 
-        gameTable.getTable().deletePlayerCards();
+        gameWindow.getTable().deletePlayerCards();
 
-        gameTable.getTable().createPlayerCards(true);
+        gameWindow.getTable().createPlayerCards(true);
     }
 }
