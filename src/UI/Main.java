@@ -25,6 +25,7 @@ public class Main {
     private static int startingStackSize;
     private static int sb;
     private static int bb;
+    private static int minBet;
 
     public static void main(String argsp[]) {
         deck = new Deck();
@@ -35,6 +36,7 @@ public class Main {
         pot = 0;
         startingStackSize = 100000;
         lastRaiseSize = bb;
+        minBet = bb;
 
         //players = Game.createPlayers(5, deck, startingStackSize);
         players = new Player[6];
@@ -118,7 +120,7 @@ public class Main {
 
     public static void raiseButtonAction() {
         int holder = Game.getHighestBet(bets);
-        int betValue = Game.getBetValue(bets, gameTable, lastRaiseSize, players);
+        int betValue = Game.getBetValue(bets, gameTable, lastRaiseSize, players, minBet, street);
         lastRaiseSize = betValue - holder;
 
         players[Game.getCurrentActionIndex()].raise(betValue, bets, playerHasActed);

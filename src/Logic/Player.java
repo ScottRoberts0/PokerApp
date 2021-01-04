@@ -50,6 +50,12 @@ public class Player {
     }
 
 
+
+    public void resetHand() {
+        hand[0] = null;
+        hand[1] = null;
+    }
+
     public void postBlind(int betSize, int[] bets) {
         if(stack - betSize < 0) {
             betSize = stack;
