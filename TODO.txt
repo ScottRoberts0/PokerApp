@@ -5,6 +5,8 @@
     - big job
 [ ] redo raising logic, it's fucked for players that would be all in, allows negative stacks
 [ ] redo checking raises allowed, it's fucked, allows negative stacks
+[ ] sit out logic
+[ ] rebuy logic
 
 
 ============= UI ================
@@ -18,3 +20,5 @@
       [ ] position player name
 3 [ ] disappear cards when a player folds (or set to display card back?)
 2 [ ] Display total pot
+  [ ] sit out button
+  [ ] rebuy button

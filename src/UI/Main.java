@@ -21,6 +21,7 @@ public class Main {
     private static boolean[] playersInHand;
     private static int pot;
     private static int limitRaiseSize;
+    private static int startingStackSize;
 
     private static int gameState;
     private static int sb;
@@ -29,24 +30,25 @@ public class Main {
     public static void main(String argsp[]) {
         deck = new Deck();
         board = new Card[5];
+        street = 0;
+        sb = 500;
+        bb = 1000;
+        pot = 0;
+        startingStackSize = 100000;
+        limitRaiseSize = bb;
 
-        //players = Game.createPlayers(5, deck, 25000);
+        //players = Game.createPlayers(5, deck, startingStackSize);
         players = new Player[6];
-        players[0] = new Player(0, deck, 25000, "Reid");
-        players[1] = new Player(1, deck, 25000, "Tyler");
-        players[2] = new Player(2, deck, 25000);
-        players[3] = new Player(3, deck, 25000);
-        players[4] = new Player(4, deck, 25000, "Dan");
-        players[5] = new Player(5, deck, 2000, "Cody");
+        players[0] = new Player(0, deck, startingStackSize, "Reid");
+        players[1] = new Player(1, deck, startingStackSize, "Tyler");
+        players[2] = new Player(2, deck, startingStackSize);
+        players[3] = new Player(3, deck, startingStackSize);
+        players[4] = new Player(4, deck, startingStackSize, "Dan");
+        players[5] = new Player(5, deck, startingStackSize / 10, "Cody");
 
         bets = new int[players.length];
         playerHasActed = new boolean[players.length];
         playersInHand = new boolean[players.length];
-        street = 0;
-        sb = 250;
-        bb = 500;
-        pot = 0;
-        limitRaiseSize = 500;
 
         startGame();
     }
