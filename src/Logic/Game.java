@@ -396,16 +396,20 @@ public class Game {
         return bigBlindIndex;
     }
 
-    public static int getBetValue(int[] bets, MainWindow gameWindow, int lastRaiseSize, Player[] players) {
+    public static int getBetValue(int[] bets, Table gameTable, int lastRaiseSize, Player[] players, int minBet, int street) {
         int betValue;
 
         try {
             betValue = Integer.parseInt(gameWindow.getRaiseText());
         } catch (NumberFormatException e) {
-            betValue = lastRaiseSize + getHighestBet(bets);
+            if(street != 0 && getHighestBet(bets) == 0) {
+                betValue = minBet;
+            } else {
+                betValue = lastRaiseSize + getHighestBet(bets);
+            }
         }
 
-        if(betValue < getHighestBet(bets) + lastRaiseSize) {
+        if(betValue < getHighestBet(bets) + lastRaiseSize && getHighestBet(bets) != 0) {
             betValue = getHighestBet(bets) + lastRaiseSize;
         }
 
@@ -640,4 +644,3 @@ public class Game {
         System.out.println("Plyaer two equity: " + p2Equity + "%");
     }
 }
-
