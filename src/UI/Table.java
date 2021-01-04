@@ -16,7 +16,7 @@ public class Table implements ActionListener {
 
     // constants
     private static final int WINDOW_WIDTH = 1000;
-    private static final int WINDOW_HEIGHT = 650;
+    private static final int WINDOW_HEIGHT = 725;
 
     // components
     private JFrame mainFrame;
@@ -132,11 +132,12 @@ public class Table implements ActionListener {
         this.players = players;
     }
 
-    public void updateButtons(Player[] players, int[] bets, int betSize){
+    public void updateButtons(Player[] players, int[] bets){
         checkButton.setEnabled(Game.checkCheckAllowed(bets));
         foldButton.setEnabled(Game.checkFoldAllowed(bets));
         callButton.setEnabled(Game.checkCallAllowed(players, bets));
-        raiseButton.setEnabled(Game.checkRaiseAllowed(players, bets, betSize));
+        raiseButton.setEnabled(Game.checkRaiseAllowed(players));
+        raiseTextBox.setText("");
 
         table.repaint();
     }
