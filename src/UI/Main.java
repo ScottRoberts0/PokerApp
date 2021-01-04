@@ -4,6 +4,7 @@ import Logic.Card;
 import Logic.Deck;
 import Logic.Game;
 import Logic.Player;
+import UI.Components.CardComponent;
 
 import java.util.Arrays;
 import java.util.InvalidPropertiesFormatException;
@@ -97,7 +98,12 @@ public class Main {
     }
 
     public static void foldButtonAction() {
-        players[Game.getCurrentActionIndex()].fold(bets, playersInHand);
+        int actionIndex = Game.getCurrentActionIndex();
+        players[actionIndex].fold(bets, playersInHand);
+        CardComponent[][] cardsToFold = gameTable.getTable().getPlayerCards();
+        cardsToFold[actionIndex][0].setHasFolded(true);
+        cardsToFold[actionIndex][1].setHasFolded(true);
+
         gameTable.updatePlayer(players);
         if (Game.checkFolds(players, playersInHand)) {
             endHand();

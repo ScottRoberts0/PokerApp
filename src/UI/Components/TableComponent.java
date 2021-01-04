@@ -337,5 +337,9 @@ public class TableComponent extends JPanel {
             cards.get(i).setAnimating(true);
         }
     }
+
+    public CardComponent[][] getPlayerCards(){
+        return playerCards;
+    }
 }
 
