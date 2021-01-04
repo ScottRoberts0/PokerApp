@@ -2,6 +2,7 @@ package UI;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import Logic.Card;
 import Logic.Game;
@@ -16,7 +17,7 @@ public class Table implements ActionListener {
 
     // constants
     private static final int WINDOW_WIDTH = 1000;
-    private static final int WINDOW_HEIGHT = 650;
+    private static final int WINDOW_HEIGHT = 725;
 
     // components
     private JFrame mainFrame;
@@ -46,11 +47,16 @@ public class Table implements ActionListener {
         table.createPlayerCards();
     }
 
+    public TableComponent getTable(){
+        return table;
+    }
+
     private void drawTable(){
         Point p;
 
         // create the table
         table = new TableComponent(players);
+        table.setBorder(new LineBorder(Color.BLACK, 5));
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = 5;
@@ -64,8 +70,10 @@ public class Table implements ActionListener {
     }
 
     private void drawControls(){
-        // create panel
         JPanel controlsPanel = new JPanel(new GridBagLayout());
+        controlsPanel.setBorder(new LineBorder(Color.BLACK, 1));
+
+        JPanel gameButtonsPanel = new JPanel();
 
         // create buttons
         foldButton = new JButton("Fold");
@@ -80,14 +88,6 @@ public class Table implements ActionListener {
         callButton.setActionCommand("Call");
         callButton.addActionListener(this);
 
-        resetButton = new JButton("Reset");
-        resetButton.setActionCommand("Reset");
-        resetButton.addActionListener(this);
-
-        testButton = new JButton("Test");
-        testButton.setActionCommand("Test");
-        testButton.addActionListener(this);
-
         raiseButton = new JButton("Raise");
         raiseButton.setActionCommand("Raise");
         raiseButton.addActionListener(this);
@@ -96,18 +96,40 @@ public class Table implements ActionListener {
         raiseTextBox = new JTextField();
         raiseTextBox.setColumns(8);
 
+        gameButtonsPanel.add(foldButton);
+        gameButtonsPanel.add(checkButton);
+        gameButtonsPanel.add(callButton);
+        gameButtonsPanel.add(raiseButton);
+        gameButtonsPanel.add(raiseTextBox);
 
-        controlsPanel.add(foldButton);
-        controlsPanel.add(checkButton);
-        controlsPanel.add(callButton);
-        controlsPanel.add(testButton);
-        controlsPanel.add(resetButton);
-        controlsPanel.add(raiseButton);
-        controlsPanel.add(raiseTextBox);
+        JPanel testButtonsPanel = new JPanel();
+
+        resetButton = new JButton("Reset");
+        resetButton.setActionCommand("Reset");
+        resetButton.addActionListener(this);
+
+        testButton = new JButton("Test");
+        testButton.setActionCommand("Test");
+        testButton.addActionListener(this);
+
+        testButtonsPanel.add(testButton, BorderLayout.LINE_END);
+        testButtonsPanel.add(resetButton, BorderLayout.LINE_END);
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 1;
+        c.weightx = 0;
+        controlsPanel.add(gameButtonsPanel, c);
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        controlsPanel.add(new JPanel(), c);
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        controlsPanel.add(testButtonsPanel, c);
 
+
+        c = new GridBagConstraints();
+        c.gridy = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
         mainPanel.add(controlsPanel, c);
     }
 
@@ -137,12 +159,6 @@ public class Table implements ActionListener {
         foldButton.setEnabled(Game.checkFoldAllowed(bets));
         callButton.setEnabled(Game.checkCallAllowed(players, bets));
         raiseButton.setEnabled(Game.checkRaiseAllowed(players, bets, betSize));
-
-        table.repaint();
-    }
-
-    public void updateTable(){
-        table.repaint();
     }
 
     public String getRaiseText(){
@@ -163,8 +179,6 @@ public class Table implements ActionListener {
             Main.resetButtonAction();
         }else if(e.getActionCommand().equals("Test")){
             Main.testButtonAction();
-
-            table.testAnimation();
         }else if(e.getActionCommand().equals("RaiseText")){
             int x = 0;
 

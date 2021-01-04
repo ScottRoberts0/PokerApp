@@ -10,7 +10,7 @@
 
 
 ============= UI ================
-1 [ ] Textbox
+1 [x] Textbox
   [x] dealer button
   [x] highlight the player who has current action
   [x] display player bets
@@ -19,7 +19,7 @@
       [x] create overloaded constructor for player class wherein we can give a player a string name
       [ ] position player name
 3 [ ] disappear cards when a player folds (or set to display card back?)
-2 [ ] Display total pot
+2 [x] Display total pot
 4 [ ] Begin animaion framework
   [ ] rebuy button
   [ ] sit out button

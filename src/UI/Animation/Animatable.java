@@ -24,6 +24,8 @@ public abstract class Animatable {
     // the current time in it's animation cycle, always 0-based so there doesn't need an initial time
     protected int currentTime;
 
+    protected EasingFunction easingFunction;
+
     protected abstract void paint(Graphics g);
 
     protected void nextStep() {
@@ -33,10 +35,10 @@ public abstract class Animatable {
         if(currentTime > totalDuration)
             currentTime = totalDuration;
 
-        double stepPercent = (double)currentTime / (double)totalDuration;
+        double progress = easingFunction.getProgress(currentTime, totalDuration);
 
-        this.currentX = (int)((double)this.originX + (((double)this.destinationX - (double)this.originX) * stepPercent));
-        this.currentY = (int)((double)this.originY + (((double)this.destinationY - (double)this.originY) * stepPercent));
+        this.currentX = (int)((double)this.originX + (((double)this.destinationX - (double)this.originX) * progress));
+        this.currentY = (int)((double)this.originY + (((double)this.destinationY - (double)this.originY) * progress));
 
         // check to see if the animation is complete
         if(currentTime == totalDuration){

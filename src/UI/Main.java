@@ -6,6 +6,7 @@ import Logic.Game;
 import Logic.Player;
 
 import java.util.Arrays;
+import java.util.InvalidPropertiesFormatException;
 
 public class Main {
 
@@ -120,8 +121,6 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        int raiseValue = Integer.parseInt(gameTable.getRaiseText());
-
         gameTable.updateButtons(players, bets, 50);
     }
 
@@ -166,6 +165,8 @@ public class Main {
 
         gameTable = new Table(players);
         gameTable.updateButtons(players, bets, 0);
+
+        gameTable.getTable().createPlayerCards(true);
     }
 
     public static void endHand() {
@@ -188,17 +189,24 @@ public class Main {
         pot = 0;
         street = 0;
         deck.shuffle();
+
         Arrays.fill(playerHasActed, false);
         Arrays.fill(playersInHand, true);
         Arrays.fill(board, null);
+
         Game.resetFolds(players);
         Game.resetBets(players, bets);
         Game.nextDealer(players);
         Game.setStartingActionIndex(players, playersInHand, street);
         Game.dealHands(players);
+
         players[Game.getSmallBlindIndex()].postBlind(sb, bets);
         players[Game.getBigBlindIndex()].postBlind(bb, bets);
+
         gameTable.updateButtons(players, bets, 0);
-        gameTable.updateTable();
+
+        gameTable.getTable().deletePlayerCards();
+
+        gameTable.getTable().createPlayerCards(true);
     }
 }

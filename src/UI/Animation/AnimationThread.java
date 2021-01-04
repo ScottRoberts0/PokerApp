@@ -35,6 +35,10 @@ public class AnimationThread extends Thread {
         animationObjects.remove(obj);
     }
 
+    public void removeAnimatableObjects(){
+        animationObjects.clear();
+    }
+
     public List<Animatable> getAnimationObjects(){
         return animationObjects;
     }
