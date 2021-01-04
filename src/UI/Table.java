@@ -106,7 +106,7 @@ public class Table implements ActionListener {
     private void createWindow(){
         mainFrame = new JFrame();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //mainFrame.setResizable(false);
+        mainFrame.setResizable(false);
 
         mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
