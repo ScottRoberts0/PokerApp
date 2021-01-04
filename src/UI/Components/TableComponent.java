@@ -6,6 +6,7 @@ import Logic.Player;
 import UI.Animation.Animatable;
 import UI.Animation.AnimationThread;
 import UI.GraphicalHelpers;
+import UI.Main;
 
 import javax.swing.JPanel;
 import java.awt.Point;
@@ -27,6 +28,7 @@ public class TableComponent extends JPanel {
     private static final int CARD_X_STAGGER = 25;
     private static final int STACK_BUFFER = 15;
     private static final int TABLE_CARD_SPACER = 5;
+    private static final int POT_LABEL_SPACER = 15;
 
     private static final int CARD_WIDTH = 52;
     private static final int CARD_HEIGHT = 76;
@@ -71,8 +73,10 @@ public class TableComponent extends JPanel {
 
         // draw the table itself
         Insets ins = getInsets();
-        g.drawOval(((this.getWidth() - TABLE_WIDTH) / 2) + ins.left, ((this.getHeight() - TABLE_HEIGHT) / 2) + ins.top, TABLE_WIDTH - ins.left - ins.right - 5,
-                TABLE_HEIGHT - ins.top - ins.bottom - 5);
+        int panelWidth = this.getWidth();
+        int x = ((panelWidth - TABLE_WIDTH) / 2) + ins.left;
+        g.drawOval(x, ((this.getHeight() - TABLE_HEIGHT) / 2) + ins.top, TABLE_WIDTH - ins.left - ins.right,
+                TABLE_HEIGHT - ins.top - ins.bottom);
 
         // draw player cards
         drawPlayerCards(g);
@@ -111,7 +115,7 @@ public class TableComponent extends JPanel {
         }
         double[] angleRadius = getPlayerAngleRadius(index);
 
-        angleRadius[1] -= POT_RADIUS_BUFFER + 20;
+        angleRadius[1] -= POT_RADIUS_BUFFER / 2;
 
         double x = (Math.sin(angleRadius[0]) * angleRadius[1]) * -1;
         double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
@@ -127,19 +131,19 @@ public class TableComponent extends JPanel {
     private void drawText(Graphics g){
         // get the table center to determine which side of the board the player is on
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
+
         // draw player stacks and bets
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
             int bet = players[i].getMoneyInPot();
-            // grab the string width
-            int stackStringWidth = g.getFontMetrics().stringWidth(stack + "");
-            int betStringWidth = g.getFontMetrics().stringWidth(bet + "");
-            int stringHeight = g.getFont().getSize();
+            int pot = Main.getPot();
+
+            int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
 
             // stack below cards
             g.drawString(stack + "",
-                    (this.getWidth() / 2) + playerPositions[i].x,
-                    (this.getHeight() / 2) + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
+                    panelCenter.x + playerPositions[i].x,
+                    panelCenter.y + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
 
             // pot in table
             double[] angleRadius = getPlayerAngleRadius(i);
@@ -150,8 +154,14 @@ public class TableComponent extends JPanel {
             double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
 
             g.drawString(bet + "",
-                    (this.getWidth() / 2) + (int)x,
-                    (this.getHeight() / 2) + (int)y);
+                    panelCenter.x  + (int)x,
+                    panelCenter.y + (int)y);
+
+            // draw the pot
+            g.drawString(pot + "",
+                    panelCenter.x - (potStringWidth / 2),
+                    panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
+                    );
         }
     }
 
@@ -234,13 +244,10 @@ public class TableComponent extends JPanel {
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
                 // grab the card image
-                // TODO: Draw card backs instead of card value if the player has folded
-                //       After next git pull, there should be a players[player].getHasFolded() function
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                         (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
                         (CARD_HEIGHT * players[player].getHand()[cardNum].getSuitValue()),
                         CARD_WIDTH, CARD_HEIGHT);
-                // TODO: After next git pull, there should be a players[player].getHasFolded() function
                 if(!players[player].getHasFolded()) {
                     cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                             (CARD_WIDTH * (players[player].getHand()[cardNum].getValue() - 2)),
@@ -280,28 +287,23 @@ public class TableComponent extends JPanel {
         int totalCards = 0;
         Point p;
 
-        for(int i = 0; i < 5; i ++){
-            if(tableCards[i] != null)
-                totalCards ++;
-            else
-                break;
-        }
-
         // grab the center of this panel
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
         // grab the card image
-        for(int i = 0; i < totalCards; i ++) {
-            BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
-                    (CARD_WIDTH * (tableCards[i].getValue() - 2)),
-                    (CARD_HEIGHT * tableCards[i].getSuitValue()),
-                    CARD_WIDTH, CARD_HEIGHT);
+        for(int i = 0; i < 5; i ++) {
+            if(tableCards[i] != null) {
+                BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
+                        (CARD_WIDTH * (tableCards[i].getValue() - 2)),
+                        (CARD_HEIGHT * tableCards[i].getSuitValue()),
+                        CARD_WIDTH, CARD_HEIGHT);
 
-            p = new Point((CARD_WIDTH * i) - (totalCards * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
+                p = new Point((CARD_WIDTH * i) - (5 * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
 
-            Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
 
-            g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+                g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
+            }
         }
     }
 

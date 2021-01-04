@@ -23,6 +23,7 @@ public class Table implements ActionListener {
     private JPanel mainPanel;
     private TableComponent table;
     private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton;
+    private JTextField raiseTextBox;
     private Player[] players;
 
     // misc vars
@@ -36,7 +37,7 @@ public class Table implements ActionListener {
 
         drawTable();
 
-        drawButtons();
+        drawControls();
 
         // show zee vindow
         mainFrame.setVisible(true);//making the frame visible
@@ -62,9 +63,11 @@ public class Table implements ActionListener {
         mainPanel.add(table, c);
     }
 
-    private void drawButtons(){
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
+    private void drawControls(){
+        // create panel
+        JPanel controlsPanel = new JPanel(new GridBagLayout());
 
+        // create buttons
         foldButton = new JButton("Fold");
         foldButton.setActionCommand("Fold");
         foldButton.addActionListener(this);
@@ -72,10 +75,6 @@ public class Table implements ActionListener {
         checkButton = new JButton("Check");
         checkButton.setActionCommand("Check");
         checkButton.addActionListener(this);
-
-        raiseButton = new JButton("Raise");
-        raiseButton.setActionCommand("Raise");
-        raiseButton.addActionListener(this);
 
         callButton = new JButton("Call");
         callButton.setActionCommand("Call");
@@ -89,18 +88,27 @@ public class Table implements ActionListener {
         testButton.setActionCommand("Test");
         testButton.addActionListener(this);
 
+        raiseButton = new JButton("Raise");
+        raiseButton.setActionCommand("Raise");
+        raiseButton.addActionListener(this);
 
-        buttonPanel.add(foldButton);
-        buttonPanel.add(checkButton);
-        buttonPanel.add(raiseButton);
-        buttonPanel.add(callButton);
-        buttonPanel.add(resetButton);
-        buttonPanel.add(testButton);
+        // create raise value textbox
+        raiseTextBox = new JTextField();
+        raiseTextBox.setColumns(8);
+
+
+        controlsPanel.add(foldButton);
+        controlsPanel.add(checkButton);
+        controlsPanel.add(callButton);
+        controlsPanel.add(testButton);
+        controlsPanel.add(resetButton);
+        controlsPanel.add(raiseButton);
+        controlsPanel.add(raiseTextBox);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 1;
 
-        mainPanel.add(buttonPanel, c);
+        mainPanel.add(controlsPanel, c);
     }
 
     private void createWindow(){
@@ -137,6 +145,10 @@ public class Table implements ActionListener {
         table.repaint();
     }
 
+    public String getRaiseText(){
+        return raiseTextBox.getText();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Fold")){
@@ -153,6 +165,10 @@ public class Table implements ActionListener {
             Main.testButtonAction();
 
             table.testAnimation();
+        }else if(e.getActionCommand().equals("RaiseText")){
+            int x = 0;
+
+            x++;
         }
     }
 }

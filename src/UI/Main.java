@@ -23,7 +23,6 @@ public class Main {
     private static int limitRaiseSize;
     private static int startingStackSize;
 
-    private static int gameState;
     private static int sb;
     private static int bb;
 
@@ -120,6 +119,8 @@ public class Main {
         }
 
         Game.printPlayers(players, bets, playersInHand);
+
+        int raiseValue = Integer.parseInt(gameTable.getRaiseText());
 
         gameTable.updateButtons(players, bets, 50);
     }
