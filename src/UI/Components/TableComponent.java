@@ -31,6 +31,7 @@ public class TableComponent extends JPanel {
     private static final int STACK_BUFFER = 15;
     private static final int TABLE_CARD_SPACER = 5;
     private static final int POT_LABEL_SPACER = 15;
+    private static final int PLAYER_NAME_SPACER = 15;
 
     public static final int CARD_WIDTH = 52;
     public static final int CARD_HEIGHT = 76;
@@ -136,6 +137,7 @@ public class TableComponent extends JPanel {
             int stack = players[i].getStack();
             int bet = players[i].getMoneyInPot();
             int pot = Main.getPot();
+            String name = players[i].getPlayerName();
 
             int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
 
@@ -157,10 +159,15 @@ public class TableComponent extends JPanel {
                     panelCenter.y + (int)y);
 
             // draw the pot
-            g.drawString(pot + "",
+            g.drawString("POT: " + pot,
                     panelCenter.x - (potStringWidth / 2),
                     panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
                     );
+
+            // draw the player name
+            g.drawString(name,
+                    panelCenter.x + playerPositions[i].x,
+                    panelCenter.y + playerPositions[i].y - (CARD_HEIGHT / 2) - PLAYER_NAME_SPACER);
         }
     }
 

@@ -399,6 +399,26 @@ public class Game {
         return bigBlindIndex;
     }
 
+    public static int getBetValue(int[] bets, Table gameTable, int lastRaiseSize, Player[] players) {
+        int betValue;
+
+        try {
+            betValue = Integer.parseInt(gameTable.getRaiseText());
+        } catch (NumberFormatException e) {
+            betValue = lastRaiseSize + getHighestBet(bets);
+        }
+
+        if(betValue < getHighestBet(bets) + lastRaiseSize) {
+            betValue = getHighestBet(bets) + lastRaiseSize;
+        }
+
+        if(players[currentActionIndex].getStack() - betValue < 0) {
+            betValue = players[currentActionIndex].getStack();
+        }
+
+        return betValue;
+    }
+
     public static boolean checkCheckAllowed(int[] bets) {
         if (bets[currentActionIndex] < getHighestBet(bets)) {
             return false;
@@ -407,11 +427,8 @@ public class Game {
         return true;
     }
 
-    public static boolean checkRaiseAllowed(Player[] players, int[] bets, int betSize) {
-        int raiseSize = getHighestBet(bets) - bets[currentActionIndex] + betSize;
-        if (players[currentActionIndex].getStack() - raiseSize < 0) {
-            return false;
-        } else if(players[currentActionIndex].getStack() == 0) {
+    public static boolean checkRaiseAllowed(Player[] players) {
+        if (players[currentActionIndex].getStack() == 0) {
             return false;
         }
 
@@ -539,6 +556,14 @@ public class Game {
         for (Player player : players) {
             player.drawHand();
         }
+    }
+
+    public static void rebuy(Player[] players) {
+
+    }
+
+    public static void sitOut(Player[] players) {
+
     }
 
     public static void dealFlop(Card[] board, Deck deck) {

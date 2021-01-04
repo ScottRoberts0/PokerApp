@@ -11,8 +11,6 @@ import java.util.InvalidPropertiesFormatException;
 public class Main {
 
     private static int street;
-    private static final int GAMESTATE_WAIT_ACTION = 1;
-
     private static Table gameTable;
     private static Deck deck;
     private static Card[] board;
@@ -20,10 +18,10 @@ public class Main {
     private static int[] bets;
     private static boolean[] playerHasActed;
     private static boolean[] playersInHand;
+    private static boolean[] playersSittingOut;
     private static int pot;
-    private static int limitRaiseSize;
+    private static int lastRaiseSize;
     private static int startingStackSize;
-
     private static int sb;
     private static int bb;
 
@@ -35,7 +33,7 @@ public class Main {
         bb = 1000;
         pot = 0;
         startingStackSize = 100000;
-        limitRaiseSize = bb;
+        lastRaiseSize = bb;
 
         //players = Game.createPlayers(5, deck, startingStackSize);
         players = new Player[6];
@@ -44,11 +42,12 @@ public class Main {
         players[2] = new Player(2, deck, startingStackSize);
         players[3] = new Player(3, deck, startingStackSize);
         players[4] = new Player(4, deck, startingStackSize, "Dan");
-        players[5] = new Player(5, deck, startingStackSize / 10, "Cody");
+        players[5] = new Player(5, deck, startingStackSize, "Cody");
 
         bets = new int[players.length];
         playerHasActed = new boolean[players.length];
         playersInHand = new boolean[players.length];
+        playersSittingOut = new boolean[players.length];
 
         startGame();
     }
@@ -59,6 +58,10 @@ public class Main {
 
     public static int getPot() {
         return pot;
+    }
+
+    public static int getStartingStackSize() {
+        return startingStackSize;
     }
 
     private static void nextStreet() {
@@ -90,7 +93,7 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets, 0);
+        gameTable.updateButtons(players, bets);
     }
 
     public static void foldButtonAction() {
@@ -106,11 +109,15 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets, 0);
+        gameTable.updateButtons(players, bets);
     }
 
     public static void raiseButtonAction() {
-        players[Game.getCurrentActionIndex()].bet(limitRaiseSize, bets, playerHasActed);
+        int holder = Game.getHighestBet(bets);
+        int betValue = Game.getBetValue(bets, gameTable, lastRaiseSize, players);
+        lastRaiseSize = betValue - holder;
+
+        players[Game.getCurrentActionIndex()].raise(betValue, bets, playerHasActed);
         if (Game.checkFolds(players, playersInHand)) {
             endHand();
         } else if (Game.checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
@@ -121,7 +128,7 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets, 50);
+        gameTable.updateButtons(players, bets);
     }
 
     public static void checkButtonAction() {
@@ -136,7 +143,7 @@ public class Main {
 
         Game.printPlayers(players, bets, playersInHand);
 
-        gameTable.updateButtons(players, bets, 0);
+        gameTable.updateButtons(players, bets);
     }
 
     public static void resetButtonAction() {
@@ -164,7 +171,7 @@ public class Main {
         Game.printPlayers(players, bets, playersInHand);
 
         gameTable = new Table(players);
-        gameTable.updateButtons(players, bets, 0);
+        gameTable.updateButtons(players, bets);
 
         gameTable.getTable().createPlayerCards(true);
     }
@@ -202,8 +209,8 @@ public class Main {
 
         players[Game.getSmallBlindIndex()].postBlind(sb, bets);
         players[Game.getBigBlindIndex()].postBlind(bb, bets);
-
-        gameTable.updateButtons(players, bets, 0);
+        lastRaiseSize = bb;
+        gameTable.updateButtons(players, bets);
 
         gameTable.getTable().deletePlayerCards();
 

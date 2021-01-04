@@ -51,62 +51,37 @@ public class Player {
 
 
     public void postBlind(int betSize, int[] bets) {
+        if(stack - betSize < 0) {
+            betSize = stack;
+        }
+
         stack -= betSize;
         Main.addToPot(betSize);
         bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
-    public void bet(int betSize, int[] bets, boolean[] playerHasActed) {
-        int raiseSize = Game.getHighestBet(bets) + betSize - bets[playerNum];
-
-        System.out.println(raiseSize);
-        System.out.println(stack);
-        System.out.println(stack - raiseSize);
-
-        if (stack - raiseSize < 0) {
-            raiseSize = stack;
-            stack -= raiseSize;
-            Main.addToPot(raiseSize);
-        } else {
-            stack -= raiseSize;
-            Main.addToPot(raiseSize);
-        }
-
-        bets[playerNum] += raiseSize;
-        moneyInPot += raiseSize;
+    public void raise(int betSize, int[] bets, boolean[] playerHasActed) {
+        stack -= betSize - bets[playerNum];
+        Main.addToPot(betSize - bets[playerNum]);
+        bets[playerNum] = betSize;
+        moneyInPot = betSize;
 
         playerHasActed[playerNum] = true;
 
-        System.out.println(playerName + " raises to " + raiseSize);
+        System.out.println(playerName + " raises to " + betSize);
         System.out.println();
     }
 
     public void call(int[] bets, boolean[] playerHasActed) {
-        int highestBet = Game.getHighestBet(bets);
-        int callSize = highestBet - bets[playerNum];
-
-        System.out.println(callSize);
-        System.out.println(stack);
-        System.out.println(stack - callSize);
-
-        if (stack - callSize < 0) {
-            callSize = stack;
-        }
+        int callSize = Game.getHighestBet(bets) - bets[playerNum];
 
         stack -= callSize;
         Main.addToPot(callSize);
-
-        if(stack >= 0) {
-            bets[playerNum] = highestBet;
-            moneyInPot = highestBet;
-        } else {
-            bets[playerNum] = callSize;
-            moneyInPot = callSize;
-        }
+        bets[playerNum] += callSize;
+        moneyInPot = bets[playerNum];
 
         playerHasActed[playerNum] = true;
-
 
         System.out.println(playerName + " calls " + callSize);
         System.out.println();
