@@ -338,8 +338,9 @@ public class TableComponent extends JPanel {
         }
     }
 
-    public CardComponent[][] getPlayerCards(){
-        return playerCards;
+    public void foldPlayer(int playerNum){
+        playerCards[playerNum][0].setHasFolded(true);
+        playerCards[playerNum][1].setHasFolded(true);
     }
 }
 

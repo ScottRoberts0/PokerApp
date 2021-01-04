@@ -100,9 +100,7 @@ public class Main {
     public static void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
         players[actionIndex].fold(bets, playersInHand);
-        CardComponent[][] cardsToFold = gameTable.getTable().getPlayerCards();
-        cardsToFold[actionIndex][0].setHasFolded(true);
-        cardsToFold[actionIndex][1].setHasFolded(true);
+        gameTable.getTable().foldPlayer(actionIndex);
 
         gameTable.updatePlayer(players);
         if (Game.checkFolds(players, playersInHand)) {
