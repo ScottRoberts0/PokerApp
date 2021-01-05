@@ -67,6 +67,19 @@ public class Player {
         moneyInPot = betSize;
     }
 
+    public void refundBet(int[] bets, boolean[] playersAllIn) {
+        if(Game.checkPlayerAllIn()) {
+            for(int i = 0; i < bets.length; i++) {
+                if(i != playerNum && playersAllIn[i] && bets[playerNum] > bets[i]) {
+                    stack += bets[playerNum] - bets[i];
+                    bets[playerNum] -= stack;
+                    moneyInPot = bets[playerNum];
+                    Game.addToPot(-stack);
+                }
+            }
+        }
+    }
+
     public void raise(int betSize, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
         if(stack - betSize == 0) {
             bets[playerNum] += betSize;

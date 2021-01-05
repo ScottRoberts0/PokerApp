@@ -19,6 +19,7 @@ public class Game {
     private static Player[] players;
 
     private static int[] bets;
+    private static int[] stacks;
     private static boolean[] playerHasActed;
     private static boolean[] playersInHand;
     private static boolean[] playersSittingOut;
@@ -84,6 +85,21 @@ public class Game {
 
     public static void addToPot(int betSize) {
         pots.set(0, pots.get(0) + betSize);
+        createSidePot(betSize);
+    }
+
+    public static void createSidePot(int betSize) {
+        if(checkPlayerAllIn() && getNumPlayersInHand() > 2) {
+            for(int i = 0; i < playersAllIn.length; i++) {
+                if(!playersAllIn[i]) {
+                    pots.add(betSize);
+                }
+            }
+        }
+    }
+
+    public static boolean checkSidePotPresent() {
+        return pots.size() > 1;
     }
 
     public static ArrayList<Integer> getPots() {
@@ -121,10 +137,11 @@ public class Game {
         lastRaiseSize = bb;
         minBet = bb;
 
-        players = createPlayers(2, deck, startingStackSize);
+        players = createPlayers(3, deck, startingStackSize);
 
         // init arrays
         bets = new int[players.length];
+        stacks = new int[players.length];
         playerHasActed = new boolean[players.length];
         playersInHand = new boolean[players.length];
         playersSittingOut = new boolean[players.length];
@@ -132,6 +149,7 @@ public class Game {
 
         Arrays.fill(board, null);
         Arrays.fill(playersInHand, true);
+        updateStacksArray();
         resetBets();
 
         pickRandomDealer();
@@ -191,6 +209,7 @@ public class Game {
         Arrays.fill(playersInHand, true);
         Arrays.fill(playersAllIn, false);
         Arrays.fill(board, null);
+        updateStacksArray();
 
         resetFolds();
         resetBets();
@@ -211,6 +230,19 @@ public class Game {
     public static void resetStacks() {
         for(Player player : players) {
             player.resetStack();
+        }
+        updateStacksArray();
+    }
+
+    public static void updateStacksArray() {
+        for(int i = 0; i < stacks.length; i++) {
+            stacks[i] = players[i].getStack();
+        }
+    }
+
+    public static void refundBets() {
+        for(Player player : players) {
+            player.refundBet(bets, playersAllIn);
         }
     }
 
@@ -487,8 +519,8 @@ public class Game {
 
     public static int getNumPlayersInHand() {
         int count = 0;
-        for(boolean player : playersInHand) {
-            if(player) {
+        for(boolean inHand : playersInHand) {
+            if(inHand) {
                 count++;
             }
         }
@@ -531,17 +563,6 @@ public class Game {
             }
         }
         return false;
-    }
-
-    public static void createSidePot(int betSize) {
-        if(checkPlayerAllIn()) {
-            for(int i = 0; i < playersAllIn.length; i++) {
-                if(playersAllIn[i]) {
-
-                }
-            }
-        }
-        pots.add(betSize);
     }
 
     public static boolean checkFolds() {
