@@ -30,9 +30,10 @@ public class Main {
 
     public static void beginUI(){
         gameWindow = new MainWindow();
-        gameWindow.updateButtons();
 
-        gameWindow.getTable().createPlayerCards(true);
+        if(Game.getPlayers() != null) {
+            gameWindow.getTable().createPlayerCards(true);
+        }
     }
 
     public static MainWindow getGameWindow(){

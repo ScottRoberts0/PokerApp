@@ -1,31 +1,46 @@
 package Networking;
 
 import Networking.MessageHandlers.PokerHandler;
-import Networking.MessageHandlers.PokerMessage;
-import UI.Main;
+import Networking.Messages.PokerClientMessage;
+import Networking.Messages.PokerMessage;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.messages.BeamMessage;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
 public class Networker {
+
+    private static Networker instance;
 
     private BeamServer server;
     private BeamClient client;
 
+    private int numPlayers;
+    private int playerNum;
+
     private boolean isServer;
 
     public Networker(boolean isServer){
+        instance = this;
         this.isServer = isServer;
+
+        this.numPlayers = 0;
 
         if(isServer){
             beginServer();
         }else{
             beginClient();
         }
+    }
+
+    public static Networker getInstance(){
+        return instance;
+    }
+
+    public void incrementPlayers(){
+        numPlayers++;
     }
 
     public void beginServer(){
@@ -58,13 +73,28 @@ public class Networker {
         }catch (IOException e1){
             client = null;
             System.out.println(e1.getMessage());
-            //System.exit(3);
+            System.exit(3);
             return;
         }
-        while(!client.isConnected()) {
 
-        }
+        // wait around until the connection is complete
+        while(!client.isConnected()) {}
+
         System.out.println("Connected");
+
+        // handshake with the server. Send a player name and wait for your player number.
+        PokerClientMessage message = new PokerClientMessage();
+        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_HANDSHAKE);
+
+        BeamMessage response = client.sendMessage(message);
+
+        if(response != null){
+            System.out.println("Response received");
+            PokerClientMessage cm = new PokerClientMessage(response);
+            PokerClientMessage.handleClientMessage(cm);
+        }else{
+            System.out.println("Response not received");
+        }
     }
 
     public boolean getIsServer(){
@@ -75,7 +105,12 @@ public class Networker {
         if(isServer) {
             server.close();
         }else {
+
             client.close();
         }
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
     }
 }

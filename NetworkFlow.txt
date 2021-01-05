@@ -1,0 +1,8 @@
+Server
+
+Client
+    Conenct to server
+    Wait for connection
+    Sent message to server with player name
+        Wait for server response with:
+            Player num

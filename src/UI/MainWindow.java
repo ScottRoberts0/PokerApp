@@ -8,6 +8,7 @@ import javax.swing.border.MatteBorder;
 import Logic.Card;
 import Logic.Game;
 import UI.Components.TableComponent;
+import UI.Listeners.MainWindowListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,9 +37,6 @@ public class MainWindow implements ActionListener {
 
         // show zee vindow
         mainFrame.setVisible(true);//making the frame visible
-
-        // create some cards
-        table.createPlayerCards();
     }
 
     public TableComponent getTable(){
@@ -49,7 +47,7 @@ public class MainWindow implements ActionListener {
         Point p;
 
         // create the table
-        table = new TableComponent(Game.getPlayers());
+        table = new TableComponent();
         table.setBorder(new LineBorder(Color.BLACK, 5));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -73,18 +71,22 @@ public class MainWindow implements ActionListener {
         foldButton = new JButton("Fold");
         foldButton.setActionCommand("Fold");
         foldButton.addActionListener(this);
+        foldButton.setEnabled(false);
 
         checkButton = new JButton("Check");
         checkButton.setActionCommand("Check");
         checkButton.addActionListener(this);
+        checkButton.setEnabled(false);
 
         callButton = new JButton("Call");
         callButton.setActionCommand("Call");
         callButton.addActionListener(this);
+        callButton.setEnabled(false);
 
         raiseButton = new JButton("Raise");
         raiseButton.setActionCommand("Raise");
         raiseButton.addActionListener(this);
+        raiseButton.setEnabled(false);
 
         // create raise value textbox
         raiseTextBox = new JTextField();
@@ -101,10 +103,12 @@ public class MainWindow implements ActionListener {
         resetButton = new JButton("Reset");
         resetButton.setActionCommand("Reset");
         resetButton.addActionListener(this);
+        resetButton.setEnabled(false);
 
         testButton = new JButton("Test");
         testButton.setActionCommand("Test");
         testButton.addActionListener(this);
+        testButton.setEnabled(false);
 
         testButtonsPanel.add(testButton, BorderLayout.LINE_END);
         testButtonsPanel.add(resetButton, BorderLayout.LINE_END);
@@ -129,7 +133,7 @@ public class MainWindow implements ActionListener {
 
     private void createWindow(){
         mainFrame = new JFrame();
-        mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new MainWindowListener());
         mainFrame.setResizable(false);
 
         String title = "ULTRA POKER!";
