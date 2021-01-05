@@ -136,7 +136,7 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
             int bet = players[i].getMoneyInPot();
-            int pot = Main.getPotList();
+            int pot = Game.getPot();
             String name = players[i].getPlayerName();
 
             int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
@@ -343,4 +343,3 @@ public class TableComponent extends JPanel {
         playerCards[playerNum][1].setHasFolded(true);
     }
 }
-

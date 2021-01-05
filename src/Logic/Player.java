@@ -62,14 +62,14 @@ public class Player {
         }
 
         stack -= betSize;
-        Main.addToPot(betSize);
+        Game.addToPot(betSize);
         bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
     public void raise(int betSize, int[] bets, boolean[] playerHasActed) {
         stack -= betSize - bets[playerNum];
-        Main.addToPot(betSize - bets[playerNum]);
+        Game.addToPot(betSize - bets[playerNum]);
         bets[playerNum] = betSize;
         moneyInPot = betSize;
 
@@ -80,10 +80,10 @@ public class Player {
     }
 
     public void call(int[] bets, boolean[] playerHasActed) {
-        int callSize = Game.getHighestBet(bets) - bets[playerNum];
+        int callSize = Game.getHighestBet() - bets[playerNum];
 
         stack -= callSize;
-        Main.addToPot(callSize);
+        Game.addToPot(callSize);
         bets[playerNum] += callSize;
         moneyInPot = bets[playerNum];
 
