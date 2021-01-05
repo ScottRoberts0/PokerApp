@@ -4,10 +4,9 @@ import Logic.Card;
 import Logic.Deck;
 import Logic.Game;
 import Logic.Player;
-import UI.Components.CardComponent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.InvalidPropertiesFormatException;
 
 public class Main {
 
@@ -20,7 +19,7 @@ public class Main {
     private static boolean[] playerHasActed;
     private static boolean[] playersInHand;
     private static boolean[] playersSittingOut;
-    private static int pot;
+    private static ArrayList<Integer> potList;
     private static int lastRaiseSize;
     private static int startingStackSize;
     private static int sb;
@@ -33,7 +32,8 @@ public class Main {
         street = 0;
         sb = 500;
         bb = 1000;
-        pot = 0;
+        potList = new ArrayList<Integer>(1);
+        potList.add(0);
         startingStackSize = 100000;
         lastRaiseSize = bb;
         minBet = bb;
@@ -56,11 +56,11 @@ public class Main {
     }
 
     public static void addToPot(int betSize) {
-        pot += betSize;
+        potList.set(0, potList.get(0) + betSize);
     }
 
-    public static int getPot() {
-        return pot;
+    public static int getPotList() {
+        return potList.get(0);
     }
 
     public static int getStartingStackSize() {
@@ -79,7 +79,7 @@ public class Main {
         } else if (street == 3) {
             Game.river(players, board, deck, playersInHand, gameTable);
         } else if (street >= 4) {
-            Game.getWinners(players, board, playersInHand, pot);
+            Game.getWinners(players, board, playersInHand, potList);
             endHand();
         }
     }
@@ -186,7 +186,7 @@ public class Main {
         if (Game.checkFolds(players, playersInHand)) {
             for (int i = 0; i < playersInHand.length; i++) {
                 if (playersInHand[i]) {
-                    players[i].win(pot);
+                    players[i].win(potList.get(0));
                     break;
                 }
             }
@@ -199,7 +199,8 @@ public class Main {
         Game.printHands(players, playersInHand);
         Game.printBoard(board);
 
-        pot = 0;
+        potList.clear();
+        potList.add(0);
         street = 0;
         deck.shuffle();
 

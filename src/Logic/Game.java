@@ -3,6 +3,7 @@ package Logic;
 import UI.Main;
 import UI.Table;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -232,7 +233,7 @@ public class Game {
         gameTable.setTableCards(board);
     }
 
-    public static void getWinners(Player[] players, Card[] board, boolean[] playersInHand, int pot) {
+    public static void getWinners(Player[] players, Card[] board, boolean[] playersInHand, ArrayList<Integer> potList) {
         boolean[] winners = Evaluator.findWinner(players, board, playersInHand);
 
         int winnerCount = 0;
@@ -244,7 +245,7 @@ public class Game {
 
         for (int i = 0; i < winners.length; i++) {
             if (winners[i]) {
-                players[i].win(pot / winnerCount);
+                players[i].win(potList.get(0) / winnerCount);
             }
         }
     }
@@ -543,7 +544,7 @@ public class Game {
                     + players[i].getStack() + " " + info);
         }
         System.out.println();
-        System.out.println("POT: " + Main.getPot());
+        System.out.println("POT: " + Main.getPotList());
         System.out.println();
     }
 
