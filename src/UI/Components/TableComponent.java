@@ -136,11 +136,8 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < Game.getPlayers().length; i ++){
             int stack = Game.getPlayers()[i].getStack();
             int bet = Game.getPlayers()[i].getMoneyInPot();
-            int mainPot = Game.getPots().get(0);
+            String mainPot = Game.getMainPot().toString();
             int sidePot = 0;
-            if(Game.checkSidePotPresent()) {
-                sidePot = Game.getPots().get(1);
-            }
             String name = Game.getPlayers()[i].getPlayerName();
 
             int potStringWidth = g.getFontMetrics().stringWidth(mainPot + "");
@@ -167,11 +164,11 @@ public class TableComponent extends JPanel {
             // check if there is a side pot, if not...
             if(!Game.checkSidePotPresent()) {
                 // just draw the main pot
-                g.drawString("POT: " + mainPot,
+                g.drawString(mainPot,
                         panelCenter.x - (potStringWidth / 2),
                         panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
                 );
-            } else if(Game.checkSidePotPresent()) {
+            } /*else if(Game.checkSidePotPresent()) {
                 // or draw both pots
                 g.drawString("MAIN POT: " + mainPot,
                         panelCenter.x - (potStringWidth),
@@ -183,7 +180,7 @@ public class TableComponent extends JPanel {
                         panelCenter.x - (potStringWidth),
                         panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
                 );
-            }
+            }*/
 
 
 

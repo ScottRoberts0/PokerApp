@@ -191,8 +191,7 @@ public class MainWindow implements ActionListener {
     }
 
     public void callButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
-        Game.refundBets();
+        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getMainPot(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
         Game.updateStacksArray();
 
         if (Game.checkFolds()) {
@@ -213,7 +212,6 @@ public class MainWindow implements ActionListener {
         int actionIndex = Game.getCurrentActionIndex();
 
         Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand());
-        Game.refundBets();
         Game.updateStacksArray();
 
         getTable().foldPlayer(actionIndex);
@@ -236,8 +234,7 @@ public class MainWindow implements ActionListener {
         int betValue = Game.getBetValue();
         Game.setLastRaiseSize(betValue - holder);
 
-        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
-        Game.refundBets();
+        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getMainPot(), Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
         Game.updateStacksArray();
 
         if (Game.checkFolds()) {
@@ -256,7 +253,6 @@ public class MainWindow implements ActionListener {
 
     public void checkButtonAction() {
         Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getPlayerHasActed());
-        Game.refundBets();
         Game.updateStacksArray();
 
         if (Game.checkFolds()) {

@@ -17,6 +17,7 @@ public class Game {
     private static Deck deck;
     private static Card[] board;
     private static Player[] players;
+    private static Pot mainPot;
 
     private static int[] bets;
     private static int[] stacks;
@@ -83,23 +84,18 @@ public class Game {
         return minBet;
     }
 
+    public static Pot getMainPot() { return mainPot; }
+
     public static void addToPot(int betSize) {
         pots.set(0, pots.get(0) + betSize);
-        createSidePot(betSize);
     }
 
     public static void createSidePot(int betSize) {
-        if(checkPlayerAllIn() && getNumPlayersInHand() > 2) {
-            for(int i = 0; i < playersAllIn.length; i++) {
-                if(!playersAllIn[i]) {
-                    pots.add(betSize);
-                }
-            }
-        }
+
     }
 
     public static boolean checkSidePotPresent() {
-        return pots.size() > 1;
+        return false;
     }
 
     public static ArrayList<Integer> getPots() {
@@ -131,6 +127,7 @@ public class Game {
         street = 0;
         sb = 500;
         bb = 1000;
+        mainPot = new Pot(1);
         pots = new ArrayList<>();
         pots.add(0);
         startingStackSize = 100000;
@@ -157,8 +154,8 @@ public class Game {
         dealHands();
 
         setStartingActionIndex();
-        players[getSmallBlindIndex()].postBlind(sb, bets);
-        players[getBigBlindIndex()].postBlind(bb, bets);
+        players[getSmallBlindIndex()].postBlind(sb, bets, mainPot);
+        players[getBigBlindIndex()].postBlind(bb, bets, mainPot);
 
         printPlayers();
     }
@@ -200,6 +197,7 @@ public class Game {
         printHands();
         printBoard();
 
+        mainPot.resetPot();
         pots.clear();
         pots.add(0);
         street = 0;
@@ -217,8 +215,8 @@ public class Game {
         setStartingActionIndex();
         dealHands();
 
-        players[getSmallBlindIndex()].postBlind(sb, bets);
-        players[getBigBlindIndex()].postBlind(bb, bets);
+        players[getSmallBlindIndex()].postBlind(sb, bets, mainPot);
+        players[getBigBlindIndex()].postBlind(bb, bets, mainPot);
         lastRaiseSize = bb;
         Main.getGameWindow().updateButtons();
 
@@ -241,9 +239,7 @@ public class Game {
     }
 
     public static void refundBets() {
-        for(Player player : players) {
-            player.refundBet(bets, playersAllIn);
-        }
+
     }
 
     /**
@@ -750,6 +746,7 @@ public class Game {
         }
         System.out.println();
         System.out.println("POT: " + pots.get(0));
+        System.out.println(mainPot);
         System.out.println();
     }
 

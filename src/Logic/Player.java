@@ -56,40 +56,34 @@ public class Player {
         Arrays.fill(hand, null);
     }
 
-    public void postBlind(int betSize, int[] bets) {
+    public void postBlind(int betSize, int[] bets, Pot mainPot) {
         if(stack - betSize < 0) {
             betSize = stack;
         }
 
         stack -= betSize;
         Game.addToPot(betSize);
+        mainPot.addToPot(betSize);
         bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
-    public void refundBet(int[] bets, boolean[] playersAllIn) {
-        if(Game.checkPlayerAllIn()) {
-            for(int i = 0; i < bets.length; i++) {
-                if(i != playerNum && playersAllIn[i] && bets[playerNum] > bets[i]) {
-                    stack += bets[playerNum] - bets[i];
-                    bets[playerNum] -= stack;
-                    moneyInPot = bets[playerNum];
-                    Game.addToPot(-stack);
-                }
-            }
-        }
+    public void refundBet(int[] bets, boolean[] playersAllIn, Pot pot) {
+
     }
 
-    public void raise(int betSize, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
+    public void raise(int betSize, Pot pot, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
         if(stack - betSize == 0) {
             bets[playerNum] += betSize;
             moneyInPot = bets[playerNum];
 
             stack -= betSize;
             Game.addToPot(betSize);
+            pot.addToPot(betSize);
         } else {
             stack -= betSize - bets[playerNum];
             Game.addToPot(betSize - bets[playerNum]);
+            pot.addToPot(betSize - bets[playerNum]);
 
             bets[playerNum] = betSize;
             moneyInPot = bets[playerNum];
@@ -105,7 +99,7 @@ public class Player {
         System.out.println();
     }
 
-    public void call(int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
+    public void call(int[] bets, Pot pot, boolean[] playerHasActed, boolean[] playersAllIn) {
         int callSize = Game.getHighestBet() - bets[playerNum];
 
         if(stack - callSize < 0) {
@@ -114,6 +108,7 @@ public class Player {
 
         stack -= callSize;
         Game.addToPot(callSize);
+        pot.addToPot(callSize);
 
         bets[playerNum] += callSize;
         moneyInPot = bets[playerNum];
