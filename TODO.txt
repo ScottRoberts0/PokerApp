@@ -1,3 +1,6 @@
+============= Misc ==============
+[ ] create executable file for beta testers
+
 ============= Logic =============
 [x] update buttons so that checking isn't allowed by first player preflop
 [x] automate next hand

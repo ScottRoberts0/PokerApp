@@ -618,6 +618,10 @@ public class Game {
         return bigBlindIndex;
     }
 
+    public static boolean[] getPlayersAllIn() {
+        return Arrays.copyOf(playersAllIn, playersAllIn.length);
+    }
+
     public static int getBetValue() {
         int betValue;
 

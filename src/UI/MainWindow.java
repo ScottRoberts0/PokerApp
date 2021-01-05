@@ -190,7 +190,7 @@ public class MainWindow implements ActionListener {
     }
 
     public void callButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getPlayerHasActed());
+        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
@@ -231,7 +231,7 @@ public class MainWindow implements ActionListener {
         int betValue = Game.getBetValue();
         Game.setLastRaiseSize(betValue - holder);
 
-        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getBets(), Game.getPlayerHasActed());
+        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
