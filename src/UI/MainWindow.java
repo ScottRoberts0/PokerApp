@@ -133,6 +133,7 @@ public class MainWindow implements ActionListener {
 
     private void createWindow(){
         mainFrame = new JFrame();
+        // TODO: this doesn't close the application
         mainFrame.addWindowListener(new MainWindowListener());
         mainFrame.setResizable(false);
 

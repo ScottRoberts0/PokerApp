@@ -11,6 +11,7 @@
 [x] min bets on streets
 [ ] rebuy logic
 [ ] sit out logic
+[ ] Can bet less than BB on streets > 0
 
 
 ============= UI ================
