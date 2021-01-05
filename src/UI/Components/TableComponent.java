@@ -136,17 +136,17 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < Game.getPlayers().length; i ++){
             int stack = Game.getPlayers()[i].getStack();
             int bet = Game.getPlayers()[i].getMoneyInPot();
-            int pot = Game.getPot();
+            int mainPot = Game.getPots().get(0);
             String name = Game.getPlayers()[i].getPlayerName();
 
-            int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
+            int potStringWidth = g.getFontMetrics().stringWidth(mainPot + "");
 
             // stack below cards
             g.drawString(stack + "",
                     panelCenter.x + playerPositions[i].x,
                     panelCenter.y + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
 
-            // pot in table
+            // mainPot in table
             double[] angleRadius = getPlayerAngleRadius(i);
 
             angleRadius[1] -= POT_RADIUS_BUFFER;
@@ -160,8 +160,8 @@ public class TableComponent extends JPanel {
                         panelCenter.y + (int) y);
             }
 
-            // draw the pot
-            g.drawString("POT: " + pot,
+            // draw the mainPot
+            g.drawString("POT: " + mainPot,
                     panelCenter.x - (potStringWidth / 2),
                     panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
                     );

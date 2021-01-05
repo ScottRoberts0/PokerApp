@@ -5,14 +5,17 @@
 [x] update buttons so that checking isn't allowed by first player preflop
 [x] automate next hand
 [ ] side pots
-    - big job
+    [x] populate allin array
+    [ ] bring back portion of player's stack that covers all in player
+    [ ] figure out how to track who belongs to what pot
 [x] redo raising logic, it's fucked for players that would be all in, allows negative stacks
 [x] redo checking raises allowed, it's fucked, allows negative stacks
 [x] min bets on streets
 [ ] rebuy logic
 [ ] sit out logic
-[ ] Can bet less than BB on streets > 0
-
+[x] Can bet less than BB on streets > 0
+[x] run hand method
+[ ] finish check hand finish method
 
 ============= UI ================
 1 [x] Textbox
@@ -25,7 +28,7 @@
       [x] position player name
 3 [x] disappear cards when a player folds (or set to display card back?)
 2 [x] Display total pot
-4 [x] Begin animaion framework
+4 [x] Begin animation framework
   [ ] rebuy button
   [ ] sit out check box
 

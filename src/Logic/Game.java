@@ -23,7 +23,6 @@ public class Game {
     private static boolean[] playersInHand;
     private static boolean[] playersSittingOut;
     private static boolean[] playersAllIn;
-    private static int pot;
     private static ArrayList<Integer> pots;
     private static int lastRaiseSize;
     private static int startingStackSize;
@@ -67,6 +66,10 @@ public class Game {
         return startingStackSize;
     }
 
+    public static boolean[] getPlayersAllIn() {
+        return Arrays.copyOf(playersAllIn, playersAllIn.length);
+    }
+
     public static int getSb() {
         return sb;
     }
@@ -80,12 +83,12 @@ public class Game {
     }
 
     public static void addToPot(int betSize) {
-        pot += betSize;
         pots.set(0, pots.get(0) + betSize);
     }
 
-    public static int getPot(){
-        return pot;
+    public static ArrayList<Integer> getPots() {
+        ArrayList<Integer> copy = pots;
+        return copy;
     }
 
     public static void nextStreet() {
@@ -112,21 +115,13 @@ public class Game {
         street = 0;
         sb = 500;
         bb = 1000;
-        pot = 0;
-        pots = new ArrayList<Integer>();
+        pots = new ArrayList<>();
         pots.add(0);
         startingStackSize = 100000;
         lastRaiseSize = bb;
         minBet = bb;
 
-        //players = createPlayers(5, deck, startingStackSize);
-        players = new Player[6];
-        players[0] = new Player(0, deck, startingStackSize, "Reid");
-        players[1] = new Player(1, deck, startingStackSize, "Tyler");
-        players[2] = new Player(2, deck, startingStackSize);
-        players[3] = new Player(3, deck, startingStackSize);
-        players[4] = new Player(4, deck, startingStackSize, "Dan");
-        players[5] = new Player(5, deck, startingStackSize, "Cody");
+        players = createPlayers(2, deck, startingStackSize);
 
         // init arrays
         bets = new int[players.length];
@@ -147,8 +142,6 @@ public class Game {
         players[getSmallBlindIndex()].postBlind(sb, bets);
         players[getBigBlindIndex()].postBlind(bb, bets);
 
-
-
         printPlayers();
     }
 
@@ -156,10 +149,30 @@ public class Game {
         if (checkFolds()) {
             for (int i = 0; i < playersInHand.length; i++) {
                 if (playersInHand[i]) {
-                    players[i].win(pot);
+                    players[i].win(pots.get(0));
                     break;
                 }
             }
+        }
+
+        resetHand();
+    }
+
+    public static void runHand() {
+        if(street == 0) {
+            flop(Main.getGameWindow());
+            turn(Main.getGameWindow());
+            river(Main.getGameWindow());
+            getWinners();
+        } else if(street == 1) {
+            turn(Main.getGameWindow());
+            river(Main.getGameWindow());
+            getWinners();
+        } else if(street == 2) {
+            river(Main.getGameWindow());
+            getWinners();
+        } else if(street == 3) {
+            getWinners();
         }
 
         resetHand();
@@ -169,7 +182,6 @@ public class Game {
         printHands();
         printBoard();
 
-        pot = 0;
         pots.clear();
         pots.add(0);
         street = 0;
@@ -182,7 +194,6 @@ public class Game {
 
         resetFolds();
         resetBets();
-        //resetStacks();
         nextDealer();
         setStartingActionIndex();
         dealHands();
@@ -357,12 +368,6 @@ public class Game {
         }
     }
 
-
-    //debugging. put street logic into a method and call it from each street
-    //check stack math
-    //all in situations
-    //not allowing stacks to go below 0
-    //look at post flop set current action 3 players left
     public static Player[] createPlayers(int numPlayers, Deck deck, int stackSize) {
         Player[] players = new Player[numPlayers];
         for (int i = 0; i < players.length; i++) {
@@ -435,98 +440,10 @@ public class Game {
 
         for (int i = 0; i < winners.length; i++) {
             if (winners[i]) {
-                players[i].win(pot / winnerCount);
+                players[i].win(pots.get(0) / winnerCount);
             }
         }
     }
-
-
-    /*public static void hand(Player[] players, Card[] board, Deck deck, int sb, int bb) {
-        pot = 0;
-        Arrays.fill(board, null);
-
-        boolean[] playersInHand = new boolean[players.length];
-        Arrays.fill(playersInHand, true);
-
-        boolean[] playerHasActed = new boolean[players.length];
-
-        int[] bets = new int[players.length];
-
-        preFlop(players, bets, playersInHand, playerHasActed, sb, bb);
-        flop(players, board, deck, bets, playersInHand, playerHasActed);
-        turn(players, board, deck, bets, playersInHand, playerHasActed);
-        river(players, board, deck, bets, playersInHand, playerHasActed);
-        nextDealer(players);
-    }*/
-
-    /*public static void preFlop(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed, int sb, int bb) {
-        System.out.println(">>>>>>>>>>>>>> PREFLOP <<<<<<<<<<<<<");
-        dealHands(players);
-        printHands(players, playersInHand);
-
-        //setStartingActionIndex(players, playersInHand, 0);
-
-        players[smallBlindIndex].postBlind(sb, bets);
-        players[bigBlindIndex].postBlind(bb, bets);
-
-        printPlayers(players, bets, playersInHand);
-
-        bettingRound(players, bets, playersInHand, playerHasActed);
-    }
-
-    public static void flop(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        Arrays.fill(bets, 0);
-        Arrays.fill(playerHasActed, false);
-
-        System.out.println(">>>>>>>>>>>>>> FLOP <<<<<<<<<<<<<<<");
-        dealFlop(board, deck);
-        printBoard(board);
-
-        //setStartingActionIndex(players, playersInHand, 1);
-
-        printPlayers(players, bets, playersInHand);
-
-        bettingRound(players, bets, playersInHand, playerHasActed);
-    }
-
-    public static void turn(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        Arrays.fill(bets, 0);
-        Arrays.fill(playerHasActed, false);
-
-        System.out.println(">>>>>>>>>>>>>> TURN <<<<<<<<<<<<<<<<");
-        dealTurn(board, deck);
-        printBoard(board);
-
-        //setStartingActionIndex(players, playersInHand, 2);
-
-        printPlayers(players, bets, playersInHand);
-
-        bettingRound(players, bets, playersInHand, playerHasActed);
-    }
-
-    public static void river(Player[] players, Card[] board, Deck deck, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        Arrays.fill(bets, 0);
-        Arrays.fill(playerHasActed, false);
-
-        System.out.println(">>>>>>>>>>>>>> RIVER <<<<<<<<<<<<<<<");
-        dealRiver(board, deck);
-        printBoard(board);
-
-        //setStartingActionIndex(players, playersInHand, 3);
-
-        printPlayers(players, bets, playersInHand);
-
-        bettingRound(players, bets, playersInHand, playerHasActed);
-    }
-
-    public static void bettingRound(Player[] players, int[] bets, boolean[] playersInHand, boolean[] playerHasActed) {
-        while (!checkBettingRoundCompleted(players, bets, playersInHand, playerHasActed)) {
-            playerAction(players, bets, playersInHand, playerHasActed);
-            printHands(players, playersInHand);
-            updateCurrentAction(players, playersInHand);
-            printPlayers(players, bets, playersInHand);
-        }
-    }*/
 
     public static boolean checkBettingRoundCompleted() {
         //check if all but one has folded
@@ -598,6 +515,35 @@ public class Game {
         return false;
     }
 
+    public static void populateAllInArray() {
+        //sets array to true if player is all in
+        for(int i = 0; i < players.length; i++) {
+            if(players[i].getStack() == 0 && playersInHand[i]) {
+                playersAllIn[i] = true;
+            }
+        }
+    }
+
+    public static boolean checkPlayerAllIn() {
+        for(boolean value : playersAllIn) {
+            if(value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void createSidePot(int betSize) {
+        if(checkPlayerAllIn()) {
+            for(int i = 0; i < playersAllIn.length; i++) {
+                if(playersAllIn[i]) {
+
+                }
+            }
+        }
+        pots.add(betSize);
+    }
+
     public static boolean checkFolds() {
         //check if all but one has folded
         int foldCount = 0;
@@ -620,9 +566,6 @@ public class Game {
         return bigBlindIndex;
     }
 
-    public static boolean[] getPlayersAllIn() {
-        return Arrays.copyOf(playersAllIn, playersAllIn.length);
-    }
 
     public static int getBetValue() {
         int betValue;
@@ -637,15 +580,32 @@ public class Game {
             }
         }
 
+        //if a player raises less than the min raise size, sets their bet value to the min raise size
         if(betValue < getHighestBet() + lastRaiseSize && getHighestBet() != 0) {
             betValue = getHighestBet() + lastRaiseSize;
         }
 
+        //if a player's leading bet is less than the min bet, sets their bet value to the min bet
+        if(checkBetsAllZero() && betValue < minBet) {
+            betValue = minBet;
+        }
+
+        //puts a player all in if their bet is greater than the value of their stack
         if(players[currentActionIndex].getStack() - betValue < 0) {
             betValue = players[currentActionIndex].getStack();
         }
 
         return betValue;
+    }
+
+    public static boolean checkBetsAllZero() {
+        int zeroCount = 0;
+        for(int bet : bets) {
+            if (bet == 0) {
+                zeroCount++;
+            }
+        }
+        return zeroCount == bets.length;
     }
 
     public static boolean checkCheckAllowed() {
@@ -768,8 +728,7 @@ public class Game {
                     + players[i].getStack() + " " + info);
         }
         System.out.println();
-        System.out.println("POT: " + pot);
-        System.out.println("POT (LIST): " + pots.get(0));
+        System.out.println("POT: " + pots.get(0));
         System.out.println();
     }
 
@@ -874,7 +833,7 @@ public class Game {
     }
 
     public static Player[] getPlayers() {
-        return players;
+        return Arrays.copyOf(players, players.length);
     }
 
     public static void setLastRaiseSize(int lastRaiseSize) {

@@ -103,12 +103,12 @@ public class MainWindow implements ActionListener {
         resetButton = new JButton("Reset");
         resetButton.setActionCommand("Reset");
         resetButton.addActionListener(this);
-        resetButton.setEnabled(false);
+        resetButton.setEnabled(true);
 
         testButton = new JButton("Test");
         testButton.setActionCommand("Test");
         testButton.addActionListener(this);
-        testButton.setEnabled(false);
+        testButton.setEnabled(true);
 
         testButtonsPanel.add(testButton, BorderLayout.LINE_END);
         testButtonsPanel.add(resetButton, BorderLayout.LINE_END);
@@ -192,6 +192,7 @@ public class MainWindow implements ActionListener {
 
     public void callButtonAction() {
         Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
+
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
@@ -200,8 +201,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        System.out.println(Game.checkHandFinished());
-
+        Game.populateAllInArray();
         Game.printPlayers();
 
         updateButtons();
@@ -209,7 +209,9 @@ public class MainWindow implements ActionListener {
 
     public void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
+
         Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand());
+
         getTable().foldPlayer(actionIndex);
 
         if (Game.checkFolds()) {
@@ -219,8 +221,6 @@ public class MainWindow implements ActionListener {
         } else {
             Game.updateCurrentAction();
         }
-
-        System.out.println(Game.checkHandFinished());
 
         Game.printPlayers();
 
@@ -233,6 +233,7 @@ public class MainWindow implements ActionListener {
         Game.setLastRaiseSize(betValue - holder);
 
         Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
+
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
@@ -241,8 +242,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        System.out.println(Game.checkHandFinished());
-
+        Game.populateAllInArray();
         Game.printPlayers();
 
         updateButtons();
@@ -250,6 +250,7 @@ public class MainWindow implements ActionListener {
 
     public void checkButtonAction() {
         Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getPlayerHasActed());
+
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
@@ -258,19 +259,18 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        System.out.println(Game.checkHandFinished());
-
         Game.printPlayers();
 
         updateButtons();
     }
 
     public void resetButtonAction() {
+        Game.resetStacks();
         Game.resetHand();
         System.out.println("Reset Pressed");
     }
 
     public void testButtonAction(){
-
+        Game.runHand();
     }
 }

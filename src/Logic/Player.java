@@ -11,6 +11,7 @@ public class Player {
     private int stack;
     private final Deck deck;
     private boolean hasFolded;
+    private boolean isAllIn;
 
     private Card[] hand;
     private Card[] possCards;
@@ -52,8 +53,7 @@ public class Player {
 
 
     public void resetHand() {
-        hand[0] = null;
-        hand[1] = null;
+        Arrays.fill(hand, null);
     }
 
     public void postBlind(int betSize, int[] bets) {
