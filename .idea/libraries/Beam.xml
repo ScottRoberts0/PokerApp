@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Beam">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../Beam/out/artifacts/Beam_jar/Beam.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javax.xml.bind_2.2.0.v201105210648.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

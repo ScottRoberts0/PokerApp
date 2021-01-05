@@ -3,10 +3,10 @@ package UI;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 
 import Logic.Card;
 import Logic.Game;
-import Logic.Player;
 import UI.Components.TableComponent;
 
 import java.awt.*;
@@ -25,20 +25,14 @@ public class MainWindow implements ActionListener {
     private TableComponent table;
     private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton;
     private JTextField raiseTextBox;
-    private Player[] players;
 
-    // misc vars
-    private int numPlayers;
-
-    public MainWindow(Player[] players) {
-        this.players = players;
-        numPlayers = players.length;
+    public MainWindow() {
 
         createWindow();
 
         drawTable();
 
-        drawControls();
+        createControls();
 
         // show zee vindow
         mainFrame.setVisible(true);//making the frame visible
@@ -55,7 +49,7 @@ public class MainWindow implements ActionListener {
         Point p;
 
         // create the table
-        table = new TableComponent(players);
+        table = new TableComponent(Game.getPlayers());
         table.setBorder(new LineBorder(Color.BLACK, 5));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -69,9 +63,9 @@ public class MainWindow implements ActionListener {
         mainPanel.add(table, c);
     }
 
-    private void drawControls(){
+    private void createControls(){
         JPanel controlsPanel = new JPanel(new GridBagLayout());
-        controlsPanel.setBorder(new LineBorder(Color.BLACK, 1));
+        controlsPanel.setBorder(new MatteBorder(0, 5, 5, 5, Color.BLACK));
 
         JPanel gameButtonsPanel = new JPanel();
 
@@ -138,6 +132,14 @@ public class MainWindow implements ActionListener {
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
 
+        String title = "ULTRA POKER!";
+        if(Main.getNetworker() != null && Main.getNetworker().getIsServer()){
+            title += " - Server";
+        }else if (Main.getNetworker() != null && !Main.getNetworker().getIsServer()){
+            title += " - Client";
+        }
+        mainFrame.setTitle(title);
+
         mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         mainPanel = new JPanel(new GridBagLayout());
@@ -150,15 +152,11 @@ public class MainWindow implements ActionListener {
         table.setTableCards(cards);
     }
 
-    public void updatePlayer(Player[] players){
-        this.players = players;
-    }
-
-    public void updateButtons(Player[] players, int[] bets){
-        checkButton.setEnabled(Game.checkCheckAllowed(bets));
-        foldButton.setEnabled(Game.checkFoldAllowed(bets));
-        callButton.setEnabled(Game.checkCallAllowed(players, bets));
-        raiseButton.setEnabled(Game.checkRaiseAllowed(players));
+    public void updateButtons(){
+        checkButton.setEnabled(Game.checkCheckAllowed());
+        foldButton.setEnabled(Game.checkFoldAllowed());
+        callButton.setEnabled(Game.checkCallAllowed());
+        raiseButton.setEnabled(Game.checkRaiseAllowed());
         raiseTextBox.setText("");
     }
 
@@ -169,21 +167,97 @@ public class MainWindow implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Fold")){
-            Main.foldButtonAction();
+            foldButtonAction();
         }else if(e.getActionCommand().equals("Check")){
-            Main.checkButtonAction();
+            checkButtonAction();
         }else if(e.getActionCommand().equals("Raise")){
-            Main.raiseButtonAction();
+            raiseButtonAction();
         }else if(e.getActionCommand().equals("Call")){
-            Main.callButtonAction();
+            callButtonAction();
         }else if(e.getActionCommand().equals("Reset")){
-            Main.resetButtonAction();
+            resetButtonAction();
         }else if(e.getActionCommand().equals("Test")){
-            Main.testButtonAction();
+            testButtonAction();
         }else if(e.getActionCommand().equals("RaiseText")){
             int x = 0;
 
             x++;
         }
+    }
+
+    public void callButtonAction() {
+        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getPlayerHasActed());
+        if (Game.checkFolds()) {
+            Game.endHand();
+        } else if (Game.checkBettingRoundCompleted()) {
+            Game.nextStreet();
+        } else {
+            Game.updateCurrentAction();
+        }
+
+        Game.printPlayers();
+
+        updateButtons();
+    }
+
+    public void foldButtonAction() {
+        int actionIndex = Game.getCurrentActionIndex();
+        Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand());
+        getTable().foldPlayer(actionIndex);
+
+        if (Game.checkFolds()) {
+            Game.endHand();
+        } else if (Game.checkBettingRoundCompleted()) {
+            Game.nextStreet();
+        } else {
+            Game.updateCurrentAction();
+        }
+
+        Game.printPlayers();
+
+        updateButtons();
+    }
+
+    public void raiseButtonAction() {
+        int holder = Game.getHighestBet();
+        int betValue = Game.getBetValue();
+        Game.setLastRaiseSize(betValue - holder);
+
+        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getBets(), Game.getPlayerHasActed());
+        if (Game.checkFolds()) {
+            Game.endHand();
+        } else if (Game.checkBettingRoundCompleted()) {
+            Game.nextStreet();
+        } else {
+            Game.updateCurrentAction();
+        }
+
+        Game.printPlayers();
+
+        updateButtons();
+    }
+
+    public void checkButtonAction() {
+        Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getPlayerHasActed());
+        if (Game.checkFolds()) {
+            Game.endHand();
+        } else if (Game.checkBettingRoundCompleted()) {
+            Game.nextStreet();
+        } else {
+            Game.updateCurrentAction();
+        }
+
+        Game.printPlayers();
+
+        updateButtons();
+    }
+
+    public void resetButtonAction() {
+        Game.resetHand();
+        System.out.println("Reset Pressed");
+    }
+
+    public void testButtonAction(){
+
     }
 }

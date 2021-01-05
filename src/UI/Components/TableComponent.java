@@ -136,7 +136,7 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < numPlayers; i ++){
             int stack = players[i].getStack();
             int bet = players[i].getMoneyInPot();
-            int pot = Main.getPot();
+            int pot = Game.getPot();
             String name = players[i].getPlayerName();
 
             int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
