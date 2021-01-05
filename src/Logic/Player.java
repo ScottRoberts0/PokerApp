@@ -2,6 +2,7 @@ package Logic;
 
 import UI.Main;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Player {
@@ -56,6 +57,13 @@ public class Player {
         Arrays.fill(hand, null);
     }
 
+    public void refundBet(int bet, Pot pot, int[] bets) {
+        stack += bet;
+        pot.removeFromPot(bet);
+        bets[playerNum] -= bet;
+        moneyInPot = bets[playerNum];
+    }
+
     public void postBlind(int betSize, int[] bets, Pot mainPot) {
         if(stack - betSize < 0) {
             betSize = stack;
@@ -64,12 +72,9 @@ public class Player {
         stack -= betSize;
         Game.addToPot(betSize);
         mainPot.addToPot(betSize);
+        mainPot.addPlayerToPot(this);
         bets[playerNum] = betSize;
         moneyInPot = betSize;
-    }
-
-    public void refundBet(int[] bets, boolean[] playersAllIn, Pot pot) {
-
     }
 
     public void raise(int betSize, Pot pot, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
@@ -80,10 +85,12 @@ public class Player {
             stack -= betSize;
             Game.addToPot(betSize);
             pot.addToPot(betSize);
+            pot.addPlayerToPot(this);
         } else {
             stack -= betSize - bets[playerNum];
             Game.addToPot(betSize - bets[playerNum]);
             pot.addToPot(betSize - bets[playerNum]);
+            pot.addPlayerToPot(this);
 
             bets[playerNum] = betSize;
             moneyInPot = bets[playerNum];
@@ -109,6 +116,7 @@ public class Player {
         stack -= callSize;
         Game.addToPot(callSize);
         pot.addToPot(callSize);
+        pot.addPlayerToPot(this);
 
         bets[playerNum] += callSize;
         moneyInPot = bets[playerNum];
@@ -123,9 +131,15 @@ public class Player {
         System.out.println();
     }
 
-    public void fold(int[] bets, boolean[] playersInHand) {
+    public void fold(int[] bets, boolean[] playersInHand, ArrayList<Pot> pots) {
         bets[playerNum] = 0;
         moneyInPot = 0;
+
+        //when a player folds, they should be removed from every pot
+        for(Pot pot : pots) {
+            pot.removePlayerFromPot(this);
+        }
+
         playersInHand[playerNum] = false;
         this.hasFolded = true;
         System.out.println(playerName + " folds");

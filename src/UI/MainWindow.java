@@ -197,6 +197,7 @@ public class MainWindow implements ActionListener {
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
+            Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
@@ -211,7 +212,7 @@ public class MainWindow implements ActionListener {
     public void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
 
-        Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand());
+        Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand(), Game.getPotsList());
         Game.updateStacksArray();
 
         getTable().foldPlayer(actionIndex);
@@ -219,6 +220,7 @@ public class MainWindow implements ActionListener {
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
+            Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
@@ -240,6 +242,7 @@ public class MainWindow implements ActionListener {
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
+            Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();

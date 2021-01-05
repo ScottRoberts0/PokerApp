@@ -7,7 +7,9 @@
 [ ] side pots
     [x] populate allin array
     [ ] bring back portion of player's stack that covers all in player
-    [ ] figure out how to track who belongs to what pot
+        [ ] refundbets method kind of works... now need side pots to put the remainders into
+    [x] figure out how to track who belongs to what pot
+
 [x] redo raising logic, it's fucked for players that would be all in, allows negative stacks
 [x] redo checking raises allowed, it's fucked, allows negative stacks
 [x] min bets on streets

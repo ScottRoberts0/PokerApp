@@ -10,10 +10,15 @@ public class Pot {
     public Pot(int name) {
         this.name = name;
         this.value = 0;
+        playersInPot = new ArrayList<>();
     }
 
     public void addToPot(int bet) {
         this.value += bet;
+    }
+
+    public void removeFromPot(int bet) {
+        this.value -= bet;
     }
 
     public void resetPot() {
@@ -26,6 +31,10 @@ public class Pot {
 
     public void addPlayerToPot(Player player) {
         playersInPot.add(player);
+    }
+
+    public void removePlayerFromPot(Player player) {
+        playersInPot.remove(player);
     }
 
     public ArrayList<Player> getPlayersInPot() {
