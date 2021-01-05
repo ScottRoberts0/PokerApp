@@ -6,8 +6,8 @@ import static java.util.Arrays.fill;
 public class Evaluator {
 
     public static boolean[] findWinner(Player[] players, Card[] board, boolean[] playersInHand) {
-        for (Player player : players) {
-            player.makeMadeHand(board);
+        for (int i = 0; i < players.length; i++) {
+            players[i].makeMadeHand(board);
         }
 
         int[] handValues = new int[players.length];
@@ -42,7 +42,6 @@ public class Evaluator {
                 winningHandValue = handValues[i];
                 winnerCount = 1;
             } else if (handValues[i] == winningHandValue) {
-                madeHands[i] = players[i].makeMadeHand(board);
                 winners[i] = true;
                 winnerCount++;
             }

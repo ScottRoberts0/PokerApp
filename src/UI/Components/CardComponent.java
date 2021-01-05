@@ -49,6 +49,7 @@ public class CardComponent extends Animatable {
                     TableComponent.CARD_WIDTH, TableComponent.CARD_HEIGHT);
 
         } else {
+            //TODO why can we access TableComponent.CARD_HEIGHT? it it set to private in TableComponent
             cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                     0, TableComponent.CARD_HEIGHT * 4, TableComponent.CARD_WIDTH, TableComponent.CARD_HEIGHT);
         }

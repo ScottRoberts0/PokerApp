@@ -199,6 +199,8 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
+        System.out.println(Game.checkHandFinished());
+
         Game.printPlayers();
 
         updateButtons();
@@ -216,6 +218,8 @@ public class MainWindow implements ActionListener {
         } else {
             Game.updateCurrentAction();
         }
+
+        System.out.println(Game.checkHandFinished());
 
         Game.printPlayers();
 
@@ -236,6 +240,8 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
+        System.out.println(Game.checkHandFinished());
+
         Game.printPlayers();
 
         updateButtons();
@@ -250,6 +256,8 @@ public class MainWindow implements ActionListener {
         } else {
             Game.updateCurrentAction();
         }
+
+        System.out.println(Game.checkHandFinished());
 
         Game.printPlayers();
 
