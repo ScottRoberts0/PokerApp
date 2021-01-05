@@ -67,11 +67,24 @@ public class Player {
         moneyInPot = betSize;
     }
 
-    public void raise(int betSize, int[] bets, boolean[] playerHasActed) {
-        stack -= betSize - bets[playerNum];
-        Game.addToPot(betSize - bets[playerNum]);
-        bets[playerNum] = betSize;
-        moneyInPot = betSize;
+    public void raise(int betSize, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
+        if(stack - betSize == 0) {
+            bets[playerNum] += betSize;
+            moneyInPot = bets[playerNum];
+
+            stack -= betSize;
+            Game.addToPot(betSize);
+        } else {
+            stack -= betSize - bets[playerNum];
+            Game.addToPot(betSize - bets[playerNum]);
+
+            bets[playerNum] = betSize;
+            moneyInPot = bets[playerNum];
+        }
+
+        if(stack == 0) {
+            playersAllIn[playerNum] = true;
+        }
 
         playerHasActed[playerNum] = true;
 
@@ -79,13 +92,22 @@ public class Player {
         System.out.println();
     }
 
-    public void call(int[] bets, boolean[] playerHasActed) {
+    public void call(int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
         int callSize = Game.getHighestBet() - bets[playerNum];
+
+        if(stack - callSize < 0) {
+            callSize = stack;
+        }
 
         stack -= callSize;
         Game.addToPot(callSize);
+
         bets[playerNum] += callSize;
         moneyInPot = bets[playerNum];
+
+        if(stack == 0) {
+            playersAllIn[playerNum] = true;
+        }
 
         playerHasActed[playerNum] = true;
 
@@ -120,6 +142,10 @@ public class Player {
 
     public void resetFolded() {
         this.hasFolded = false;
+    }
+
+    public void resetStack() {
+        this.stack = Game.getStartingStackSize();
     }
 
 

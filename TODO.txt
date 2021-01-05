@@ -19,7 +19,7 @@
   [x] display player number / name
       [x] create overloaded constructor for player class wherein we can give a player a string name
       [x] position player name
-3 [ ] disappear cards when a player folds (or set to display card back?)
+3 [x] disappear cards when a player folds (or set to display card back?)
 2 [x] Display total pot
 4 [x] Begin animaion framework
   [ ] rebuy button

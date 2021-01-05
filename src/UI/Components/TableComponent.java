@@ -154,9 +154,11 @@ public class TableComponent extends JPanel {
             double x = (Math.sin(angleRadius[0]) * angleRadius[1]) * -1;
             double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
 
-            g.drawString(bet + "",
-                    panelCenter.x  + (int)x,
-                    panelCenter.y + (int)y);
+            if(bet != 0) {
+                g.drawString(bet + "",
+                        panelCenter.x + (int) x,
+                        panelCenter.y + (int) y);
+            }
 
             // draw the pot
             g.drawString("POT: " + pot,
