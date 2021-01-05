@@ -180,7 +180,7 @@ public class Game {
 
         resetFolds();
         resetBets();
-        resetStacks();
+        //resetStacks();
         nextDealer();
         setStartingActionIndex();
         dealHands();
