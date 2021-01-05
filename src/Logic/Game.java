@@ -147,6 +147,8 @@ public class Game {
         players[getSmallBlindIndex()].postBlind(sb, bets);
         players[getBigBlindIndex()].postBlind(bb, bets);
 
+
+
         printPlayers();
     }
 
@@ -180,7 +182,7 @@ public class Game {
 
         resetFolds();
         resetBets();
-        resetStacks();
+        //resetStacks();
         nextDealer();
         setStartingActionIndex();
         dealHands();

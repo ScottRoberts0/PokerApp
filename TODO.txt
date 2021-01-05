@@ -29,7 +29,6 @@
   [ ] sit out check box
 
 ============= Server ================
-
   [ ] Create a test build configuration for basic server testing using a new argument
   [ ] Create a server
   [ ] Create a client

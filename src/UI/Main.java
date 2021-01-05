@@ -17,9 +17,11 @@ public class Main {
                 networker = new Networker(true);
                 Game.startGame();
                 beginUI();
+                gameWindow.updateButtons();
             }else{
                 Game.startGame();
                 beginUI();
+                gameWindow.updateButtons();
             }
         }
     }
