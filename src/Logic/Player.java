@@ -170,7 +170,6 @@ public class Player {
         this.stack = Game.getStartingStackSize();
     }
 
-
     public void drawHand() {
         hand[0] = deck.drawCard();
         hand[1] = deck.drawCard();

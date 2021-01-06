@@ -19,6 +19,7 @@ public class Game {
     private static Player[] players;
     private static Pot mainPot;
     private static ArrayList<Pot> potsList;
+    private static int potCounter = 1;
 
     private static int[] bets;
     private static int[] stacks;
@@ -95,9 +96,16 @@ public class Game {
         pots.set(0, pots.get(0) + betSize);
     }
 
-    public static void createSidePot(int betSize) {
+    public static void createSidePot() {
         //how do we know when to create a side pot?
         //a player has just gone all in and there are players in the hand with money left in their stacks
+        potCounter++;
+        Pot sidePot = new Pot(potCounter);
+        potsList.add(sidePot);
+
+        for(int i = 0; i < stacks.length; i++) {
+
+        }
     }
 
     public static void refundBets() {
@@ -144,6 +152,7 @@ public class Game {
         street = 0;
         sb = 500;
         bb = 1000;
+        potCounter = 1;
         mainPot = new Pot(1);
         potsList = new ArrayList<>();
         potsList.add(mainPot);
@@ -153,6 +162,7 @@ public class Game {
         lastRaiseSize = bb;
         minBet = bb;
 
+        //players = Game.createPlayers(8, deck, startingStackSize);
         players = new Player[3];
         players[0] = new Player(0, deck, startingStackSize, "Reid");
         players[1] = new Player(1, deck, 75000, "Tyler");
@@ -219,6 +229,7 @@ public class Game {
         printHands();
         printBoard();
 
+        potCounter = 1;
         mainPot.resetPot();
         pots.clear();
         pots.add(0);

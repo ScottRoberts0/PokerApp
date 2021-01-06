@@ -42,6 +42,13 @@ public class Pot {
         return copy;
     }
 
+    public void printPlayersInPot() {
+        System.out.println("POT " + name + ":");
+        for(Player player : playersInPot) {
+            System.out.println(player);
+        }
+    }
+
     public String toString() {
         if(name == 1) {
             return "MAIN POT: " + value + "§";

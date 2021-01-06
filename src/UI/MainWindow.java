@@ -234,6 +234,7 @@ public class MainWindow implements ActionListener {
     public void raiseButtonAction() {
         int holder = Game.getHighestBet();
         int betValue = Game.getBetValue();
+
         Game.setLastRaiseSize(betValue - holder);
 
         Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getMainPot(), Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());

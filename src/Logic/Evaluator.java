@@ -1,13 +1,15 @@
 package Logic;
 import java.util.Arrays;
 
-import static java.util.Arrays.fill;
+import java.util.Arrays;
 
 public class Evaluator {
 
     public static boolean[] findWinner(Player[] players, Card[] board, boolean[] playersInHand) {
         for (int i = 0; i < players.length; i++) {
-            players[i].makeMadeHand(board);
+            if(playersInHand[i]) {
+                players[i].makeMadeHand(board);
+            }
         }
 
         int[] handValues = new int[players.length];
@@ -29,7 +31,9 @@ public class Evaluator {
         Card[][] madeHands = new Card[players.length][5];
 
         for (int i = 0; i < madeHands.length; i++) {
-            madeHands[i] = players[i].makeMadeHand(board);
+            if(playersInHand[i]) {
+                madeHands[i] = players[i].makeMadeHand(board);
+            }
         }
 
         int winningHandValue = -1;
@@ -37,7 +41,7 @@ public class Evaluator {
 
         for (int i = 0; i < handValues.length; i++) {
             if (handValues[i] > winningHandValue) {
-                fill(winners, false);
+                Arrays.fill(winners, false);
                 winners[i] = true;
                 winningHandValue = handValues[i];
                 winnerCount = 1;
@@ -179,10 +183,10 @@ public class Evaluator {
 
     private static void createToolArrays(Card[] possCards, int[] counter, int[] suitCounter, int[][] specialCounter) {
         //reset all these arrays
-        fill(counter, 0);
-        fill(suitCounter, 0);
+        Arrays.fill(counter, 0);
+        Arrays.fill(suitCounter, 0);
         for (int i = 0; i < suitCounter.length; i++) {
-            fill(specialCounter[i], 0);
+            Arrays.fill(specialCounter[i], 0);
         }
 
         for (int i = 0; i < possCards.length; i++) {
