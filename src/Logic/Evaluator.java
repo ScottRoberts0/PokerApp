@@ -2,22 +2,32 @@ package Logic;
 import java.util.Arrays;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Evaluator {
 
-    public static boolean[] findWinner(Player[] players, Card[] board, boolean[] playersInHand) {
-        for (int i = 0; i < players.length; i++) {
-            if(playersInHand[i]) {
+    public static ArrayList<Player> findWinner(Card[] board, Pot pot) {
+        /*for (int i = 0; i < players.length; i++) {
+            if(pot.containsPlayer(players[i])) {
                 players[i].makeMadeHand(board);
+            }
+        }*/
+
+        ArrayList<Player> players = pot.getPlayersInPot();
+        ArrayList<Player> winningPlayers = new ArrayList<>();
+        boolean[] winners = new boolean[pot.getNumPlayersInPot()];
+        Card[][] madeHands = new Card[pot.getNumPlayersInPot()][5];
+
+        for (int i = 0; i < madeHands.length; i++) {
+            if(pot.containsPlayer(players.get(i))) {
+                madeHands[i] = players.get(i).makeMadeHand(board);
             }
         }
 
-        int[] handValues = new int[players.length];
+        int[] handValues = new int[pot.getNumPlayersInPot()];
         for (int i = 0; i < handValues.length; i++) {
-            if(playersInHand[i]) {
-                handValues[i] = players[i].getMadeHandValue();
-            } else {
-                handValues[i] = -1;
+            if(pot.containsPlayer(players.get(i))) {
+                handValues[i] = players.get(i).getMadeHandValue();
             }
         }
 
@@ -27,14 +37,6 @@ public class Evaluator {
         }
         System.out.println();
 
-        boolean[] winners = new boolean[players.length];
-        Card[][] madeHands = new Card[players.length][5];
-
-        for (int i = 0; i < madeHands.length; i++) {
-            if(playersInHand[i]) {
-                madeHands[i] = players[i].makeMadeHand(board);
-            }
-        }
 
         int winningHandValue = -1;
         int winnerCount = 1;
@@ -85,7 +87,13 @@ public class Evaluator {
         }
         System.out.println();
 
-        return Arrays.copyOf(winners, winners.length);
+        for(int i = 0; i < winners.length; i++) {
+            if(winners[i]) {
+                winningPlayers.add(players.get(i));
+            }
+        }
+
+        return winningPlayers;
     }
 
     public static Card[] makeMadeHand(Card[] possCards) {

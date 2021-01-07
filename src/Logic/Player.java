@@ -12,16 +12,10 @@ public class Player {
     private int stack;
     private final Deck deck;
     private boolean hasFolded;
-    private boolean isAllIn;
 
     private Card[] hand;
     private Card[] possCards;
     private Card[] madeHand;
-
-    //various utility arrays
-    private int[] counter = new int[15];
-    private int[] suitCounter = new int[4];
-    private int[][] specialCounter = new int[4][15];
 
     public Player(int playerNum, Deck deck) {
         hand = new Card[2];
@@ -64,92 +58,95 @@ public class Player {
         moneyInPot = bets[playerNum];
     }
 
-    public void postBlind(int betSize, int[] bets, Pot mainPot) {
+    public void postBlind(int betSize, Pot mainPot) {
         if(stack - betSize < 0) {
             betSize = stack;
         }
 
         stack -= betSize;
         Game.addToPot(betSize);
-        mainPot.addToPot(betSize);
-        mainPot.addPlayerToPot(this);
-        bets[playerNum] = betSize;
+        mainPot.addToPot(betSize, playerNum);
+        mainPot.addPlayerToPot(this, betSize);
+        //bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
-    public void raise(int betSize, Pot pot, int[] bets, boolean[] playerHasActed, boolean[] playersAllIn) {
+    public void raise(int betSize, Pot pot) {
         if(stack - betSize == 0) {
-            bets[playerNum] += betSize;
-            moneyInPot = bets[playerNum];
+            //bets[playerNum] += betSize;
+            moneyInPot += betSize;
 
             stack -= betSize;
             Game.addToPot(betSize);
-            pot.addToPot(betSize);
-            pot.addPlayerToPot(this);
+            pot.addToPot(betSize, playerNum);
+            if(!pot.containsPlayer(this)) {
+                pot.addPlayerToPot(this, betSize);
+            }
         } else {
-            stack -= betSize - bets[playerNum];
-            Game.addToPot(betSize - bets[playerNum]);
-            pot.addToPot(betSize - bets[playerNum]);
-            pot.addPlayerToPot(this);
+            stack -= betSize - pot.getBets()[playerNum];
+            Game.addToPot(betSize - pot.getBets()[playerNum]);
+            pot.addToPot(betSize - pot.getBets()[playerNum], playerNum);
+            if(!pot.containsPlayer(this)) {
+                pot.addPlayerToPot(this, betSize);
+            }
 
-            bets[playerNum] = betSize;
-            moneyInPot = bets[playerNum];
+            moneyInPot = betSize;
         }
 
-        if(stack == 0) {
-            playersAllIn[playerNum] = true;
-        }
-
-        playerHasActed[playerNum] = true;
+        pot.setPlayerActed(playerNum, true);
 
         System.out.println(playerName + " raises to " + betSize);
         System.out.println();
+
+        pot.printPlayersInPot();
     }
 
-    public void call(int[] bets, Pot pot, boolean[] playerHasActed, boolean[] playersAllIn) {
-        int callSize = Game.getHighestBet() - bets[playerNum];
+    public void call(Pot pot) {
+        int callSize = Game.getHighestBet() - pot.getBets()[playerNum];
 
         if(stack - callSize < 0) {
             callSize = stack;
         }
 
+        moneyInPot += callSize;
+
         stack -= callSize;
         Game.addToPot(callSize);
-        pot.addToPot(callSize);
-        pot.addPlayerToPot(this);
-
-        bets[playerNum] += callSize;
-        moneyInPot = bets[playerNum];
-
-        if(stack == 0) {
-            playersAllIn[playerNum] = true;
+        pot.addToPot(callSize, playerNum);
+        if(!pot.containsPlayer(this)) {
+            pot.addPlayerToPot(this, callSize);
         }
 
-        playerHasActed[playerNum] = true;
+        pot.setPlayerActed(playerNum, true);
 
         System.out.println(playerName + " calls " + callSize);
         System.out.println();
+
+        pot.printPlayersInPot();
     }
 
-    public void fold(int[] bets, boolean[] playersInHand, ArrayList<Pot> pots) {
-        bets[playerNum] = 0;
+    public void fold(ArrayList<Pot> pots) {
         moneyInPot = 0;
 
         //when a player folds, they should be removed from every pot
         for(Pot pot : pots) {
             pot.removePlayerFromPot(this);
+            pot.setPlayerActed(playerNum, false);
         }
 
-        playersInHand[playerNum] = false;
         this.hasFolded = true;
+
         System.out.println(playerName + " folds");
         System.out.println();
     }
 
-    public void check(boolean[] playerHasActed) {
-        playerHasActed[playerNum] = true;
+    public void check(Pot pot) {
+        pot.setPlayerActed(playerNum, true);
+
         System.out.println(playerName + " checks");
         System.out.println();
+
+        pot.printPlayersInPot();
     }
 
     public void win(int potSize) {
@@ -277,6 +274,6 @@ public class Player {
     }
 
     public String toString() {
-        return "Player " + getPlayerNum() + " stack: " + getStack() + " cards: " + hand[0].toString() + ", " + hand[1].toString();
+        return playerName + " stack: " + getStack() + " cards: " + hand[0].toString() + ", " + hand[1].toString();
     }
 }

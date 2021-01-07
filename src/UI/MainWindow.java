@@ -191,19 +191,17 @@ public class MainWindow implements ActionListener {
     }
 
     public void callButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getBets(), Game.getMainPot(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
-        Game.updateStacksArray();
+        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            Game.refundBets();
+            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
         }
 
-        Game.populateAllInArray();
         Game.printPlayers();
 
         updateButtons();
@@ -212,15 +210,14 @@ public class MainWindow implements ActionListener {
     public void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
 
-        Game.getPlayers()[actionIndex].fold(Game.getBets(), Game.getPlayersInHand(), Game.getPotsList());
-        Game.updateStacksArray();
+        Game.getPlayers()[actionIndex].fold(Game.getPotsList());
 
         getTable().foldPlayer(actionIndex);
 
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            Game.refundBets();
+            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
@@ -233,31 +230,28 @@ public class MainWindow implements ActionListener {
 
     public void raiseButtonAction() {
         int holder = Game.getHighestBet();
-        int betValue = Game.getBetValue();
+        int betValue = Game.formatBetValue();
 
         Game.setLastRaiseSize(betValue - holder);
 
-        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getMainPot(), Game.getBets(), Game.getPlayerHasActed(), Game.getPlayersAllIn());
-        Game.updateStacksArray();
+        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            Game.refundBets();
+            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
         }
 
-        Game.populateAllInArray();
         Game.printPlayers();
 
         updateButtons();
     }
 
     public void checkButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getPlayerHasActed());
-        Game.updateStacksArray();
+        Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
