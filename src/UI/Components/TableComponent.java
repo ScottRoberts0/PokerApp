@@ -136,17 +136,18 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < Game.getPlayers().length; i ++){
             int stack = Game.getPlayers()[i].getStack();
             int bet = Game.getPlayers()[i].getMoneyInPot();
-            int pot = Game.getPot();
+            String mainPot = Game.getMainPot().toString();
+            int sidePot = 0;
             String name = Game.getPlayers()[i].getPlayerName();
 
-            int potStringWidth = g.getFontMetrics().stringWidth(pot + "");
+            int potStringWidth = g.getFontMetrics().stringWidth(mainPot + "");
 
             // stack below cards
             g.drawString(stack + "",
                     panelCenter.x + playerPositions[i].x,
                     panelCenter.y + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
 
-            // pot in table
+            // mainPot in table
             double[] angleRadius = getPlayerAngleRadius(i);
 
             angleRadius[1] -= POT_RADIUS_BUFFER;
@@ -160,11 +161,28 @@ public class TableComponent extends JPanel {
                         panelCenter.y + (int) y);
             }
 
-            // draw the pot
-            g.drawString("POT: " + pot,
-                    panelCenter.x - (potStringWidth / 2),
-                    panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
-                    );
+            // check if there is a side pot, if not...
+            if(!Game.checkSidePotPresent()) {
+                // just draw the main pot
+                g.drawString(mainPot,
+                        panelCenter.x - (potStringWidth / 2),
+                        panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
+                );
+            } /*else if(Game.checkSidePotPresent()) {
+                // or draw both pots
+                g.drawString("MAIN POT: " + mainPot,
+                        panelCenter.x - (potStringWidth),
+                        panelCenter.y - (CARD_HEIGHT / 2) - (POT_LABEL_SPACER * 2)
+                );
+
+                //draw the side pot
+                g.drawString("SIDE POT: " + sidePot,
+                        panelCenter.x - (potStringWidth),
+                        panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
+                );
+            }*/
+
+
 
             // draw the player name
             g.drawString(name,
