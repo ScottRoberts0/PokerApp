@@ -27,6 +27,10 @@ public class Pot {
         this.bets[playerNum] += bet;
     }
 
+    public void addToPot(int bet) {
+        this.potValue += bet;
+    }
+
     public void removeFromPot(int bet) {
         this.potValue -= bet;
     }
@@ -89,38 +93,77 @@ public class Pot {
         return false;
     }
 
-    //create side pots based on gaps in bets
-    //TODO: sort playersinpot so that they correspond to their bets
+    //create side pots based on gaps in bets, must be called after betting round is complete!
+    //TODO: continue to debug and test
     public ArrayList<Pot> createSidePots() {
         ArrayList<Pot> pots = new ArrayList<>();
-        System.out.println(getNumPlayersInPot());
+        ArrayList<Integer> betsSorted = new ArrayList<>();
+        ArrayList<Player> playersSorted = new ArrayList<>();
+
+        for(int bet : bets) {
+            if(bet > 0) {
+                betsSorted.add(bet);
+            }
+        }
+
         //sort bets and players in ascending order, and so they remain one-to-one
         boolean sorted = false;
         while(!sorted) {
             sorted = true;
-            for (int i = 0; i < bets.length - 1; i++) {
-                if (bets[i + 1] < bets[i]) {
-                    int temp = bets[i];
-                    //Player temporary = playersInPot.get(i);
-
-                    bets[i] = bets[i + 1];
-                    //playersInPot.set(i, playersInPot.get(i + 1));
-
-                    bets[i + 1] = temp;
-                    //playersInPot.set(i + 1, temporary);
+            for (int i = 0; i < betsSorted.size() - 1; i++) {
+                if (betsSorted.get(i + 1) < betsSorted.get(i)) {
+                    int temp = betsSorted.get(i);
+                    betsSorted.set(i, betsSorted.get(i + 1));
+                    betsSorted.set(i + 1, temp);
 
                     sorted = false;
                 }
             }
         }
-        printBets();
 
-        for(int i = 0; i < bets.length - 1; i++) {
-            if(bets[i] < bets[i + 1]) {
-                Pot sidePot = new Pot(Game.getPots().size());
-                for(int j = playersInPot.size(); j > i; j--) {
-                    sidePot.addPlayerToPot(playersInPot.get(j));
+        for(int bet : betsSorted) {
+            for(int j = 0; j < playersInPot.size(); j++) {
+                if(playersInPot.get(j).getMoneyInPot() == bet && !playersSorted.contains(playersInPot.get(j))) {
+                    playersSorted.add(playersInPot.get(j));
                 }
+            }
+        }
+
+
+
+        //testing output:
+        for(int bet : betsSorted) {
+            System.out.println(bet);
+        }
+        System.out.println();
+        for(Player player : playersInPot) {
+            System.out.println(player);
+        }
+        System.out.println();
+
+
+
+        int potCount = Game.getPots().size() + 1;
+        for(int i = 0; i < betsSorted.size() - 1; i++) {
+            //condition for createing a side pot: there is a player all in, or there is a difference in bet sizes after all bets have finished
+            if(betsSorted.get(i) < betsSorted.get(i + 1) || playersSorted.get(i).getStack() == 0) {
+                int difference = betsSorted.get(i + 1) - betsSorted.get(i);
+                Pot sidePot = new Pot(potCount);
+                potCount++;
+
+                //add players to the side pot
+                for(int j = i + 1; j < playersSorted.size(); j++) {
+                    sidePot.addPlayerToPot(playersSorted.get(j));
+                }
+
+                //add money to the side pot, remove money from the main pot
+                for(int j = 0; j < sidePot.playersInPot.size(); j++) {
+                    if(bets[sidePot.playersInPot.get(j).getPlayerNum()] == betsSorted.get(i + 1)) {
+                        Game.getCurrentPot().removeFromPot(difference);
+                        sidePot.addToPot(difference);
+                    }
+                }
+
                 pots.add(sidePot);
             }
         }
@@ -136,32 +179,6 @@ public class Pot {
             }
         }
         return count;
-    }
-
-    //must be called after betting is complete
-    public boolean checkPlayerAllIn() {
-        for(int i = 0; i < playersInPot.size(); i++) {
-            if (playersInPot.get(i).getStack() == 0 && bets[playersInPot.get(i).getPlayerNum()] < getHighestBet()) return true;
-            break;
-        }
-        return false;
-    }
-
-    //must be called after betting is complete
-    public ArrayList<Player> findPlayersForSidePot() {
-        ArrayList<Player> playersForSidePot = new ArrayList<>();
-        for(int i = 0; i < playersInPot.size(); i++) {
-            if(playersInPot.get(i).getStack() > 0) {
-                playersForSidePot.add(playersInPot.get(i));
-            }
-        }
-        return playersForSidePot;
-    }
-
-    public void testPrinter() {
-        for(int i = 0; i < findPlayersForSidePot().size(); i++) {
-            System.out.println(findPlayersForSidePot().get(i));
-        }
     }
 
     //returns true if the player is involved in the pot
@@ -216,12 +233,6 @@ public class Pot {
             System.out.println(player);
         }
         System.out.println();
-    }
-
-    public void printBets() {
-        for(int bet : bets) {
-            System.out.println(bet);
-        }
     }
 
     public String toString() {

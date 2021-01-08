@@ -93,8 +93,6 @@ public class Player {
 
         System.out.println(playerName + " raises to " + betSize);
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void call(Pot pot) {
@@ -116,8 +114,6 @@ public class Player {
 
         System.out.println(playerName + " calls " + callSize);
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void fold(ArrayList<Pot> pots) {
@@ -140,8 +136,6 @@ public class Player {
 
         System.out.println(playerName + " checks");
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void win(int potSize) {

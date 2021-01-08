@@ -82,7 +82,7 @@ public class Game {
     }
 
     //must be called after betting is complete
-    public static void createSidePot() {
+/*    public static void createSidePot() {
         //adds the appropriate players from the previous pot to the new side pot.
         //sets the current pot to the new side pot.
         ArrayList<Player> playersForSidePot = currentPot.findPlayersForSidePot();
@@ -106,7 +106,7 @@ public class Game {
                 currentPot.addToPot(highestBet - lowestBet, player.getPlayerNum());
             }
         }
-    }
+    }*/
 
     public static boolean checkSidePotPresent() {
         return false;
@@ -119,9 +119,11 @@ public class Game {
         currentPot.resetPlayerHasActed();
 
         //check if side pot is required, and create said side pot
-        ArrayList<Pot> newPots = currentPot.createSidePots();
-        pots.addAll(newPots);
-        currentPot = pots.get(pots.size() - 1);
+        if(currentPot.getNumPlayersInPot() > 2) {
+            ArrayList<Pot> newPots = currentPot.createSidePots();
+            pots.addAll(newPots);
+            currentPot = pots.get(pots.size() - 1);
+        }
 
         for(Pot pot : pots) {
             pot.resetBets();
@@ -675,7 +677,7 @@ public class Game {
         }
         System.out.println();
         for(Pot pot : pots) {
-            System.out.println(pot);
+            pot.printPlayersInPot();
         }
         System.out.println();
     }
