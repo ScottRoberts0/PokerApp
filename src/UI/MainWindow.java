@@ -7,6 +7,7 @@ import javax.swing.border.MatteBorder;
 
 import Logic.Card;
 import Logic.Game;
+import Networking.Networker;
 import UI.Components.TableComponent;
 import UI.Listeners.MainWindowListener;
 
@@ -24,7 +25,7 @@ public class MainWindow implements ActionListener {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private TableComponent table;
-    private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton;
+    private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton, test2Button;
     private JTextField raiseTextBox;
 
     public MainWindow() {
@@ -110,6 +111,12 @@ public class MainWindow implements ActionListener {
         testButton.addActionListener(this);
         testButton.setEnabled(true);
 
+        test2Button = new JButton("Test2");
+        test2Button.setActionCommand("Test2");
+        test2Button.addActionListener(this);
+        test2Button.setEnabled(true);
+
+        testButtonsPanel.add(test2Button, BorderLayout.LINE_END);
         testButtonsPanel.add(testButton, BorderLayout.LINE_END);
         testButtonsPanel.add(resetButton, BorderLayout.LINE_END);
 
@@ -183,6 +190,8 @@ public class MainWindow implements ActionListener {
             resetButtonAction();
         }else if(e.getActionCommand().equals("Test")){
             testButtonAction();
+        }else if(e.getActionCommand().equals("Test2")){
+            test2ButtonAction();
         }else if(e.getActionCommand().equals("RaiseText")){
             int x = 0;
 
@@ -273,5 +282,9 @@ public class MainWindow implements ActionListener {
 
     public void testButtonAction(){
         Game.runHand();
+    }
+
+    public void test2ButtonAction(){
+        Networker.getInstance().broadCastGameData();
     }
 }

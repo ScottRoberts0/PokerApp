@@ -14,21 +14,29 @@ public class PokerClientMessage extends LegacyMessage {
         super (message);
     }
 
-    public static void handleClientMessage(LegacyMessage message){
+    public static void handleServerResponse(LegacyMessage message){
         String messageType = message.getString(PokerMessage.MESSAGE_TYPE);
         System.out.println("Type: " + messageType);
 
         // ---------------------------- Handshake -----------------------
         if(messageType.equals(PokerMessage.MESSAGE_TYPE_HANDSHAKE)){
-            Integer playerNum = message.getInt(PokerMessage.MESSAGE_PLAYERNUM);
-
-            System.out.println("PlayerNum: " + playerNum);
+            handleHandshake(message);
         }
         // ---------------------------- Error -----------------------
         else if(messageType.equals(PokerMessage.MESSAGE_TYPE_ERROR)){
 
         }
+    }
 
+    public static void handleHandshake(LegacyMessage message){
+        Integer playerNum = message.getInt(PokerMessage.MESSAGE_PLAYERNUM);
 
+        System.out.println("PlayerNum: " + playerNum);
+    }
+
+    public static void handleGameDataMessage(LegacyMessage message){
+        Integer numPlyaers = message.getInt(PokerMessage.MESSAGE_NUMPLAYERS);
+
+        System.out.println("Num Players: " + numPlyaers);
     }
 }

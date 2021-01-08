@@ -18,8 +18,7 @@ public class PokerHandler extends LegacyHandler {
 
     @Override
     public LegacyMessage messageReceived(Communicator communicator, LegacyMessage message) {
-
-
+        // handle the received message given the user type
         if(Networker.getInstance().getIsServer())
             return serverMessageReceived(message);
         else
@@ -38,7 +37,7 @@ public class PokerHandler extends LegacyHandler {
             // ------------------------ Handshaking -----------------------
             if(messageType.equals(PokerMessage.MESSAGE_TYPE_HANDSHAKE)){
                 // handle handshaking
-                response = handleHandshakingMessage(message);
+                response = PokerServerMessage.handleHandshakingMessage(message);
             }
             // ------------------------ Error -----------------------
             else {
@@ -62,25 +61,13 @@ public class PokerHandler extends LegacyHandler {
         // get a response ready
         PokerServerMessage response = new PokerServerMessage();
 
-        return response;
-    }
-
-    private PokerServerMessage handleHandshakingMessage(LegacyMessage message){
-        PokerServerMessage response = new PokerServerMessage();
-
-        // grab the playername
-        String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
-        System.out.println(playerName + "");
-
-        // set the response type
-        response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_HANDSHAKE);
-        // send the player back their playerNum
-        response.setInt(PokerMessage.MESSAGE_PLAYERNUM, Networker.getInstance().getNumPlayers());
-
-
-        // increment the players
-        Networker.getInstance().incrementPlayers();
+        String messageType = message.getString(PokerMessage.MESSAGE_TYPE);
+        // ------------------------ Game Data Message -----------------------
+        if(messageType.equals(PokerMessage.MESSAGE_TYPE_GAME_DATA)){
+            PokerClientMessage.handleGameDataMessage(message);
+        }
 
         return response;
     }
+
 }

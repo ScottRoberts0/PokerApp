@@ -3,6 +3,7 @@ package Networking;
 import Networking.MessageHandlers.PokerHandler;
 import Networking.Messages.PokerClientMessage;
 import Networking.Messages.PokerMessage;
+import Networking.Messages.PokerServerMessage;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.messages.BeamMessage;
@@ -63,7 +64,6 @@ public class Networker {
         try {
             // create the client and connect to the server
             client = new BeamClient("127.0.0.1", "PokerClient", 45800, false);
-            client.addHandler(PokerHandler.class);
 
             System.out.println("Connecting...");
             client.connect();
@@ -80,9 +80,10 @@ public class Networker {
 
         // wait around until the connection is complete
         while(!client.isConnected()) {}
-
-
         System.out.println("Connected");
+
+        // add a handler
+        client.addHandler(PokerHandler.class);
 
         // handshake with the server. Send a player name and wait for your player number.
         PokerClientMessage message = new PokerClientMessage();
@@ -94,7 +95,7 @@ public class Networker {
         if(response != null){
             System.out.println("Response received");
             PokerClientMessage cm = new PokerClientMessage(response);
-            PokerClientMessage.handleClientMessage(cm);
+            PokerClientMessage.handleServerResponse(cm);
         }else{
             System.out.println("Response not received");
         }
@@ -102,6 +103,21 @@ public class Networker {
 
     public boolean getIsServer(){
         return isServer;
+    }
+
+    public void broadCastGameData(){
+        if(!isServer)
+            return;
+
+        PokerServerMessage message = new PokerServerMessage();
+        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_GAME_DATA); // put in the message type as neccessary
+
+        // start plugging this message full of data
+        
+        message.setInt(PokerMessage.MESSAGE_NUMPLAYERS, 2);
+
+
+        server.broadcast(message);
     }
 
     public void close(){

@@ -752,7 +752,10 @@ public class Game {
     }
 
     public static Player[] getPlayers() {
-        return Arrays.copyOf(players, players.length);
+        if(players != null) {
+            return Arrays.copyOf(players, players.length);
+        }
+        return null;
     }
 
     public static void setLastRaiseSize(int lastRaiseSize) {
