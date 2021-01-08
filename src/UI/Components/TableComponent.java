@@ -3,6 +3,7 @@ package UI.Components;
 import Logic.Card;
 import Logic.Game;
 import Logic.Player;
+import Logic.Pot;
 import UI.Animation.Animatable;
 import UI.Animation.AnimationThread;
 import UI.Animation.InOutQuintEasingFunction;
@@ -136,11 +137,14 @@ public class TableComponent extends JPanel {
         for(int i = 0; i < Game.getPlayers().length; i ++){
             int stack = Game.getPlayers()[i].getStack();
             int bet = Game.getPlayers()[i].getMoneyInPot();
-            String mainPot = Game.getMainPot().toString();
+            StringBuilder pots = new StringBuilder();
+            for(Pot pot : Game.getPots()) {
+                pots.append(pot).append(" ");
+            }
             int sidePot = 0;
             String name = Game.getPlayers()[i].getPlayerName();
 
-            int potStringWidth = g.getFontMetrics().stringWidth(mainPot + "");
+            int potStringWidth = g.getFontMetrics().stringWidth(pots + "");
 
             // stack below cards
             g.drawString(stack + "",
@@ -164,7 +168,7 @@ public class TableComponent extends JPanel {
             // check if there is a side pot, if not...
             if(!Game.checkSidePotPresent()) {
                 // just draw the main pot
-                g.drawString(mainPot,
+                g.drawString(pots.toString(),
                         panelCenter.x - (potStringWidth / 2),
                         panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
                 );
