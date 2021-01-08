@@ -8,6 +8,7 @@ public class PokerMessage {
     public final static String MESSAGE_BASIC = "client_message";
     public final static String MESSAGE_HANDSHAKE = "handshake";
     public final static String MESSAGE_PLAYERNUM = "playernum";
+    public final static String MESSAGE_PLAYERNAME = "playername";
     public final static String MESSAGE_ERROR = "error";
 
 }

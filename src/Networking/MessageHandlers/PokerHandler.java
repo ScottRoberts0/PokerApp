@@ -18,6 +18,15 @@ public class PokerHandler extends LegacyHandler {
 
     @Override
     public LegacyMessage messageReceived(Communicator communicator, LegacyMessage message) {
+
+
+        if(Networker.getInstance().getIsServer())
+            return serverMessageReceived(message);
+        else
+            return clientMessageReceived(message);
+    }
+
+    private LegacyMessage serverMessageReceived(LegacyMessage message){
         // get a response ready
         PokerServerMessage response;
 
@@ -38,26 +47,36 @@ public class PokerHandler extends LegacyHandler {
                 response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_ERROR);
                 response.setString(PokerMessage.MESSAGE_ERROR, "Did not recognize message type, bitch.");
             }
-        }else{
-            // no message type
+        }
+        // ------------------------ No message type -----------------------
+        else{
             response = new PokerServerMessage();
             response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_ERROR);
             response.setString(PokerMessage.MESSAGE_ERROR, "No message type. Did we lose it?");
         }
 
+        return response;
+    }
 
-        //send the message back
+    private LegacyMessage clientMessageReceived(LegacyMessage message){
+        // get a response ready
+        PokerServerMessage response = new PokerServerMessage();
+
         return response;
     }
 
     private PokerServerMessage handleHandshakingMessage(LegacyMessage message){
-
         PokerServerMessage response = new PokerServerMessage();
+
+        // grab the playername
+        String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
+        System.out.println(playerName + "");
 
         // set the response type
         response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_HANDSHAKE);
         // send the player back their playerNum
         response.setInt(PokerMessage.MESSAGE_PLAYERNUM, Networker.getInstance().getNumPlayers());
+
 
         // increment the players
         Networker.getInstance().incrementPlayers();

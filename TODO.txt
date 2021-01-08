@@ -31,7 +31,13 @@
 
 ============= Server ================
 
-  [ ] Create a test build configuration for basic server testing using a new argument
-  [ ] Create a server
-  [ ] Create a client
-  [ ] Send some basic data
+  [x] Create a test build configuration for basic server testing using a new argument
+  [x] Create a server
+  [x] Create a client
+  [x] Send some basic data
+  [ ] send game data
+        Player cards
+        Player stacks
+        Pot
+        bets
+

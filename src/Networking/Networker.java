@@ -63,6 +63,7 @@ public class Networker {
         try {
             // create the client and connect to the server
             client = new BeamClient("127.0.0.1", "PokerClient", 45800, false);
+            client.addHandler(PokerHandler.class);
 
             System.out.println("Connecting...");
             client.connect();
@@ -80,11 +81,13 @@ public class Networker {
         // wait around until the connection is complete
         while(!client.isConnected()) {}
 
+
         System.out.println("Connected");
 
         // handshake with the server. Send a player name and wait for your player number.
         PokerClientMessage message = new PokerClientMessage();
         message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_HANDSHAKE);
+        message.setString(PokerMessage.MESSAGE_PLAYERNAME, "Tyler");
 
         BeamMessage response = client.sendMessage(message);
 
