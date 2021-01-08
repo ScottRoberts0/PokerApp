@@ -7,13 +7,20 @@ import javax.swing.border.MatteBorder;
 
 import Logic.Card;
 import Logic.Game;
+import Logic.Player;
 import Networking.Networker;
 import UI.Components.TableComponent;
 import UI.Listeners.MainWindowListener;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 public class MainWindow implements ActionListener {
 
@@ -285,6 +292,33 @@ public class MainWindow implements ActionListener {
     }
 
     public void test2ButtonAction(){
-        Networker.getInstance().broadCastGameData();
+        JsonFactory factory = new JsonFactory();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            JsonGenerator generator = factory.createGenerator(out);
+
+            Player player1 = Game.getPlayers()[0];
+            generator.writeStartObject();
+            generator.writeStringField("name", player1.getPlayerName());
+            
+            generator.writeNumberField("value0", player1.getHand()[0].getValue());
+            generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
+            generator.writeNumberField("value1", player1.getHand()[1].getValue());
+            generator.writeNumberField("suit1", player1.getHand()[1].getSuitValue());
+
+
+            generator.writeEndObject();
+
+            generator.close();
+
+            String output = new String(out.toByteArray());
+
+            System.out.println(output);
+
+        }catch (IOException e){
+            // this will probably never throw
+        }
     }
 }
