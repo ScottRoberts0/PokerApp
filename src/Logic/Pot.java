@@ -53,13 +53,58 @@ public class Pot {
         return this.potValue;
     }
 
-    public void addPlayerToPot(Player player, int bet) {
+    public void addPlayerToPot(Player player) {
         this.playersInPot.add(player);
     }
 
     public void removePlayerFromPot(Player player) {
         this.playersInPot.remove(player);
         this.bets[player.getPlayerNum()] = 0;
+    }
+
+    public void refundBets() {
+        if(getNumPlayersInPot() == 2) {
+            if(bets[playersInPot.get(0).getPlayerNum()] > bets[playersInPot.get(1).getPlayerNum()]) {
+                //refunds the difference between players(0) and players(1)
+                playersInPot.get(0).refundBet(bets[playersInPot.get(0).getPlayerNum()] - bets[playersInPot.get(1).getPlayerNum()], this);
+            } else {
+                playersInPot.get(1).refundBet(bets[playersInPot.get(1).getPlayerNum()] - bets[playersInPot.get(0).getPlayerNum()], this);
+            }
+        }
+    }
+
+    public boolean checkSidePotRequirement() {
+        if(getNumPlayersInPot() > 2) {
+
+        }
+        return false;
+    }
+
+    //must be called after betting is complete
+    public boolean checkPlayerAllIn() {
+        for(int i = 0; i < playersInPot.size(); i++) {
+            if (playersInPot.get(i).getStack() == 0 && bets[playersInPot.get(i).getPlayerNum()] < getHighestBet()) return true;
+            break;
+        }
+        return false;
+    }
+
+    //must be called after betting is complete
+    public ArrayList<Player> findPlayersForSidePot() {
+        ArrayList<Player> playersForSidePot = new ArrayList<>();
+        for(int i = 0; i < playersInPot.size(); i++) {
+            if(playersInPot.get(i).getStack() > 0) {
+                playersForSidePot.add(playersInPot.get(i));
+            }
+        }
+        testPrinter();
+        return playersForSidePot;
+    }
+
+    public void testPrinter() {
+        for(int i = 0; i < findPlayersForSidePot().size(); i++) {
+            System.out.println(findPlayersForSidePot().get(i));
+        }
     }
 
     //returns true if the player is involved in the pot
@@ -110,7 +155,7 @@ public class Pot {
         if(name == 1) {
             return "MAIN POT: " + potValue + "§";
         } else {
-            return "SIDE POT " + name + ": " + potValue + "§";
+            return "POT " + name + ": " + potValue + "§";
         }
     }
 }

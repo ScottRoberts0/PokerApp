@@ -210,14 +210,13 @@ public class MainWindow implements ActionListener {
     public void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
 
-        Game.getPlayers()[actionIndex].fold(Game.getPotsList());
+        Game.getPlayers()[actionIndex].fold(Game.getPots());
 
         getTable().foldPlayer(actionIndex);
 
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();

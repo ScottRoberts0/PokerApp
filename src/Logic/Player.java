@@ -51,11 +51,10 @@ public class Player {
         Arrays.fill(hand, null);
     }
 
-    public void refundBet(int bet, Pot pot, int[] bets) {
+    public void refundBet(int bet, Pot pot) {
         stack += bet;
         pot.removeFromPot(bet);
-        bets[playerNum] -= bet;
-        moneyInPot = bets[playerNum];
+        moneyInPot -= bet;
     }
 
     public void postBlind(int betSize, Pot mainPot) {
@@ -64,30 +63,27 @@ public class Player {
         }
 
         stack -= betSize;
-        Game.addToPot(betSize);
+        //Game.addToPot(betSize);
         mainPot.addToPot(betSize, playerNum);
-        mainPot.addPlayerToPot(this, betSize);
+        mainPot.addPlayerToPot(this);
         //bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
     public void raise(int betSize, Pot pot) {
         if(stack - betSize == 0) {
-            //bets[playerNum] += betSize;
             moneyInPot += betSize;
 
             stack -= betSize;
-            Game.addToPot(betSize);
             pot.addToPot(betSize, playerNum);
             if(!pot.containsPlayer(this)) {
-                pot.addPlayerToPot(this, betSize);
+                pot.addPlayerToPot(this);
             }
         } else {
             stack -= betSize - pot.getBets()[playerNum];
-            Game.addToPot(betSize - pot.getBets()[playerNum]);
             pot.addToPot(betSize - pot.getBets()[playerNum], playerNum);
             if(!pot.containsPlayer(this)) {
-                pot.addPlayerToPot(this, betSize);
+                pot.addPlayerToPot(this);
             }
 
             moneyInPot = betSize;
@@ -111,10 +107,9 @@ public class Player {
         moneyInPot += callSize;
 
         stack -= callSize;
-        Game.addToPot(callSize);
         pot.addToPot(callSize, playerNum);
         if(!pot.containsPlayer(this)) {
-            pot.addPlayerToPot(this, callSize);
+            pot.addPlayerToPot(this);
         }
 
         pot.setPlayerActed(playerNum, true);
@@ -253,6 +248,10 @@ public class Player {
         return Arrays.copyOf(hand, hand.length);
     }
 
+    public boolean checkHasHand() {
+        return hand[0] != null || hand[1] != null;
+    }
+
     public int getPlayerNum() {
         return playerNum;
     }
@@ -274,6 +273,6 @@ public class Player {
     }
 
     public String toString() {
-        return playerName + " stack: " + getStack() + " cards: " + hand[0].toString() + ", " + hand[1].toString();
+        return playerName + " stack: " + getStack();
     }
 }
