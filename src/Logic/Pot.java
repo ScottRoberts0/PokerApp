@@ -64,20 +64,78 @@ public class Pot {
 
     public void refundBets() {
         if(getNumPlayersInPot() == 2) {
+            //refunds the difference between the two players to the higher player
+            int difference = bets[playersInPot.get(0).getPlayerNum()] - bets[playersInPot.get(1).getPlayerNum()];
             if(bets[playersInPot.get(0).getPlayerNum()] > bets[playersInPot.get(1).getPlayerNum()]) {
-                //refunds the difference between players(0) and players(1)
-                playersInPot.get(0).refundBet(bets[playersInPot.get(0).getPlayerNum()] - bets[playersInPot.get(1).getPlayerNum()], this);
+                playersInPot.get(0).refundBet(difference, this);
             } else {
-                playersInPot.get(1).refundBet(bets[playersInPot.get(1).getPlayerNum()] - bets[playersInPot.get(0).getPlayerNum()], this);
+                playersInPot.get(1).refundBet(difference, this);
             }
         }
     }
 
+    //TODO: check for multiple side pots in one street, IE one player has 25, another has 75, another has 100, another has 150, all go all in, requires 2 side pots
+    //must be called after betting is complete
     public boolean checkSidePotRequirement() {
         if(getNumPlayersInPot() > 2) {
-
+            for (Player player : playersInPot) {
+                if (bets[player.getPlayerNum()] < getHighestBet()) {
+                    return true;
+                } else if(player.checkPlayerAllIn() && playersWithMoneyBehind() > 1) {
+                    return true;
+                }
+            }
         }
         return false;
+    }
+
+    //create side pots based on gaps in bets
+    //TODO: sort playersinpot so that they correspond to their bets
+    public ArrayList<Pot> createSidePots() {
+        ArrayList<Pot> pots = new ArrayList<>();
+        System.out.println(getNumPlayersInPot());
+        //sort bets and players in ascending order, and so they remain one-to-one
+        boolean sorted = false;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < bets.length - 1; i++) {
+                if (bets[i + 1] < bets[i]) {
+                    int temp = bets[i];
+                    //Player temporary = playersInPot.get(i);
+
+                    bets[i] = bets[i + 1];
+                    //playersInPot.set(i, playersInPot.get(i + 1));
+
+                    bets[i + 1] = temp;
+                    //playersInPot.set(i + 1, temporary);
+
+                    sorted = false;
+                }
+            }
+        }
+        printBets();
+
+        for(int i = 0; i < bets.length - 1; i++) {
+            if(bets[i] < bets[i + 1]) {
+                Pot sidePot = new Pot(Game.getPots().size());
+                for(int j = playersInPot.size(); j > i; j--) {
+                    sidePot.addPlayerToPot(playersInPot.get(j));
+                }
+                pots.add(sidePot);
+            }
+        }
+
+        return pots;
+    }
+
+    public int playersWithMoneyBehind() {
+        int count = 0;
+        for(Player player : playersInPot) {
+            if(player.getStack() > 0) {
+                count++;
+            }
+        }
+        return count;
     }
 
     //must be called after betting is complete
@@ -97,7 +155,6 @@ public class Pot {
                 playersForSidePot.add(playersInPot.get(i));
             }
         }
-        testPrinter();
         return playersForSidePot;
     }
 
@@ -143,12 +200,28 @@ public class Pot {
         return highestBet;
     }
 
+    public int getLowestBet() {
+        int lowestBet = 2147483646;
+        for(int bet : bets) {
+            if(bet < lowestBet && bet != 0) {
+                lowestBet = bet;
+            }
+        }
+        return lowestBet;
+    }
+
     public void printPlayersInPot() {
         System.out.println("POT " + name + " PLAYERS IN POT: ");
         for(Player player : this.playersInPot) {
             System.out.println(player);
         }
         System.out.println();
+    }
+
+    public void printBets() {
+        for(int bet : bets) {
+            System.out.println(bet);
+        }
     }
 
     public String toString() {

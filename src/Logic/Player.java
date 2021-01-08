@@ -260,6 +260,10 @@ public class Player {
         return stack;
     }
 
+    public boolean checkPlayerAllIn() {
+        return stack == 0;
+    }
+
     public String getPlayerName() {
         return playerName;
     }

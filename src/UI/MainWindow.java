@@ -202,7 +202,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        Game.printPlayers();
+        Game.printPlayersAndPot();
 
         updateButtons();
     }
@@ -222,7 +222,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        Game.printPlayers();
+        Game.printPlayersAndPot();
 
         updateButtons();
     }
@@ -244,7 +244,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        Game.printPlayers();
+        Game.printPlayersAndPot();
 
         updateButtons();
     }
@@ -260,7 +260,7 @@ public class MainWindow implements ActionListener {
             Game.updateCurrentAction();
         }
 
-        Game.printPlayers();
+        Game.printPlayersAndPot();
 
         updateButtons();
     }
