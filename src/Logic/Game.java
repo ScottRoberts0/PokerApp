@@ -94,9 +94,10 @@ public class Game {
             pot.resetBets();
         }
 
-        if(checkHandCompleted()) {
-            runHand();
-        } else {
+        //TODO: once satisified with side pots, enable the commented out lines below which will just finish hands automatically
+        //if(checkHandCompleted()) {
+        //    runHand();
+        //} else {
             street++;
             if (street == 1) {
                 flop(Main.getGameWindow());
@@ -108,7 +109,7 @@ public class Game {
                 getWinners();
                 endHand();
             }
-        }
+        //}
     }
 
     public static void startGame() {
@@ -161,7 +162,12 @@ public class Game {
     }
 
     public static boolean checkHandCompleted() {
-        return currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1 || currentPot.getNumPlayersInPot() == currentPot.getNumPlayersAllIn();
+        if(currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1) {
+            return true;
+        } /*else if(currentPot.getNumPlayersInPot() == currentPot.getNumPlayersAllIn()) {
+            return true;
+        }*/
+        return false;
     }
 
     public static void runHand() {

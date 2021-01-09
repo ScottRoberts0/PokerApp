@@ -111,15 +111,6 @@ public class Pot {
     }
 
     public void refundBets() {
-/*      if(getNumPlayersInPot() == 2) {
-            //refunds the difference between the two players to the higher player
-            int difference = bets[playersInPot.get(0).getPlayerNum()] - bets[playersInPot.get(1).getPlayerNum()];
-            if(bets[playersInPot.get(0).getPlayerNum()] > bets[playersInPot.get(1).getPlayerNum()]) {
-                playersInPot.get(0).refundBet(difference, this);
-            } else {
-                playersInPot.get(1).refundBet(difference, this);
-            }
-        }*/
         if (!Game.checkHandCompleted()) {
             ArrayList<Integer> sortedBets = sortBets();
             ArrayList<Player> sortedPlayers = sortPlayers(sortedBets);
@@ -136,10 +127,14 @@ public class Pot {
         ArrayList<Integer> sortedBets = sortBets();
         ArrayList<Player> playersSorted = sortPlayers(sortedBets);
 
+        for(int bet : sortedBets) {
+            System.out.println(bet);
+        }
+
         int potCount = Game.getPots().size() + 1;
         for(int i = 0; i < sortedBets.size() - 1; i++) {
             //condition for createing a side pot: there is a player all in, or there is a difference in bet sizes after all bets have finished
-            if(sortedBets.get(i) < sortedBets.get(i + 1) || playersSorted.get(i).getStack() == 0) {
+            if(sortedBets.get(i) < sortedBets.get(i + 1) || (playersSorted.get(i).getStack() == 0 && pots.get(pots.size() - 1).getNumPlayersInPot() > 2)) {
                 Pot sidePot = new Pot(potCount);
                 potCount++;
 
