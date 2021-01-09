@@ -302,7 +302,7 @@ public class MainWindow implements ActionListener {
             Player player1 = Game.getPlayers()[0];
             generator.writeStartObject();
             generator.writeStringField("name", player1.getPlayerName());
-            
+
             generator.writeNumberField("value0", player1.getHand()[0].getValue());
             generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
             generator.writeNumberField("value1", player1.getHand()[1].getValue());
