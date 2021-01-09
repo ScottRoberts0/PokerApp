@@ -1,7 +1,5 @@
 package Logic;
 
-import UI.Main;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -44,7 +42,6 @@ public class Player {
         this.stack = stack;
         this.playerName = playerName;
     }
-
 
 
     public void resetHand() {
@@ -93,8 +90,6 @@ public class Player {
 
         System.out.println(playerName + " raises to " + betSize);
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void call(Pot pot) {
@@ -116,12 +111,11 @@ public class Player {
 
         System.out.println(playerName + " calls " + callSize);
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void fold(ArrayList<Pot> pots) {
         moneyInPot = 0;
+        resetHand();
 
         //when a player folds, they should be removed from every pot
         for(Pot pot : pots) {
@@ -140,13 +134,11 @@ public class Player {
 
         System.out.println(playerName + " checks");
         System.out.println();
-
-        pot.printPlayersInPot();
     }
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println(playerName + " wins " + potSize + " satoshis!");
+        System.out.println(playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!");
         System.out.println();
     }
 
@@ -249,7 +241,7 @@ public class Player {
     }
 
     public boolean checkHasHand() {
-        return hand[0] != null || hand[1] != null;
+        return hand[0] == null || hand[1] == null;
     }
 
     public int getPlayerNum() {
@@ -277,6 +269,6 @@ public class Player {
     }
 
     public String toString() {
-        return playerName + " stack: " + getStack();
+        return playerName + " Stack: " + getStack();
     }
 }

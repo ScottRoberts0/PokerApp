@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Logic.Card;
 import Logic.Game;
@@ -33,6 +35,7 @@ public class MainWindow implements ActionListener {
     private JPanel mainPanel;
     private TableComponent table;
     private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton, test2Button;
+    private JSlider betSlider;
     private JTextField raiseTextBox;
 
     public MainWindow() {
@@ -100,11 +103,17 @@ public class MainWindow implements ActionListener {
         raiseTextBox = new JTextField();
         raiseTextBox.setColumns(8);
 
+        // create a bet slider and have it affect the raise text box
+        betSlider = new JSlider(0, Game.getPlayers()[Game.getCurrentActionIndex()].getStack());
+        ChangeListener e = e1 -> setTextValue(); //idk wtf this means but it was cleaner than the other thing
+        betSlider.addChangeListener(e);
+
         gameButtonsPanel.add(foldButton);
         gameButtonsPanel.add(checkButton);
         gameButtonsPanel.add(callButton);
         gameButtonsPanel.add(raiseButton);
         gameButtonsPanel.add(raiseTextBox);
+        gameButtonsPanel.add(betSlider);
 
         JPanel testButtonsPanel = new JPanel();
 
@@ -176,11 +185,17 @@ public class MainWindow implements ActionListener {
         foldButton.setEnabled(Game.checkFoldAllowed());
         callButton.setEnabled(Game.checkCallAllowed());
         raiseButton.setEnabled(Game.checkRaiseAllowed());
-        raiseTextBox.setText("");
+        betSlider.setMaximum(Game.getPlayers()[Game.getCurrentActionIndex()].getStack());
+        betSlider.setValue(0);
+        setTextValue();
     }
 
     public String getRaiseText(){
         return raiseTextBox.getText();
+    }
+
+    public void setTextValue() {
+        raiseTextBox.setText(Integer.toString(betSlider.getValue()));
     }
 
     @Override
@@ -193,8 +208,10 @@ public class MainWindow implements ActionListener {
             raiseButtonAction();
         }else if(e.getActionCommand().equals("Call")){
             callButtonAction();
-        }else if(e.getActionCommand().equals("Reset")){
+        }else if(e.getActionCommand().equals("Reset")) {
             resetButtonAction();
+        }else if(e.getActionCommand().equals("Slide")) {
+            betSliderAction();
         }else if(e.getActionCommand().equals("Test")){
             testButtonAction();
         }else if(e.getActionCommand().equals("Test2")){
@@ -212,7 +229,6 @@ public class MainWindow implements ActionListener {
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
@@ -254,7 +270,6 @@ public class MainWindow implements ActionListener {
         if (Game.checkFolds()) {
             Game.endHand();
         } else if (Game.checkBettingRoundCompleted()) {
-            //Game.refundBets();
             Game.nextStreet();
         } else {
             Game.updateCurrentAction();
@@ -288,7 +303,11 @@ public class MainWindow implements ActionListener {
     }
 
     public void testButtonAction(){
-        Game.runHand();
+
+    }
+
+    public void betSliderAction() {
+        setTextValue();
     }
 
     public void test2ButtonAction(){
@@ -303,6 +322,7 @@ public class MainWindow implements ActionListener {
             generator.writeStartObject();
             generator.writeStringField("name", player1.getPlayerName());
 
+            //tyler: folded players now have their cards set to null
             generator.writeNumberField("value0", player1.getHand()[0].getValue());
             generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
             generator.writeNumberField("value1", player1.getHand()[1].getValue());

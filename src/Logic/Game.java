@@ -13,13 +13,14 @@ public class Game {
     private static int currentActionIndex;
     private static int street;
 
+    //WIP:
+    private static ArrayList<Player> playersList;
+
     private static Deck deck;
     private static Card[] board;
     private static Player[] players;
     private static Pot mainPot;
     private static Pot currentPot;
-
-    //TODO: Figure out which one of these i'm actually using.
     private static ArrayList<Pot> pots;
 
     private static int lastRaiseSize;
@@ -49,7 +50,7 @@ public class Game {
     }
 
     public static int getNumPlayers() {
-        return players.length;
+        return playersList.size();
     }
 
     public static int getSb() {
@@ -68,48 +69,8 @@ public class Game {
         return pots;
     }
 
-    public static Pot getMainPot() { return mainPot; }
-
     public static Pot getCurrentPot() {
         return currentPot;
-    }
-
-    public static void printPots() {
-        for(Pot pot : pots) {
-            System.out.println(pot);
-        }
-        System.out.println();
-    }
-
-    //must be called after betting is complete
-    public static void createSidePot() {
-        //adds the appropriate players from the previous pot to the new side pot.
-        //sets the current pot to the new side pot.
-        ArrayList<Player> playersForSidePot = currentPot.findPlayersForSidePot();
-        int[] bets = currentPot.getBets();
-        int highestBet = currentPot.getHighestBet();
-        int lowestBet = currentPot.getLowestBet();
-
-        if(currentPot.checkSidePotRequirement()) {
-            for(Player ignored : playersForSidePot) {
-                currentPot.removeFromPot(highestBet - lowestBet);
-            }
-
-            Pot sidePot = new Pot(pots.size() + 1);
-            for (int i = 0; i < playersForSidePot.size(); i++) {
-                sidePot.addPlayerToPot(playersForSidePot.get(i));
-            }
-            pots.add(sidePot);
-            currentPot = pots.get(pots.size() - 1);
-
-            for(Player player : playersForSidePot) {
-                currentPot.addToPot(highestBet - lowestBet, player.getPlayerNum());
-            }
-        }
-    }
-
-    public static boolean checkSidePotPresent() {
-        return false;
     }
 
     public static void nextStreet() {
@@ -119,25 +80,32 @@ public class Game {
         currentPot.resetPlayerHasActed();
 
         //check if side pot is required, and create said side pot
-        ArrayList<Pot> newPots = currentPot.createSidePots();
-        pots.addAll(newPots);
-        currentPot = pots.get(pots.size() - 1);
+        if(currentPot.getNumPlayersInPot() > 2) {
+            ArrayList<Pot> newPots = currentPot.createSidePots();
+            pots.addAll(newPots);
+            currentPot = pots.get(pots.size() - 1);
+        }
 
         for(Pot pot : pots) {
             pot.resetBets();
         }
 
-        street++;
-        if (street == 1) {
-            flop(Main.getGameWindow());
-        } else if (street == 2) {
-            turn(Main.getGameWindow());
-        } else if (street == 3) {
-            river(Main.getGameWindow());
-        } else if (street >= 4) {
-            getWinners();
-            endHand();
-        }
+        //TODO: once satisified with side pots, enable the commented out lines below which will just finish hands automatically
+        //if(checkHandCompleted()) {
+        //    runHand();
+        //} else {
+            street++;
+            if (street == 1) {
+                flop(Main.getGameWindow());
+            } else if (street == 2) {
+                turn(Main.getGameWindow());
+            } else if (street == 3) {
+                river(Main.getGameWindow());
+            } else if (street >= 4) {
+                getWinners();
+                endHand();
+            }
+        //}
     }
 
     public static void startGame() {
@@ -152,7 +120,7 @@ public class Game {
         minBet = bb;
         startingStackSize = 100000;
 
-        //players = Game.createPlayers(8, deck, startingStackSize);
+        //players = createPlayers(6, deck, startingStackSize);
         players = new Player[6];
         players[0] = new Player(0, deck, startingStackSize, "Reid");
         players[1] = new Player(1, deck, 75000, "Tyler");
@@ -160,6 +128,8 @@ public class Game {
         players[3] = new Player(3, deck, 125000, "Scott");
         players[4] = new Player(4, deck, 110000, "Pat");
         players[5] = new Player(5, deck, 0, "Denis");
+
+        playersList = createPlayersList(players);
 
         //init pot
         mainPot = new Pot(1);
@@ -172,8 +142,10 @@ public class Game {
         dealHands();
 
         setStartingActionIndex();
-        players[getSmallBlindIndex()].postBlind(sb, mainPot);
-        players[getBigBlindIndex()].postBlind(bb, mainPot);
+        playersList.get(smallBlindIndex).postBlind(sb, mainPot);
+        playersList.get(bigBlindIndex).postBlind(bb, mainPot);
+        //players[getSmallBlindIndex()].postBlind(sb, mainPot);
+        //players[getBigBlindIndex()].postBlind(bb, mainPot);
 
         printPlayersAndPot();
     }
@@ -185,6 +157,15 @@ public class Game {
         }
 
         resetHand();
+    }
+
+    public static boolean checkHandCompleted() {
+        if(currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1) {
+            return true;
+        } /*else if(currentPot.getNumPlayersInPot() == currentPot.getNumPlayersAllIn()) {
+            return true;
+        }*/
+        return false;
     }
 
     public static void runHand() {
@@ -238,6 +219,9 @@ public class Game {
     }
 
     public static void resetPots() {
+        for(Player player : players) {
+            player.resetMoneyInPot();
+        }
         mainPot.resetPot();
         pots.clear();
         pots.add(mainPot);
@@ -384,6 +368,20 @@ public class Game {
         return players;
     }
 
+    public static ArrayList<Player> createPlayersList(int numPlayers, Deck deck, int stackSize) {
+        ArrayList<Player> players = new ArrayList<>();
+        for(int i = 0; i < numPlayers; i++) {
+            players.add(new Player(i, deck, stackSize));
+        }
+        return players;
+    }
+
+    public static ArrayList<Player> createPlayersList(Player[] inputPlayers) {
+        ArrayList<Player> players = new ArrayList<>();
+        players.addAll(Arrays.asList(inputPlayers));
+        return players;
+    }
+
     public static void pickRandomDealer() {
         dealerIndex = (int) (Math.random() * players.length);
 
@@ -393,12 +391,23 @@ public class Game {
 
     public static void nextDealer() {
         dealerIndex++;
-        if (dealerIndex > players.length - 1) {
-            dealerIndex = 0;
+        wrapDealerIndex();
+
+        while(playersList.get(dealerIndex).getStack() == 0) {
+            dealerIndex++;
+            wrapDealerIndex();
         }
+
+        System.out.println("Dealer index: " + dealerIndex);
 
         setSmallBlindIndex();
         setBigBlindIndex();
+    }
+
+    public static void wrapDealerIndex() {
+        if (dealerIndex > players.length - 1) {
+            dealerIndex = 0;
+        }
     }
 
     public static void setSmallBlindIndex() {
@@ -457,15 +466,10 @@ public class Game {
     }
 
     public static void getWinners() {
-        //legacy:
- /*       ArrayList<Player> winners = Evaluator.findWinner(board, mainPot);
-
-        for (int i = 0; i < winners.size(); i++) {
-            winners.get(i).win(mainPot.getPotValue() / winners.size());
-        }*/
         for(Pot pot : pots) {
             ArrayList<Player> winners = Evaluator.findWinner(board, pot);
             for(int i = 0; i < winners.size(); i++) {
+                System.out.print(pot + ": ");
                 winners.get(i).win(pot.getPotValue() / winners.size());
             }
         }
@@ -629,13 +633,13 @@ public class Game {
     public static void checkValidCurrentActionIndex() {
         if(street != 0) {
             //postflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while (!currentPot.containsPlayer(players[currentActionIndex]) || !players[currentActionIndex].checkHasHand()) {
+            while (!currentPot.containsPlayer(players[currentActionIndex]) || players[currentActionIndex].checkHasHand()) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
         } else {
             //preflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while(!players[currentActionIndex].checkHasHand()) {
+            while(players[currentActionIndex].checkHasHand()) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
@@ -675,7 +679,7 @@ public class Game {
         }
         System.out.println();
         for(Pot pot : pots) {
-            System.out.println(pot);
+            pot.printPlayersInPot();
         }
         System.out.println();
     }
