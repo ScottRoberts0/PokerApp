@@ -13,13 +13,14 @@ public class Game {
     private static int currentActionIndex;
     private static int street;
 
+    //WIP:
+    private static ArrayList<Player> playersList;
+
     private static Deck deck;
     private static Card[] board;
     private static Player[] players;
     private static Pot mainPot;
     private static Pot currentPot;
-
-    //TODO: Figure out which one of these i'm actually using.
     private static ArrayList<Pot> pots;
 
     private static int lastRaiseSize;
@@ -122,14 +123,16 @@ public class Game {
         minBet = bb;
         startingStackSize = 100000;
 
-        players = Game.createPlayers(6, deck, startingStackSize);
-/*        players = new Player[6];
+        //players = createPlayers(6, deck, startingStackSize);
+        players = new Player[6];
         players[0] = new Player(0, deck, startingStackSize, "Reid");
         players[1] = new Player(1, deck, 75000, "Tyler");
         players[2] = new Player(2, deck, 50000, "Dan");
         players[3] = new Player(3, deck, 125000, "Scott");
         players[4] = new Player(4, deck, 110000, "Pat");
-        players[5] = new Player(5, deck, 0, "Denis");*/
+        players[5] = new Player(5, deck, 0, "Denis");
+
+        playersList = createPlayersList(players);
 
         //init pot
         mainPot = new Pot(1);
@@ -158,7 +161,7 @@ public class Game {
     }
 
     public static boolean checkHandCompleted() {
-        return currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1;
+        return currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1 || currentPot.getNumPlayersInPot() == currentPot.getNumPlayersAllIn();
     }
 
     public static void runHand() {
@@ -358,6 +361,20 @@ public class Game {
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player(i, deck, stackSize);
         }
+        return players;
+    }
+
+    public static ArrayList<Player> createPlayersList(int numPlayers, Deck deck, int stackSize) {
+        ArrayList<Player> players = new ArrayList<>();
+        for(int i = 0; i < numPlayers; i++) {
+            players.add(new Player(i, deck, stackSize));
+        }
+        return players;
+    }
+
+    public static ArrayList<Player> createPlayersList(Player[] inputPlayers) {
+        ArrayList<Player> players = new ArrayList<>();
+        players.addAll(Arrays.asList(inputPlayers));
         return players;
     }
 
