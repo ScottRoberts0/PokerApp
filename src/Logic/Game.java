@@ -50,7 +50,7 @@ public class Game {
     }
 
     public static int getNumPlayers() {
-        return players.length;
+        return playersList.size();
     }
 
     public static int getSb() {
@@ -71,10 +71,6 @@ public class Game {
 
     public static Pot getCurrentPot() {
         return currentPot;
-    }
-
-    public static boolean checkSidePotPresent() {
-        return false;
     }
 
     public static void nextStreet() {
@@ -146,8 +142,10 @@ public class Game {
         dealHands();
 
         setStartingActionIndex();
-        players[getSmallBlindIndex()].postBlind(sb, mainPot);
-        players[getBigBlindIndex()].postBlind(bb, mainPot);
+        playersList.get(smallBlindIndex).postBlind(sb, mainPot);
+        playersList.get(bigBlindIndex).postBlind(bb, mainPot);
+        //players[getSmallBlindIndex()].postBlind(sb, mainPot);
+        //players[getBigBlindIndex()].postBlind(bb, mainPot);
 
         printPlayersAndPot();
     }
@@ -393,12 +391,23 @@ public class Game {
 
     public static void nextDealer() {
         dealerIndex++;
-        if (dealerIndex > players.length - 1) {
-            dealerIndex = 0;
+        wrapDealerIndex();
+
+        while(playersList.get(dealerIndex).getStack() == 0) {
+            dealerIndex++;
+            wrapDealerIndex();
         }
+
+        System.out.println("Dealer index: " + dealerIndex);
 
         setSmallBlindIndex();
         setBigBlindIndex();
+    }
+
+    public static void wrapDealerIndex() {
+        if (dealerIndex > players.length - 1) {
+            dealerIndex = 0;
+        }
     }
 
     public static void setSmallBlindIndex() {

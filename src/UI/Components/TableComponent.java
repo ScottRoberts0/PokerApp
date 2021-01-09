@@ -2,20 +2,13 @@ package UI.Components;
 
 import Logic.Card;
 import Logic.Game;
-import Logic.Player;
 import Logic.Pot;
 import UI.Animation.Animatable;
 import UI.Animation.AnimationThread;
-import UI.Animation.InOutQuintEasingFunction;
-import UI.Animation.OutSineEasingFunction;
 import UI.GraphicalHelpers;
-import UI.Main;
 
-import javax.swing.JPanel;
-import java.awt.Point;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -73,7 +66,7 @@ public class TableComponent extends JPanel {
         drawTableCards(g);
 
         // only try to paint players if there are some
-        if(Game.getPlayers() != null) {
+        if (Game.getPlayers() != null) {
             // update labels
             drawText(g);
 
@@ -82,8 +75,8 @@ public class TableComponent extends JPanel {
         }
     }
 
-    public void initPlayers(){
-        if(Game.getPlayers() != null) {
+    public void initPlayers() {
+        if (Game.getPlayers() != null) {
             // grab the positions of the players and store them so we don't have to recalculate every frame
             playerPositions = new Point[Game.getPlayers().length];
             for (int i = 0; i < Game.getPlayers().length; i++) {
@@ -97,7 +90,7 @@ public class TableComponent extends JPanel {
      *
      * @param g
      */
-    private void drawActionIndicators(Graphics g){
+    private void drawActionIndicators(Graphics g) {
         // store the default colour to switch back at the end of this function
         Color currentColour = g.getColor();
 
@@ -108,12 +101,7 @@ public class TableComponent extends JPanel {
 
         // draw dealer button (transparent with a D in the middle)
         g.setColor(Color.BLACK);
-        int index = Game.getSmallBlindIndex();
-        if(index == 0){
-            index = Game.getPlayers().length - 1;
-        }else{
-            index --;
-        }
+        int index = Game.getDealerIndex();
         double[] angleRadius = getPlayerAngleRadius(index);
 
         angleRadius[1] -= POT_RADIUS_BUFFER / 2;
@@ -122,26 +110,26 @@ public class TableComponent extends JPanel {
         double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
 
         g.drawString("D",
-                (this.getWidth() / 2) + (int)x,
-                (this.getHeight() / 2) + (int)y);
-        g.drawOval((this.getWidth() / 2) + (int)x - 5, (this.getHeight() / 2) + (int) y - 15, 20, 20);
+                (this.getWidth() / 2) + (int) x,
+                (this.getHeight() / 2) + (int) y);
+        g.drawOval((this.getWidth() / 2) + (int) x - 5, (this.getHeight() / 2) + (int) y - 15, 20, 20);
 
         g.setColor(currentColour);
     }
 
-    private void drawText(Graphics g){
+    private void drawText(Graphics g) {
         // get the table center to determine which side of the board the player is on
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
         // draw player stacks and bets
-        for(int i = 0; i < Game.getPlayers().length; i ++){
+        for (int i = 0; i < Game.getPlayers().length; i++) {
             int stack = Game.getPlayers()[i].getStack();
 
             int bet = Game.getPlayers()[i].getMoneyInPot();
 
             StringBuilder pots = new StringBuilder();
 
-            for(Pot pot : Game.getPots()) {
+            for (Pot pot : Game.getPots()) {
                 pots.append(pot).append(" ");
             }
 
@@ -154,7 +142,6 @@ public class TableComponent extends JPanel {
                     panelCenter.x + playerPositions[i].x,
                     panelCenter.y + playerPositions[i].y + (CARD_HEIGHT / 2) + STACK_BUFFER);
 
-            // mainPot in table
             double[] angleRadius = getPlayerAngleRadius(i);
 
             angleRadius[1] -= POT_RADIUS_BUFFER;
@@ -162,34 +149,17 @@ public class TableComponent extends JPanel {
             double x = (Math.sin(angleRadius[0]) * angleRadius[1]) * -1;
             double y = (Math.cos(angleRadius[0]) * angleRadius[1]);
 
-            if(bet != 0) {
+            if (bet != 0) {
                 g.drawString(bet + "",
                         panelCenter.x + (int) x,
                         panelCenter.y + (int) y);
             }
 
-            // check if there is a side pot, if not...
-            if(!Game.checkSidePotPresent()) {
-                // just draw the main pot
-                g.drawString(pots.toString(),
-                        panelCenter.x - (potStringWidth / 2),
-                        panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
-                );
-            } /*else if(Game.checkSidePotPresent()) {
-                // or draw both pots
-                g.drawString("MAIN POT: " + mainPot,
-                        panelCenter.x - (potStringWidth),
-                        panelCenter.y - (CARD_HEIGHT / 2) - (POT_LABEL_SPACER * 2)
-                );
-
-                //draw the side pot
-                g.drawString("SIDE POT: " + sidePot,
-                        panelCenter.x - (potStringWidth),
-                        panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
-                );
-            }*/
-
-
+            // draw the pots
+            g.drawString(pots.toString(),
+                    panelCenter.x - (potStringWidth / 2),
+                    panelCenter.y - (CARD_HEIGHT / 2) - POT_LABEL_SPACER
+            );
 
             // draw the player name
             g.drawString(name,
@@ -198,22 +168,22 @@ public class TableComponent extends JPanel {
         }
     }
 
-    public double[] getPlayerAngleRadius(int playerNum){
+    public double[] getPlayerAngleRadius(int playerNum) {
         double angle = (Math.PI * 2 / Game.getPlayers().length) * (double) playerNum;
 
-        double radius = ((double)TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
+        double radius = ((double) TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
                 Math.sqrt(
-                        (Math.pow((double)TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) +
-                                (Math.pow((double)TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
+                        (Math.pow((double) TABLE_HEIGHT / 2, 2) * Math.pow(Math.sin(angle), 2) +
+                                (Math.pow((double) TABLE_WIDTH / 2, 2) * Math.pow(Math.cos(angle), 2)))
                 );
-        return new double[] {angle, radius};
+        return new double[]{angle, radius};
     }
 
-    public Point getPlayerPosition(int playerNum){
-        if(playerNum >= Game.getPlayers().length){
+    public Point getPlayerPosition(int playerNum) {
+        if (playerNum >= Game.getPlayers().length) {
             //throw new InvalidPlayerNumException("Player number requested is more than total players in the game");
             System.out.println("Player number requested is more than total players in the game");
-            return new Point(0,0);
+            return new Point(0, 0);
         }
 
         double[] angleRadius = getPlayerAngleRadius(playerNum);
@@ -226,18 +196,18 @@ public class TableComponent extends JPanel {
         return new Point((int) x, (int) y);
     }
 
-    public void createPlayerCards(boolean animateNow){
+    public void createPlayerCards(boolean animateNow) {
         createPlayerCards();
-        if(animateNow){
+        if (animateNow) {
             animatePlayerCards();
         }
     }
 
-    public void createPlayerCards(){
+    public void createPlayerCards() {
         playerCards = new CardComponent[Game.getPlayers().length][2];
 
         for (int player = 0; player < Game.getPlayers().length; player++) {
-            if(Game.getPlayers()[player].getHand()[0] == null){
+            if (Game.getPlayers()[player].getHand()[0] == null) {
                 // this player has no cards. Draw nothing.
                 continue;
             }
@@ -258,7 +228,7 @@ public class TableComponent extends JPanel {
                 Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
                 cardLoc.y -= (CARD_HEIGHT / 2);
 
-                if(cardNum == 0) {
+                if (cardNum == 0) {
                     cardLoc.x -= CARD_X_STAGGER;
                     cardLoc.y -= CARD_Y_STAGGER;
                 }
@@ -274,7 +244,7 @@ public class TableComponent extends JPanel {
         }
     }
 
-    public void deletePlayerCards(){
+    public void deletePlayerCards() {
         AnimationThread.getInstance().removeAnimatableObjects();
     }
 
@@ -328,8 +298,8 @@ public class TableComponent extends JPanel {
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
         // grab the card image
-        for(int i = 0; i < 5; i ++) {
-            if(tableCards[i] != null) {
+        for (int i = 0; i < 5; i++) {
+            if (tableCards[i] != null) {
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                         (CARD_WIDTH * (tableCards[i].getValue() - 2)),
                         (CARD_HEIGHT * tableCards[i].getSuitValue()),
@@ -344,7 +314,7 @@ public class TableComponent extends JPanel {
         }
     }
 
-    public void setTableCards(Card[] cards){
+    public void setTableCards(Card[] cards) {
         tableCards = cards;
 
         repaint();
@@ -353,15 +323,15 @@ public class TableComponent extends JPanel {
     private int count = 0;
     CardComponent animCard;
 
-    public void animatePlayerCards(){
+    public void animatePlayerCards() {
         List<Animatable> cards = AnimationThread.getInstance().getAnimationObjects();
 
-        for(int i = 0; i < cards.size(); i++ ){
+        for (int i = 0; i < cards.size(); i++) {
             cards.get(i).setAnimating(true);
         }
     }
 
-    public void foldPlayer(int playerNum){
+    public void foldPlayer(int playerNum) {
         playerCards[playerNum][0].setHasFolded(true);
         playerCards[playerNum][1].setHasFolded(true);
     }
