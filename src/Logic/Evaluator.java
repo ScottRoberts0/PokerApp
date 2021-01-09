@@ -7,12 +7,6 @@ import java.util.ArrayList;
 public class Evaluator {
 
     public static ArrayList<Player> findWinner(Card[] board, Pot pot) {
-        /*for (int i = 0; i < players.length; i++) {
-            if(pot.containsPlayer(players[i])) {
-                players[i].makeMadeHand(board);
-            }
-        }*/
-
         ArrayList<Player> players = pot.getPlayersInPot();
         ArrayList<Player> winningPlayers = new ArrayList<>();
         boolean[] winners = new boolean[pot.getNumPlayersInPot()];
@@ -30,13 +24,6 @@ public class Evaluator {
                 handValues[i] = players.get(i).getMadeHandValue();
             }
         }
-
-        //TESTING READOUT:
-        for (int val : handValues) {
-            System.out.println(val);
-        }
-        System.out.println();
-
 
         int winningHandValue = -1;
         int winnerCount = 1;
@@ -80,12 +67,6 @@ public class Evaluator {
                 winners = findWinnerHighCards(madeHands, 0, handValues, 0);
             }
         }
-
-        //TESTING READOUT:
-        for (boolean wl : winners) {
-            System.out.println(wl);
-        }
-        System.out.println();
 
         for(int i = 0; i < winners.length; i++) {
             if(winners[i]) {
@@ -824,18 +805,10 @@ public class Evaluator {
                 }
             }
 
-            System.out.println(winnerCount);
-            System.out.println();
-
             if (winnerCount == 1) {
                 break;
             }
         }
-
-        for (boolean winner : winners) {
-            System.out.println(winner);
-        }
-        System.out.println();
 
         return winners;
     }

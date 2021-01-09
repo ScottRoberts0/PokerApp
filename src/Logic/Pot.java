@@ -218,7 +218,7 @@ public class Pot {
 
 
     public void printPlayersInPot() {
-        System.out.println("POT " + name + " PLAYERS IN POT: ");
+        System.out.println("POT " + name + " (VALUE: " + this.potValue + ")" + " PLAYERS IN POT: ");
         for(Player player : this.playersInPot) {
             System.out.println(player);
         }

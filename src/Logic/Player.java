@@ -138,7 +138,7 @@ public class Player {
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println(playerName + " wins " + potSize + " satoshis!");
+        System.out.println(playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!");
         System.out.println();
     }
 
@@ -269,6 +269,6 @@ public class Player {
     }
 
     public String toString() {
-        return playerName + " stack: " + getStack() + " playernum: " + playerNum;
+        return playerName + " Stack: " + getStack();
     }
 }

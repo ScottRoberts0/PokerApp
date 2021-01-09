@@ -466,15 +466,10 @@ public class Game {
     }
 
     public static void getWinners() {
-        //legacy:
- /*       ArrayList<Player> winners = Evaluator.findWinner(board, mainPot);
-
-        for (int i = 0; i < winners.size(); i++) {
-            winners.get(i).win(mainPot.getPotValue() / winners.size());
-        }*/
         for(Pot pot : pots) {
             ArrayList<Player> winners = Evaluator.findWinner(board, pot);
             for(int i = 0; i < winners.size(); i++) {
+                System.out.print(pot + ": ");
                 winners.get(i).win(pot.getPotValue() / winners.size());
             }
         }
@@ -685,7 +680,6 @@ public class Game {
         System.out.println();
         for(Pot pot : pots) {
             pot.printPlayersInPot();
-            System.out.println(pot.getPotValue());
         }
         System.out.println();
     }
