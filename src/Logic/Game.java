@@ -68,45 +68,9 @@ public class Game {
         return pots;
     }
 
-    public static Pot getMainPot() { return mainPot; }
-
     public static Pot getCurrentPot() {
         return currentPot;
     }
-
-    public static void printPots() {
-        for(Pot pot : pots) {
-            System.out.println(pot);
-        }
-        System.out.println();
-    }
-
-    //must be called after betting is complete
-/*    public static void createSidePot() {
-        //adds the appropriate players from the previous pot to the new side pot.
-        //sets the current pot to the new side pot.
-        ArrayList<Player> playersForSidePot = currentPot.findPlayersForSidePot();
-        int[] bets = currentPot.getBets();
-        int highestBet = currentPot.getHighestBet();
-        int lowestBet = currentPot.getLowestBet();
-
-        if(currentPot.checkSidePotRequirement()) {
-            for(Player ignored : playersForSidePot) {
-                currentPot.removeFromPot(highestBet - lowestBet);
-            }
-
-            Pot sidePot = new Pot(pots.size() + 1);
-            for (int i = 0; i < playersForSidePot.size(); i++) {
-                sidePot.addPlayerToPot(playersForSidePot.get(i));
-            }
-            pots.add(sidePot);
-            currentPot = pots.get(pots.size() - 1);
-
-            for(Player player : playersForSidePot) {
-                currentPot.addToPot(highestBet - lowestBet, player.getPlayerNum());
-            }
-        }
-    }*/
 
     public static boolean checkSidePotPresent() {
         return false;
@@ -129,16 +93,20 @@ public class Game {
             pot.resetBets();
         }
 
-        street++;
-        if (street == 1) {
-            flop(Main.getGameWindow());
-        } else if (street == 2) {
-            turn(Main.getGameWindow());
-        } else if (street == 3) {
-            river(Main.getGameWindow());
-        } else if (street >= 4) {
-            getWinners();
-            endHand();
+        if(checkHandCompleted()) {
+            runHand();
+        } else {
+            street++;
+            if (street == 1) {
+                flop(Main.getGameWindow());
+            } else if (street == 2) {
+                turn(Main.getGameWindow());
+            } else if (street == 3) {
+                river(Main.getGameWindow());
+            } else if (street >= 4) {
+                getWinners();
+                endHand();
+            }
         }
     }
 
@@ -154,14 +122,14 @@ public class Game {
         minBet = bb;
         startingStackSize = 100000;
 
-        //players = Game.createPlayers(8, deck, startingStackSize);
-        players = new Player[6];
+        players = Game.createPlayers(6, deck, startingStackSize);
+/*        players = new Player[6];
         players[0] = new Player(0, deck, startingStackSize, "Reid");
         players[1] = new Player(1, deck, 75000, "Tyler");
         players[2] = new Player(2, deck, 50000, "Dan");
         players[3] = new Player(3, deck, 125000, "Scott");
         players[4] = new Player(4, deck, 110000, "Pat");
-        players[5] = new Player(5, deck, 0, "Denis");
+        players[5] = new Player(5, deck, 0, "Denis");*/
 
         //init pot
         mainPot = new Pot(1);
@@ -187,6 +155,10 @@ public class Game {
         }
 
         resetHand();
+    }
+
+    public static boolean checkHandCompleted() {
+        return currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1;
     }
 
     public static void runHand() {
@@ -240,6 +212,9 @@ public class Game {
     }
 
     public static void resetPots() {
+        for(Player player : players) {
+            player.resetMoneyInPot();
+        }
         mainPot.resetPot();
         pots.clear();
         pots.add(mainPot);
@@ -631,13 +606,13 @@ public class Game {
     public static void checkValidCurrentActionIndex() {
         if(street != 0) {
             //postflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while (!currentPot.containsPlayer(players[currentActionIndex]) || !players[currentActionIndex].checkHasHand()) {
+            while (!currentPot.containsPlayer(players[currentActionIndex]) || players[currentActionIndex].checkHasHand()) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
         } else {
             //preflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while(!players[currentActionIndex].checkHasHand()) {
+            while(players[currentActionIndex].checkHasHand()) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
@@ -678,6 +653,7 @@ public class Game {
         System.out.println();
         for(Pot pot : pots) {
             pot.printPlayersInPot();
+            System.out.println(pot.getPotValue());
         }
         System.out.println();
     }
