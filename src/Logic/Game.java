@@ -15,14 +15,14 @@ public class Game {
     private static int street;
     private static double rebuyThreshold;
 
-    //WIP:
     private static ArrayList<Player> players;
+    private static ArrayList<Pot> pots;
 
     private static Deck deck;
     private static Card[] board;
+
     private static Pot mainPot;
     private static Pot currentPot;
-    private static ArrayList<Pot> pots;
 
     private static int lastRaiseSize;
     private static int startingStackSize;
@@ -640,6 +640,7 @@ public class Game {
     }
 
 
+
     public static void setStartingActionIndex() {
         if (street == 0) {
             currentActionIndex = bigBlindIndex + 1;
@@ -829,7 +830,7 @@ public class Game {
 
     public static void updateStartingStackValues() {
         for(Player player : players) {
-            player.updateStartingStackSize();
+            player.updateStreetStartingStackSize();
         }
     }
 

@@ -69,10 +69,10 @@ public class Pot {
             }
         }
 
-/*        if(sortedBets.size() == 0) {
+        if(sortedBets.size() == 0) {
             sortedBets.add(0);
             sortedBets.add(0);
-        }*/
+        }
 
         //sort bets in ascending order
         boolean sorted = false;
@@ -139,7 +139,7 @@ public class Pot {
         for(int i = 0; i < sortedBets.size() - 1; i++) {
             //condition for creating a side pot: there is a player all in, or there is a difference in bet sizes after all bets have finished
             //last statement checks to make sure we aren't creating extra side pots by comparing and ensuring the bets are not equal
-            if(sortedBets.get(i) < sortedBets.get(i + 1) || (sortedPlayers.get(i).getStack() == 0 && !sortedBets.get(i).equals(sortedBets.get(i + 1)))) {
+            if(sortedBets.get(i) < sortedBets.get(i + 1) || sortedPlayers.get(i).getStack() == 0) {
                 Pot sidePot = new Pot(potCount);
                 potCount++;
 

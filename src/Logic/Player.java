@@ -9,7 +9,7 @@ public class Player implements Comparable {
 
     private int moneyInPot; //value used by the UI to display player's current bet
     private int stack;
-    private int startingStackSize;
+    private int streetStartingStackSize;
     private boolean hasFolded;
 
     private Card[] hand; //player's hole cards
@@ -29,7 +29,7 @@ public class Player implements Comparable {
         madeHand = new Card[5];
         this.playerNum = playerNum;
         this.stack = stack;
-        this.startingStackSize = this.stack;
+        this.streetStartingStackSize = this.stack;
         this.playerName = "Player " + playerNum;
     }
 
@@ -39,7 +39,7 @@ public class Player implements Comparable {
         madeHand = new Card[5];
         this.playerNum = playerNum;
         this.stack = stack;
-        this.startingStackSize = this.stack;
+        this.streetStartingStackSize = this.stack;
         this.playerName = playerName;
     }
 
@@ -174,8 +174,8 @@ public class Player implements Comparable {
         this.stack = Game.getStartingStackSize();
     }
 
-    public void updateStartingStackSize() {
-        this.startingStackSize = this.stack;
+    public void updateStreetStartingStackSize() {
+        this.streetStartingStackSize = this.stack;
     }
 
     /**
@@ -292,8 +292,8 @@ public class Player implements Comparable {
         return stack;
     }
 
-    public int getStartingStackSize() {
-        return this.startingStackSize;
+    public int getStreetStartingStackSize() {
+        return this.streetStartingStackSize;
     }
 
     public boolean checkPlayerAllIn() {
@@ -320,9 +320,9 @@ public class Player implements Comparable {
     @Override
     public int compareTo(Object o) {
         Player p1 = (Player) o;
-        if(p1.getStartingStackSize() > this.startingStackSize) {
+        if(p1.getStreetStartingStackSize() > this.streetStartingStackSize) {
             return -1;
-        } else if (p1.getStartingStackSize() < this.startingStackSize) {
+        } else if (p1.getStreetStartingStackSize() < this.streetStartingStackSize) {
             return 1;
         } else {
             return 0;

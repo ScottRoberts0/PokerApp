@@ -32,13 +32,13 @@ public class Card {
 
         //set suits based on suit values
         if (suitValue == 0 || suitValue < 0) {
-            this.suit = "Diamonds";
-        } else if (suitValue == 1) {
             this.suit = "Hearts";
+        } else if (suitValue == 1) {
+            this.suit = "Diamonds";
         } else if (suitValue == 2) {
-            this.suit = "Spades";
-        } else {
             this.suit = "Clubs";
+        } else {
+            this.suit = "Spades";
         }
     }
 
