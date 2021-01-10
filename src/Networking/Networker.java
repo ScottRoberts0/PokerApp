@@ -1,22 +1,14 @@
 package Networking;
 
-import Logic.Game;
-import Logic.Player;
-import Networking.MessageHandlers.PokerHandler;
-import Networking.Messages.PokerClientMessage;
-import Networking.Messages.PokerMessage;
-import Networking.Messages.PokerServerMessage;
+import Networking.MessageHandlers.ClientHandler;
+import Networking.MessageHandlers.ServerHandler;
+import Networking.Messages.*;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.messages.BeamMessage;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Networker {
 
@@ -49,7 +41,7 @@ public class Networker {
         server.start();
 
         // add a handler for messages
-        server.addHandler(PokerHandler.class);
+        server.addHandler(ServerHandler.class);
 
         // check if it's alive and then open the UI
         if(server.isAlive()){
@@ -83,18 +75,16 @@ public class Networker {
         System.out.println("Connected");
 
         // add a handler
-        client.addHandler(PokerHandler.class);
+        client.addHandler(ClientHandler.class);
 
         // handshake with the server. Send a player name and wait for your player number.
-        PokerClientMessage message = new PokerClientMessage();
-        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_HANDSHAKE);
-        message.setString(PokerMessage.MESSAGE_PLAYERNAME, "Tyler");
+        ClientConnectedMessage mess = new ClientConnectedMessage("Tyler");
 
-        BeamMessage response = client.sendMessage(message);
+        BeamMessage response = client.sendMessage(mess);
 
         if(response != null){
-            PokerClientMessage cm = new PokerClientMessage(response);
-            PokerClientMessage.handleServerResponse(cm);
+            ClientConnectedMessage cm = new ClientConnectedMessage(response);
+            cm.clientHandleServerResponse();
         }else{
             System.out.println("Response not received");
         }
@@ -109,20 +99,7 @@ public class Networker {
             return;
 
         // get a message ready and put a message type header on it
-        PokerServerMessage message = new PokerServerMessage();
-        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_GAME_DATA);
-
-        // grab the players
-        List<Player> players = Game.getPlayers();
-
-        // start plugging this message full of data
-        // add number of players
-        message.setInt(PokerMessage.MESSAGE_NUMPLAYERS, players.size());
-
-        // add player data
-        for(int i = 0; i < players.size(); i ++){
-            message.setString(PokerMessage.MESSAGE_PLAYER_STRING + i, players.get(i).getPlayerStateForNetwork());
-        }
+        PlayerDataMessage message = new PlayerDataMessage();
 
         server.broadcast(message);
     }

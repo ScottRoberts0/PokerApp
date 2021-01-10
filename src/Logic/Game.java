@@ -221,6 +221,7 @@ public class Game {
         street = 0;
         deck.shuffle();
         Arrays.fill(board, null);
+        Main.getGameWindow().getTable().resetTableCardsAnimated();
 
         updateStartingStackValues();
         resetHands();
