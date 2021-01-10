@@ -34,6 +34,7 @@ public class TableComponent extends JPanel {
     private Card[] tableCards;
     private Point[] playerPositions;
     private CardComponent[][] playerCards;
+    private CardComponent[] tableCardsAnimated;
 
     public TableComponent() {
         super(null);
@@ -41,6 +42,7 @@ public class TableComponent extends JPanel {
 
         // initialize arrays
         tableCards = new Card[5];
+        tableCardsAnimated = new CardComponent[5];
 
         // create and start the animation thread
         new AnimationThread(this);
@@ -61,7 +63,7 @@ public class TableComponent extends JPanel {
                 TABLE_HEIGHT - ins.top - ins.bottom);
 
         // draw table cards
-        drawTableCards(g);
+        //drawTableCards(g);
 
         // only try to paint players if there are some
         if (Main.getGameWindow().getIsGameStarted()) {
@@ -197,7 +199,7 @@ public class TableComponent extends JPanel {
     public void createPlayerCards(boolean animateNow) {
         createPlayerCards();
         if (animateNow) {
-            animatePlayerCards();
+            animateCards();
         }
     }
 
@@ -316,16 +318,41 @@ public class TableComponent extends JPanel {
 
     }
 
+    public void createTableCards() {
+        Point p;
+
+        // grab the center of this panel
+        Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
+
+        // grab the card image
+        for (int i = 0; i < 5; i++) {
+            if (tableCards[i] != null && tableCardsAnimated[i] == null) {
+                p = new Point((CARD_WIDTH * i) - (5 * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
+
+                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
+
+                int dealerPosition = Game.getDealerIndex();
+                Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
+
+
+                tableCardsAnimated[i] = new CardComponent(dealerPoint.x, dealerPoint.y, new Card(tableCards[i].getValue(), tableCards[i].getSuitValue()));
+                tableCardsAnimated[i].moveTo(cardLoc.x, cardLoc.y, 500, true);
+
+                AnimationThread.getInstance().addAnimatableObject(tableCardsAnimated[i]);
+            }
+        }
+    }
+
     public void setTableCards(Card[] cards) {
         tableCards = cards;
-
+        createTableCards();
         repaint();
     }
 
     private int count = 0;
     CardComponent animCard;
 
-    public void animatePlayerCards() {
+    public void animateCards() {
         List<Animatable> cards = AnimationThread.getInstance().getAnimationObjects();
 
         for (int i = 0; i < cards.size(); i++) {
@@ -336,5 +363,9 @@ public class TableComponent extends JPanel {
     public void foldPlayer(int playerNum) {
         playerCards[playerNum][0].setHasFolded(true);
         playerCards[playerNum][1].setHasFolded(true);
+    }
+
+    public void resetTableCardsAnimated() {
+        tableCardsAnimated = new CardComponent[5];
     }
 }
