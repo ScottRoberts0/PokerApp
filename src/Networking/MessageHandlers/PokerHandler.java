@@ -20,12 +20,12 @@ public class PokerHandler extends LegacyHandler {
     public LegacyMessage messageReceived(Communicator communicator, LegacyMessage message) {
         // handle the received message given the user type
         if(Networker.getInstance().getIsServer())
-            return serverMessageReceived(message);
+            return serverMessageReceived(communicator, message);
         else
-            return clientMessageReceived(message);
+            return clientMessageReceived(communicator, message);
     }
 
-    private LegacyMessage serverMessageReceived(LegacyMessage message){
+    private LegacyMessage serverMessageReceived(Communicator communicator, LegacyMessage message){
         // get a response ready
         PokerServerMessage response;
 
@@ -39,25 +39,21 @@ public class PokerHandler extends LegacyHandler {
                 // handle handshaking
                 response = PokerServerMessage.handleHandshakingMessage(message);
             }
-            // ------------------------ Error -----------------------
+            // ------------------------ Unrecognized Message Type Error -----------------------
             else {
                 // no type recognized, send back some error stuffs
-                response = new PokerServerMessage();
-                response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_ERROR);
-                response.setString(PokerMessage.MESSAGE_ERROR, "Did not recognize message type, bitch.");
+                response = PokerServerMessage.handleUnknownMessageType(message);
             }
         }
         // ------------------------ No message type -----------------------
         else{
-            response = new PokerServerMessage();
-            response.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_ERROR);
-            response.setString(PokerMessage.MESSAGE_ERROR, "No message type. Did we lose it?");
+            response = PokerServerMessage.handleNoMessageType(message);
         }
 
         return response;
     }
 
-    private LegacyMessage clientMessageReceived(LegacyMessage message){
+    private LegacyMessage clientMessageReceived(Communicator communicator, LegacyMessage message){
         // get a response ready
         PokerServerMessage response = new PokerServerMessage();
 

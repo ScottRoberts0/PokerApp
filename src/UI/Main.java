@@ -15,12 +15,12 @@ public class Main {
                 beginUI();
             }else if(argsp[0].equals("-server")){
                 networker = new Networker(true);
-                Game.startGame();
+                //Game.startGame();
+                //gameWindow.updateButtons();
                 beginUI();
-                gameWindow.updateButtons();
             }else{
-                Game.startGame();
                 beginUI();
+                Game.startGame();
                 gameWindow.updateButtons();
             }
         }
@@ -32,10 +32,6 @@ public class Main {
 
     public static void beginUI(){
         gameWindow = new MainWindow();
-
-        if(Game.getPlayers() != null) {
-            gameWindow.getTable().createPlayerCards(true);
-        }
     }
 
     public static MainWindow getGameWindow(){

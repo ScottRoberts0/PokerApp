@@ -18,16 +18,11 @@ public class Networker {
     private BeamServer server;
     private BeamClient client;
 
-    private int numPlayers;
-    private int playerNum;
-
     private boolean isServer;
 
     public Networker(boolean isServer){
         instance = this;
         this.isServer = isServer;
-
-        this.numPlayers = 0;
 
         if(isServer){
             beginServer();
@@ -38,10 +33,6 @@ public class Networker {
 
     public static Networker getInstance(){
         return instance;
-    }
-
-    public void incrementPlayers(){
-        numPlayers++;
     }
 
     public void beginServer(){
@@ -57,6 +48,8 @@ public class Networker {
         if(server.isAlive()){
             System.out.println("Server is alive");
         }
+
+
     }
 
     public void beginClient(){
@@ -124,12 +117,7 @@ public class Networker {
         if(isServer) {
             server.close();
         }else {
-
             client.close();
         }
-    }
-
-    public int getNumPlayers() {
-        return numPlayers;
     }
 }
