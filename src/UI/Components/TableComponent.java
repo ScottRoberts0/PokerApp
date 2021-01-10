@@ -339,6 +339,10 @@ public class TableComponent extends JPanel {
                 tableCardsAnimated[i].moveTo(cardLoc.x, cardLoc.y, 500, true);
 
                 AnimationThread.getInstance().addAnimatableObject(tableCardsAnimated[i]);
+
+                for(CardComponent card : tableCardsAnimated) {
+                    System.out.println(card);
+                }
             }
         }
     }
