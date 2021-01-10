@@ -31,6 +31,7 @@ public abstract class Animatable {
     protected void nextStep() {
         // add the frame time to the current time
         currentTime += AnimationThread.FRAME_TIME;
+
         // clamp it
         if(currentTime > totalDuration)
             currentTime = totalDuration;
@@ -44,8 +45,6 @@ public abstract class Animatable {
         if(currentTime == totalDuration){
             // stop animating
             this.animating = false;
-            // reset the time
-            this.currentTime = 0;
 
             // TODO: Create an animation complete callback using runnables.
             //       Make a class that implements runnable that takes an index as a constructor parameter
@@ -71,6 +70,9 @@ public abstract class Animatable {
         this.destinationY = toY;
 
         this.totalDuration = duration;
+
+        // reset the time
+        this.currentTime = 0;
     }
 
     public void setAnimating(boolean animating){

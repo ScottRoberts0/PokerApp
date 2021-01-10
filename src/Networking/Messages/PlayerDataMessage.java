@@ -1,57 +1,45 @@
 package Networking.Messages;
 
 import Logic.Card;
+import Logic.Game;
 import Logic.Player;
-import Networking.Messages.PokerMessage;
+import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class PokerClientMessage extends LegacyMessage {
-    public final static int EXAMPLE_MESSAGE_ID = 1000;
-    public PokerClientMessage() {
-        super(EXAMPLE_MESSAGE_ID);
+public class PlayerDataMessage extends LegacyMessage {
+    public final static int MESSAGE_ID = 1001;
+
+    public PlayerDataMessage() {
+        super(MESSAGE_ID);
+
+        // grab the players
+        List<Player> players = Game.getPlayers();
+
+        // start plugging this message full of data
+        // add number of players
+        this.setInt(PokerMessage.MESSAGE_NUMPLAYERS, players.size());
+
+        // add player data
+        for(int i = 0; i < players.size(); i ++){
+            this.setString(PokerMessage.MESSAGE_PLAYER_STRING + i, players.get(i).getPlayerStateForNetwork());
+        }
     }
 
-    public PokerClientMessage(BeamMessage message) {
+    public PlayerDataMessage(BeamMessage message) {
         super (message);
     }
 
-    /**
-     * This method handles the response from the server after sending a message
-     * Called whenever a client sends a message
-     * @param message
-     */
-    public static void handleServerResponse(LegacyMessage message){
-        String messageType = message.getString(PokerMessage.MESSAGE_TYPE);
-        System.out.println("Type: " + messageType);
-
-        // ---------------------------- Handshake -----------------------
-        if(messageType.equals(PokerMessage.MESSAGE_TYPE_HANDSHAKE)){
-            handleHandshake(message);
-        }
-        // ---------------------------- Error -----------------------
-        else if(messageType.equals(PokerMessage.MESSAGE_TYPE_ERROR)){
-
-        }
-    }
-
-    public static void handleHandshake(LegacyMessage message){
-        Integer playerNum = message.getInt(PokerMessage.MESSAGE_PLAYERNUM);
-
-        System.out.println("PlayerNum: " + playerNum);
-        System.out.println("");
-    }
-
-    /**
-     * Handles a received broadcast from the server
-     * Called by PokerHandler
-     * @param message
-     */
-    public static void handleGameDataMessage(LegacyMessage message){
+    public static void clientReceivedPlayerDataBroadcast(Communicator communicator, LegacyMessage message){
+        // this message is always a broadcast, no need for a response
         JsonFactory factory = new JsonFactory();
 
         // grab the number of players
