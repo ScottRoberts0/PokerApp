@@ -106,6 +106,7 @@ public class Game {
             runHand();
         } else {
             street++;
+            setStartingActionIndex();
             if (street == 1) {
                 flop(Main.getGameWindow());
             } else if (street == 2) {
@@ -141,14 +142,16 @@ public class Game {
             addPlayer(new Player(5, 12000, "Denis"));
         }
 
-/*        if(Networker.getInstance() == null) {
-            addPlayer(new Player(0, 99000, "Reid"));
-            addPlayer(new Player(1, startingStackSize, "Tyler"));
+/*
+        if(Networker.getInstance() == null) {
+            addPlayer(new Player(0, 50000, "Reid"));
+            addPlayer(new Player(1, 50000, "Tyler"));
             addPlayer(new Player(2, startingStackSize, "Dan"));
             addPlayer(new Player(3, startingStackSize, "Scott"));
             addPlayer(new Player(4, startingStackSize, "Pat"));
             addPlayer(new Player(5, startingStackSize, "Denis"));
-        }*/
+        }
+*/
 
         //init pot
         mainPot = new Pot(1);
@@ -183,11 +186,10 @@ public class Game {
     }
 
     public static boolean checkHandCompleted() {
-        if(currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() == 1) {
+        //checks to see if a hand should be completed based on the number of players with money left in their stack (0 or 1)
+        if(currentPot.getNumPlayersInPot() - currentPot.getNumPlayersAllIn() <= 1) {
             return true;
-        } /*else if(currentPot.getNumPlayersInPot() == currentPot.getNumPlayersAllIn()) {
-            return true;
-        }*/
+        }
         return false;
     }
 
@@ -471,21 +473,18 @@ public class Game {
 
     public static void flop(MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> FLOP <<<<<<<<<<<<<<<<");
-        setStartingActionIndex();
         dealFlop();
         gameWindow.setTableCards(board);
     }
 
     public static void turn(MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> TURN <<<<<<<<<<<<<<<<");
-        setStartingActionIndex();
         dealTurn();
         gameWindow.setTableCards(board);
     }
 
     public static void river(MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> RIVER <<<<<<<<<<<<<<<<");
-        setStartingActionIndex();
         dealRiver();
         gameWindow.setTableCards(board);
     }
@@ -666,12 +665,20 @@ public class Game {
                     players.get(currentActionIndex).getStack() == 0) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
+
+                if(currentPot.getNumPlayersAllIn() == currentPot.getNumPlayersInPot()) {
+                    break;
+                }
             }
         } else {
             //preflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
             while(players.get(currentActionIndex).checkHasHand() || players.get(currentActionIndex).getStack() == 0) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
+
+                if(currentPot.getNumPlayersAllIn() == currentPot.getNumPlayersInPot()) {
+                    break;
+                }
             }
         }
     }

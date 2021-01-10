@@ -698,10 +698,6 @@ public class Evaluator {
             }
         }
 
-        for (int x : handValues) {
-            System.out.println(x);
-        }
-
         return winners;
     }
 

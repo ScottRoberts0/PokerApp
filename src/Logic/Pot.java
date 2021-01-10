@@ -138,13 +138,16 @@ public class Pot {
         int potCount = Game.getPots().size() + 1;
         for(int i = 0; i < sortedBets.size() - 1; i++) {
             //condition for creating a side pot: there is a player all in, or there is a difference in bet sizes after all bets have finished
-            if(sortedBets.get(i) < sortedBets.get(i + 1) || sortedPlayers.get(i).getStack() == 0) {
+            //last statement checks to make sure we aren't creating extra side pots by comparing and ensuring the bets are not equal
+            if(sortedBets.get(i) < sortedBets.get(i + 1) || (sortedPlayers.get(i).getStack() == 0 && !sortedBets.get(i).equals(sortedBets.get(i + 1)))) {
                 Pot sidePot = new Pot(potCount);
                 potCount++;
 
                 //add players to the side pot
                 for(int j = i + 1; j < sortedPlayers.size(); j++) {
-                    sidePot.addPlayerToPot(sortedPlayers.get(j));
+                    if(bets[sortedPlayers.get(j).getPlayerNum()] >= sortedBets.get(i + 1)) {
+                        sidePot.addPlayerToPot(sortedPlayers.get(j));
+                    }
                 }
 
                 //add money to the side pot, remove money from the main pot
