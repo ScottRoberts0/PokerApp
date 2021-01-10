@@ -8,37 +8,33 @@ public class Player {
     private String playerName;
     private int moneyInPot;
     private int stack;
-    private final Deck deck;
     private boolean hasFolded;
 
     private Card[] hand;
     private Card[] possCards;
     private Card[] madeHand;
 
-    public Player(int playerNum, Deck deck) {
+    public Player(int playerNum) {
         hand = new Card[2];
         possCards = new Card[7];
         madeHand = new Card[5];
         this.playerNum = playerNum;
-        this.deck = deck;
     }
 
-    public Player(int playerNum, Deck deck, int stack) {
+    public Player(int playerNum, int stack) {
         hand = new Card[2];
         possCards = new Card[7];
         madeHand = new Card[5];
         this.playerNum = playerNum;
-        this.deck = deck;
         this.stack = stack;
         this.playerName = "Player " + playerNum;
     }
 
-    public Player(int playerNum, Deck deck, int stack, String playerName) {
+    public Player(int playerNum, int stack, String playerName) {
         hand = new Card[2];
         possCards = new Card[7];
         madeHand = new Card[5];
         this.playerNum = playerNum;
-        this.deck = deck;
         this.stack = stack;
         this.playerName = playerName;
     }
@@ -155,12 +151,12 @@ public class Player {
         this.stack = Game.getStartingStackSize();
     }
 
-    public void drawHand() {
+    public void drawHand(Deck deck) {
         hand[0] = deck.drawCard();
         hand[1] = deck.drawCard();
     }
 
-    public void drawHand(String value1, String suit1, String value2, String suit2) {
+    public void drawHand(Deck deck, String value1, String suit1, String value2, String suit2) {
         hand[0] = deck.drawCard(value1, suit1);
         hand[1] = deck.drawCard(value2, suit2);
     }

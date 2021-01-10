@@ -6,6 +6,7 @@ import Logic.Pot;
 import UI.Animation.Animatable;
 import UI.Animation.AnimationThread;
 import UI.GraphicalHelpers;
+import UI.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,9 +42,6 @@ public class TableComponent extends JPanel {
         // initialize arrays
         tableCards = new Card[5];
 
-        // init the players
-        initPlayers();
-
         // create and start the animation thread
         new AnimationThread(this);
         AnimationThread.getInstance().start();
@@ -66,7 +64,7 @@ public class TableComponent extends JPanel {
         drawTableCards(g);
 
         // only try to paint players if there are some
-        if (Game.getPlayers() != null) {
+        if (Main.getGameWindow().getIsGameStarted()) {
             // update labels
             drawText(g);
 
@@ -76,12 +74,10 @@ public class TableComponent extends JPanel {
     }
 
     public void initPlayers() {
-        if (Game.getPlayers() != null) {
-            // grab the positions of the players and store them so we don't have to recalculate every frame
-            playerPositions = new Point[Game.getPlayers().length];
-            for (int i = 0; i < Game.getPlayers().length; i++) {
-                playerPositions[i] = getPlayerPosition(i);
-            }
+        // grab the positions of the players and store them so we don't have to recalculate every frame
+        playerPositions = new Point[Game.getPlayers().size()];
+        for (int i = 0; i < Game.getPlayers().size(); i++) {
+            playerPositions[i] = getPlayerPosition(i);
         }
     }
 
@@ -122,10 +118,10 @@ public class TableComponent extends JPanel {
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
         // draw player stacks and bets
-        for (int i = 0; i < Game.getPlayers().length; i++) {
-            int stack = Game.getPlayers()[i].getStack();
+        for (int i = 0; i < Game.getPlayers().size(); i++) {
+            int stack = Game.getPlayers().get(i).getStack();
 
-            int bet = Game.getPlayers()[i].getMoneyInPot();
+            int bet = Game.getPlayers().get(i).getMoneyInPot();
 
             StringBuilder pots = new StringBuilder();
 
@@ -133,7 +129,7 @@ public class TableComponent extends JPanel {
                 pots.append(pot).append(" ");
             }
 
-            String name = Game.getPlayers()[i].getPlayerName();
+            String name = Game.getPlayers().get(i).getPlayerName();
 
             int potStringWidth = g.getFontMetrics().stringWidth(pots + "");
 
@@ -169,7 +165,7 @@ public class TableComponent extends JPanel {
     }
 
     public double[] getPlayerAngleRadius(int playerNum) {
-        double angle = (Math.PI * 2 / Game.getPlayers().length) * (double) playerNum;
+        double angle = (Math.PI * 2 / Game.getPlayers().size()) * (double) playerNum;
 
         double radius = ((double) TABLE_WIDTH / 2 * TABLE_HEIGHT / 2) /
                 Math.sqrt(
@@ -180,7 +176,7 @@ public class TableComponent extends JPanel {
     }
 
     public Point getPlayerPosition(int playerNum) {
-        if (playerNum >= Game.getPlayers().length) {
+        if (playerNum >= Game.getPlayers().size()) {
             //throw new InvalidPlayerNumException("Player number requested is more than total players in the game");
             System.out.println("Player number requested is more than total players in the game");
             return new Point(0, 0);
@@ -204,10 +200,14 @@ public class TableComponent extends JPanel {
     }
 
     public void createPlayerCards() {
-        playerCards = new CardComponent[Game.getPlayers().length][2];
+        if(playerPositions == null){
+            initPlayers();
+        }
 
-        for (int player = 0; player < Game.getPlayers().length; player++) {
-            if (Game.getPlayers()[player].getHand()[0] == null) {
+        playerCards = new CardComponent[Game.getPlayers().size()][2];
+
+        for (int player = 0; player < Game.getPlayers().size(); player++) {
+            if (Game.getPlayers().get(player).getHand()[0] == null) {
                 // this player has no cards. Draw nothing.
                 continue;
             }
@@ -221,8 +221,8 @@ public class TableComponent extends JPanel {
                 // TODO: Draw card backs instead of card value if the player has folded
                 //       After next git pull, there should be a players[player].getHasFolded() function
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
-                        (CARD_WIDTH * (Game.getPlayers()[player].getHand()[cardNum].getValue() - 2)),
-                        (CARD_HEIGHT * Game.getPlayers()[player].getHand()[cardNum].getSuitValue()),
+                        (CARD_WIDTH * (Game.getPlayers().get(player).getHand()[cardNum].getValue() - 2)),
+                        (CARD_HEIGHT * Game.getPlayers().get(player).getHand()[cardNum].getSuitValue()),
                         CARD_WIDTH, CARD_HEIGHT);
 
                 Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
@@ -236,7 +236,7 @@ public class TableComponent extends JPanel {
                 // TODO: Make cards come from the dealer
                 int dealerPosition = Game.getDealerIndex();
                 Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
-                playerCards[player][cardNum] = new CardComponent(dealerPoint.x, dealerPoint.y, Game.getPlayers()[player].getHand()[cardNum]);
+                playerCards[player][cardNum] = new CardComponent(dealerPoint.x, dealerPoint.y, Game.getPlayers().get(player).getHand()[cardNum]);
                 playerCards[player][cardNum].moveTo(cardLoc.x, cardLoc.y, 500, false);
 
                 AnimationThread.getInstance().addAnimatableObject(playerCards[player][cardNum]);
@@ -249,7 +249,7 @@ public class TableComponent extends JPanel {
     }
 
     /*public void drawPlayerCards(Graphics g) {
-        for (int player = 0; player < Game.getPlayers().length; player++) {
+        for (int player = 0; player < Game.getPlayers().size(); player++) {
             if(players[player].getHand()[0] == null){
                 // this player has no cards. Draw nothing.
                 continue;

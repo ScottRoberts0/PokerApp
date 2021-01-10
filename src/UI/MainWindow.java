@@ -30,6 +30,8 @@ public class MainWindow implements ActionListener {
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 725;
 
+    private boolean isGameStarted = false;
+
     // components
     private JFrame mainFrame;
     private JPanel mainPanel;
@@ -48,6 +50,14 @@ public class MainWindow implements ActionListener {
 
         // show zee vindow
         mainFrame.setVisible(true);//making the frame visible
+    }
+
+    public boolean getIsGameStarted(){
+        return isGameStarted;
+    }
+
+    public void setIsGameStarted(boolean isGameStarted){
+        this.isGameStarted = isGameStarted;
     }
 
     public TableComponent getTable(){
@@ -104,7 +114,12 @@ public class MainWindow implements ActionListener {
         raiseTextBox.setColumns(8);
 
         // create a bet slider and have it affect the raise text box
-        betSlider = new JSlider(0, Game.getPlayers()[Game.getCurrentActionIndex()].getStack());
+        if(Game.getPlayers() != null){
+            betSlider = new JSlider(0, Game.getPlayers().get(Game.getCurrentActionIndex()).getStack());
+        }else{
+            betSlider = new JSlider(0, 0);
+        }
+
         ChangeListener e = e1 -> setTextValue(); //idk wtf this means but it was cleaner than the other thing
         betSlider.addChangeListener(e);
 
@@ -127,7 +142,7 @@ public class MainWindow implements ActionListener {
         testButton.addActionListener(this);
         testButton.setEnabled(true);
 
-        test2Button = new JButton("Test2");
+        test2Button = new JButton("0");
         test2Button.setActionCommand("Test2");
         test2Button.addActionListener(this);
         test2Button.setEnabled(true);
@@ -185,7 +200,7 @@ public class MainWindow implements ActionListener {
         foldButton.setEnabled(Game.checkFoldAllowed());
         callButton.setEnabled(Game.checkCallAllowed());
         raiseButton.setEnabled(Game.checkRaiseAllowed());
-        betSlider.setMaximum(Game.getPlayers()[Game.getCurrentActionIndex()].getStack());
+        betSlider.setMaximum(Game.getPlayers().get(Game.getCurrentActionIndex()).getStack());
         betSlider.setValue(0);
         setTextValue();
     }
@@ -224,7 +239,7 @@ public class MainWindow implements ActionListener {
     }
 
     public void callButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].call(Game.getCurrentPot());
+        Game.getPlayers().get(Game.getCurrentActionIndex()).call(Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
@@ -242,7 +257,7 @@ public class MainWindow implements ActionListener {
     public void foldButtonAction() {
         int actionIndex = Game.getCurrentActionIndex();
 
-        Game.getPlayers()[actionIndex].fold(Game.getPots());
+        Game.getPlayers().get(actionIndex).fold(Game.getPots());
 
         getTable().foldPlayer(actionIndex);
 
@@ -265,7 +280,7 @@ public class MainWindow implements ActionListener {
 
         Game.setLastRaiseSize(betValue - holder);
 
-        Game.getPlayers()[Game.getCurrentActionIndex()].raise(betValue, Game.getCurrentPot());
+        Game.getPlayers().get(Game.getCurrentActionIndex()).raise(betValue, Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
@@ -281,7 +296,7 @@ public class MainWindow implements ActionListener {
     }
 
     public void checkButtonAction() {
-        Game.getPlayers()[Game.getCurrentActionIndex()].check(Game.getCurrentPot());
+        Game.getPlayers().get(Game.getCurrentActionIndex()).check(Game.getCurrentPot());
 
         if (Game.checkFolds()) {
             Game.endHand();
@@ -311,34 +326,55 @@ public class MainWindow implements ActionListener {
     }
 
     public void test2ButtonAction(){
-        JsonFactory factory = new JsonFactory();
+        if(isGameStarted){
+            JsonFactory factory = new JsonFactory();
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try {
-            JsonGenerator generator = factory.createGenerator(out);
+            try {
+                JsonGenerator generator = factory.createGenerator(out);
 
-            Player player1 = Game.getPlayers()[0];
-            generator.writeStartObject();
-            generator.writeStringField("name", player1.getPlayerName());
-
-            //tyler: folded players now have their cards set to null
-            generator.writeNumberField("value0", player1.getHand()[0].getValue());
-            generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
-            generator.writeNumberField("value1", player1.getHand()[1].getValue());
-            generator.writeNumberField("suit1", player1.getHand()[1].getSuitValue());
+                Player player1 = Game.getPlayers().get(0);
+                generator.writeStartObject();
+                generator.writeStringField("name", player1.getPlayerName());
 
 
-            generator.writeEndObject();
+                if(player1.getHand()[0] != null){
+                    generator.writeNumberField("value0", player1.getHand()[0].getValue());
+                    generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
+                }else{
+                    generator.writeNumberField("value0", -1);
+                    generator.writeNumberField("suit0", -1);
+                }
 
-            generator.close();
+                if(player1.getHand()[1] != null){
+                    generator.writeNumberField("value0", player1.getHand()[1].getValue());
+                    generator.writeNumberField("suit0", player1.getHand()[1].getSuitValue());
+                }else{
+                    generator.writeNumberField("value0", -1);
+                    generator.writeNumberField("suit0", -1);
+                }
 
-            String output = new String(out.toByteArray());
+                generator.writeEndObject();
 
-            System.out.println(output);
+                generator.close();
 
-        }catch (IOException e){
-            // this will probably never throw
+                String output = new String(out.toByteArray());
+
+                System.out.println(output);
+
+            }catch (IOException e){
+                // this will probably never throw
+            }
+        }else{
+            // waited for players to connect, starting the game
+            if(Game.getPlayers().size() > 1) {
+                Game.startGame();
+            }
         }
+    }
+
+    public void setPlayerNumOnButton(){
+        test2Button.setText("" + Game.getPlayers().size());
     }
 }
