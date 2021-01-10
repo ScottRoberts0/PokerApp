@@ -39,7 +39,6 @@ public class GraphicalHelpers {
         // if the image isn't loaded yet, bring it on in
         if(GraphicalHelpers.cardsImage == null) {
             try {
-                System.out.println("Working Directory = " + System.getProperty("user.dir"));
                 File f = new File(System.getProperty("user.dir") + "\\resources\\card deck.png");
                 GraphicalHelpers.cardsImage = ImageIO.read(f);
             }catch (Exception e){

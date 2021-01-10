@@ -32,7 +32,7 @@ public class PokerHandler extends LegacyHandler {
         // get the message type
         String messageType = message.getString(PokerMessage.MESSAGE_TYPE);
         if (messageType != null) {
-            System.out.println ("Type: " + messageType);
+            System.out.println("MessageType: " + messageType);
 
             // ------------------------ Handshaking -----------------------
             if(messageType.equals(PokerMessage.MESSAGE_TYPE_HANDSHAKE)){
@@ -54,12 +54,14 @@ public class PokerHandler extends LegacyHandler {
     }
 
     private LegacyMessage clientMessageReceived(Communicator communicator, LegacyMessage message){
+
         // get a response ready
         PokerServerMessage response = new PokerServerMessage();
 
         String messageType = message.getString(PokerMessage.MESSAGE_TYPE);
         // ------------------------ Game Data Message -----------------------
         if(messageType.equals(PokerMessage.MESSAGE_TYPE_GAME_DATA)){
+            System.out.println("MessageType: " + messageType);
             PokerClientMessage.handleGameDataMessage(message);
         }
 

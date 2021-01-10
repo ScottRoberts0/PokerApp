@@ -131,10 +131,10 @@ public class Game {
         if(Networker.getInstance() == null) {
             addPlayer(new Player(0, startingStackSize, "Reid"));
             addPlayer(new Player(1, 75000, "Tyler"));
-            addPlayer(new Player(2, 50000, "Dan"));
-            addPlayer(new Player(3, 125000, "Scott"));
-            addPlayer(new Player(4, 110000, "Pat"));
-            addPlayer(new Player(5, 12000, "Denis"));
+            //addPlayer(new Player(2, 50000, "Dan"));
+            //addPlayer(new Player(3, 125000, "Scott"));
+            //addPlayer(new Player(4, 110000, "Pat"));
+            //addPlayer(new Player(5, 12000, "Denis"));
         }
 
         //init pot

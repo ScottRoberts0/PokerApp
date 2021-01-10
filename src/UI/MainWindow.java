@@ -4,25 +4,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Logic.Card;
 import Logic.Game;
-import Logic.Player;
 import Networking.Networker;
 import UI.Components.TableComponent;
 import UI.Listeners.MainWindowListener;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 public class MainWindow implements ActionListener {
 
@@ -327,49 +319,15 @@ public class MainWindow implements ActionListener {
 
     public void test2ButtonAction(){
         if(isGameStarted){
-            JsonFactory factory = new JsonFactory();
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            try {
-                JsonGenerator generator = factory.createGenerator(out);
-
-                Player player1 = Game.getPlayers().get(0);
-                generator.writeStartObject();
-                generator.writeStringField("name", player1.getPlayerName());
-
-
-                if(player1.getHand()[0] != null){
-                    generator.writeNumberField("value0", player1.getHand()[0].getValue());
-                    generator.writeNumberField("suit0", player1.getHand()[0].getSuitValue());
-                }else{
-                    generator.writeNumberField("value0", -1);
-                    generator.writeNumberField("suit0", -1);
-                }
-
-                if(player1.getHand()[1] != null){
-                    generator.writeNumberField("value0", player1.getHand()[1].getValue());
-                    generator.writeNumberField("suit0", player1.getHand()[1].getSuitValue());
-                }else{
-                    generator.writeNumberField("value0", -1);
-                    generator.writeNumberField("suit0", -1);
-                }
-
-                generator.writeEndObject();
-
-                generator.close();
-
-                String output = new String(out.toByteArray());
-
-                System.out.println(output);
-
-            }catch (IOException e){
-                // this will probably never throw
-            }
+            
         }else{
             // waited for players to connect, starting the game
             if(Game.getPlayers().size() > 1) {
                 Game.startGame();
+
+                Networker.getInstance().broadCastInitialGameData();
+
+                test2Button.setText("Test2");
             }
         }
     }
