@@ -1,5 +1,7 @@
 package Networking;
 
+import Logic.Game;
+import Logic.Player;
 import Networking.MessageHandlers.PokerHandler;
 import Networking.Messages.PokerClientMessage;
 import Networking.Messages.PokerMessage;
@@ -7,9 +9,14 @@ import Networking.Messages.PokerServerMessage;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.messages.BeamMessage;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Networker {
 
@@ -86,7 +93,6 @@ public class Networker {
         BeamMessage response = client.sendMessage(message);
 
         if(response != null){
-            System.out.println("Response received");
             PokerClientMessage cm = new PokerClientMessage(response);
             PokerClientMessage.handleServerResponse(cm);
         }else{
@@ -98,17 +104,25 @@ public class Networker {
         return isServer;
     }
 
-    public void broadCastGameData(){
+    public void broadCastInitialGameData(){
         if(!isServer)
             return;
 
+        // get a message ready and put a message type header on it
         PokerServerMessage message = new PokerServerMessage();
-        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_GAME_DATA); // put in the message type as neccessary
+        message.setString(PokerMessage.MESSAGE_TYPE, PokerMessage.MESSAGE_TYPE_GAME_DATA);
+
+        // grab the players
+        List<Player> players = Game.getPlayers();
 
         // start plugging this message full of data
-        
-        message.setInt(PokerMessage.MESSAGE_NUMPLAYERS, 2);
+        // add number of players
+        message.setInt(PokerMessage.MESSAGE_NUMPLAYERS, players.size());
 
+        // add player data
+        for(int i = 0; i < players.size(); i ++){
+            message.setString(PokerMessage.MESSAGE_PLAYER_STRING + i, players.get(i).getPlayerStateForNetwork());
+        }
 
         server.broadcast(message);
     }

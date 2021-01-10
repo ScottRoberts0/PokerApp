@@ -1,9 +1,23 @@
 package Logic;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Player implements Comparable {
+
+    public static final String PLAYER_NAME = "name";
+    public static final String PLAYER_CARD1_VALUE = "value0";
+    public static final String PLAYER_CARD1_SUIT = "suit0";
+    public static final String PLAYER_CARD2_VALUE = "value1";
+    public static final String PLAYER_CARD2_SUIT = "suit1";
+    public static final String PLAYER_STACK = "stack";
+
     private final int playerNum;
     private String playerName;
 
@@ -43,6 +57,9 @@ public class Player implements Comparable {
         this.playerName = playerName;
     }
 
+    public void setHand(Card[] cards){
+        this.hand = cards;
+    }
 
 
     public void resetHand() {
@@ -203,7 +220,9 @@ public class Player implements Comparable {
     public void printHand() {
         System.out.println(playerName + " hand:");
         for (int i = 0; i < hand.length; i++) {
-            System.out.println(hand[i]);
+            if(hand[i] != null) {
+                System.out.println(hand[i]);
+            }
         }
         System.out.println();
     }
@@ -267,9 +286,57 @@ public class Player implements Comparable {
     }
 
 
-
     public String getMadeHandName() {
         return Evaluator.getMadeHandName(madeHand);
+    }
+
+    public String getPlayerStateForNetwork(){
+        String output = "";
+
+        JsonFactory factory = new JsonFactory();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            JsonGenerator generator = factory.createGenerator(out);
+            generator.writeStartObject();
+
+            // playername
+            generator.writeStringField(PLAYER_NAME, playerName);
+
+
+            // player cards, or -1 if the card is null
+            if(hand[0] != null){
+                generator.writeNumberField(PLAYER_CARD1_VALUE, hand[0].getValue());
+                generator.writeNumberField(PLAYER_CARD1_SUIT, hand[0].getSuitValue());
+            }else{
+                generator.writeNumberField(PLAYER_CARD1_VALUE, -1);
+                generator.writeNumberField(PLAYER_CARD1_SUIT, -1);
+            }
+            if(hand[1] != null){
+                generator.writeNumberField(PLAYER_CARD2_VALUE, hand[1].getValue());
+                generator.writeNumberField(PLAYER_CARD2_SUIT, hand[1].getSuitValue());
+            }else{
+                generator.writeNumberField(PLAYER_CARD2_VALUE, -1);
+                generator.writeNumberField(PLAYER_CARD2_SUIT, -1);
+            }
+
+            // stack
+            generator.writeNumberField(PLAYER_STACK, stack);
+
+
+            generator.writeEndObject();
+
+            generator.close();
+
+            output = new String(out.toByteArray());
+
+            System.out.println(output);
+
+        }catch (IOException e){
+            // this will probably never throw
+        }
+
+        return output;
     }
 
     public int getMadeHandValue() {
@@ -313,7 +380,11 @@ public class Player implements Comparable {
     }
 
     public String toString() {
-        return playerName + " Stack: " + getStack();
+        if(hand[0] != null && hand[1] != null){
+            return playerName + " Stack: " + getStack() + " Hand: " + hand[0] + ", " + hand[1];
+        }else {
+            return playerName + " Stack: " + getStack() + " Hand: None";
+        }
     }
 
     //allows comparison of players based on their stack sizes.

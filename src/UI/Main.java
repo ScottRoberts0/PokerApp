@@ -15,8 +15,6 @@ public class Main {
                 beginUI();
             }else if(argsp[0].equals("-server")){
                 networker = new Networker(true);
-                //Game.startGame();
-                //gameWindow.updateButtons();
                 beginUI();
             }else{
                 beginUI();
