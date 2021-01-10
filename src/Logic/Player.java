@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class Player {
+public class Player implements Comparable {
 
     public static final String PLAYER_NAME = "name";
     public static final String PLAYER_CARD1_VALUE = "value0";
@@ -20,13 +20,15 @@ public class Player {
 
     private final int playerNum;
     private String playerName;
-    private int moneyInPot;
+
+    private int moneyInPot; //value used by the UI to display player's current bet
     private int stack;
+    private int streetStartingStackSize;
     private boolean hasFolded;
 
-    private Card[] hand;
-    private Card[] possCards;
-    private Card[] madeHand;
+    private Card[] hand; //player's hole cards
+    private Card[] possCards; //array used by evaluator class to create a made hand
+    private Card[] madeHand; //the player's best possible hand after all cards are dealt
 
     public Player(int playerNum) {
         hand = new Card[2];
@@ -41,6 +43,7 @@ public class Player {
         madeHand = new Card[5];
         this.playerNum = playerNum;
         this.stack = stack;
+        this.streetStartingStackSize = this.stack;
         this.playerName = "Player " + playerNum;
     }
 
@@ -50,12 +53,14 @@ public class Player {
         madeHand = new Card[5];
         this.playerNum = playerNum;
         this.stack = stack;
+        this.streetStartingStackSize = this.stack;
         this.playerName = playerName;
     }
 
     public void setHand(Card[] cards){
         this.hand = cards;
     }
+
 
     public void resetHand() {
         Arrays.fill(hand, null);
@@ -67,31 +72,41 @@ public class Player {
         moneyInPot -= bet;
     }
 
+    /**
+     * @param betSize blind value
+     * @param mainPot blinds should only ever be put into the main pot
+     */
     public void postBlind(int betSize, Pot mainPot) {
         if(stack - betSize < 0) {
             betSize = stack;
         }
 
         stack -= betSize;
-        //Game.addToPot(betSize);
         mainPot.addToPot(betSize, playerNum);
         mainPot.addPlayerToPot(this);
-        //bets[playerNum] = betSize;
         moneyInPot = betSize;
     }
 
     public void raise(int betSize, Pot pot) {
+        //bet sizes are formatted by Game class before being passed in
+        //bet sizes are formatted to be exactly the value passed in by the player
         if(stack - betSize == 0) {
+            //if the player is going all in
             moneyInPot += betSize;
-
             stack -= betSize;
             pot.addToPot(betSize, playerNum);
+
+            //if the current pot does not yet have this player, add to the current pot (case: preflop only)
             if(!pot.containsPlayer(this)) {
                 pot.addPlayerToPot(this);
             }
         } else {
+            //if the player is not going all in
+            //since we are raising to exactly what the player passes in, we take out only the difference between the raise size, and what they have already put in
             stack -= betSize - pot.getBets()[playerNum];
             pot.addToPot(betSize - pot.getBets()[playerNum], playerNum);
+
+            //if the current pot does not yet have this player, add to the current pot (case: preflop only)
             if(!pot.containsPlayer(this)) {
                 pot.addPlayerToPot(this);
             }
@@ -101,13 +116,15 @@ public class Player {
 
         pot.setPlayerActed(playerNum, true);
 
-        System.out.println(playerName + " raises to " + betSize);
+        System.out.println(playerName + " raises to " + pot.getBets()[playerNum]);
         System.out.println();
     }
 
     public void call(Pot pot) {
+        //formats a the callsize by taking the difference between the highest bet and the current highest bet, the value to call to
         int callSize = Game.getHighestBet() - pot.getBets()[playerNum];
 
+        //doesn't allow a player to go below 0 stack
         if(stack - callSize < 0) {
             callSize = stack;
         }
@@ -116,6 +133,8 @@ public class Player {
 
         stack -= callSize;
         pot.addToPot(callSize, playerNum);
+
+        //adds the player to the current pot if it is not already included
         if(!pot.containsPlayer(this)) {
             pot.addPlayerToPot(this);
         }
@@ -143,6 +162,7 @@ public class Player {
     }
 
     public void check(Pot pot) {
+        //basically does nothing except they have acted
         pot.setPlayerActed(playerNum, true);
 
         System.out.println(playerName + " checks");
@@ -151,7 +171,11 @@ public class Player {
 
     public void win(int potSize) {
         stack += potSize;
-        System.out.println(playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!");
+        if(madeHand[0] == null) {
+            System.out.println(playerName + " wins " + potSize + " satoshis!");
+        } else {
+            System.out.println(playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!");
+        }
         System.out.println();
     }
 
@@ -167,11 +191,27 @@ public class Player {
         this.stack = Game.getStartingStackSize();
     }
 
+    public void updateStreetStartingStackSize() {
+        this.streetStartingStackSize = this.stack;
+    }
+
+    /**
+     * This method draws a random hand.
+     * @param deck The deck being used.
+     */
     public void drawHand(Deck deck) {
         hand[0] = deck.drawCard();
         hand[1] = deck.drawCard();
     }
 
+    /**
+     * This method allows you to draw a specific hand input by the user.
+     * @param deck The deck being used.
+     * @param value1 The value (1 [Ace] - 13 [King]) of the first card.
+     * @param suit1 The suit value (0 = Diamonds, 1 = Hearts, 2 = Spades, 3 = Clubs) of the first card.
+     * @param value2 The value (1 [Ace] - 13 [King]) of the second card.
+     * @param suit2 The suit value (0 = Diamonds, 1 = Hearts, 2 = Spades, 3 = Clubs) of the second card.
+     */
     public void drawHand(Deck deck, String value1, String suit1, String value2, String suit2) {
         hand[0] = deck.drawCard(value1, suit1);
         hand[1] = deck.drawCard(value2, suit2);
@@ -188,6 +228,7 @@ public class Player {
     }
 
     public Card[] makeMadeHand(Card[] board) {
+        //method used by evaluator class to create a made hand attached to a player
         Arrays.fill(madeHand, null);
         createPossCards(board);
         madeHand = Evaluator.makeMadeHand(possCards);
@@ -196,6 +237,7 @@ public class Player {
     }
 
     public void printMadeHand() {
+        //method used for testing only
         System.out.println(playerName + " made hand: " + getMadeHandName());
         for (int i = 0; i < madeHand.length; i++) {
             System.out.println(madeHand[i]);
@@ -204,6 +246,7 @@ public class Player {
     }
 
     public void createPossCards(Card[] board) {
+        //method used by evaluator class to help create a made hand attached to the player
         Arrays.fill(possCards, null);
 
         //populates possCards
@@ -241,6 +284,7 @@ public class Player {
         }
         System.out.println();
     }
+
 
     public String getMadeHandName() {
         return Evaluator.getMadeHandName(madeHand);
@@ -315,6 +359,10 @@ public class Player {
         return stack;
     }
 
+    public int getStreetStartingStackSize() {
+        return this.streetStartingStackSize;
+    }
+
     public boolean checkPlayerAllIn() {
         return stack == 0;
     }
@@ -336,6 +384,19 @@ public class Player {
             return playerName + " Stack: " + getStack() + " Hand: " + hand[0] + ", " + hand[1];
         }else {
             return playerName + " Stack: " + getStack() + " Hand: None";
+        }
+    }
+
+    //allows comparison of players based on their stack sizes.
+    @Override
+    public int compareTo(Object o) {
+        Player p1 = (Player) o;
+        if(p1.getStreetStartingStackSize() > this.streetStartingStackSize) {
+            return -1;
+        } else if (p1.getStreetStartingStackSize() < this.streetStartingStackSize) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 }

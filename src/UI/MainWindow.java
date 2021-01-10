@@ -28,7 +28,7 @@ public class MainWindow implements ActionListener {
     private JFrame mainFrame;
     private JPanel mainPanel;
     private TableComponent table;
-    private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton, test2Button;
+    private JButton checkButton, callButton, foldButton, raiseButton, resetButton, testButton, test2Button, runHandButton;
     private JSlider betSlider;
     private JTextField raiseTextBox;
 
@@ -139,6 +139,12 @@ public class MainWindow implements ActionListener {
         test2Button.addActionListener(this);
         test2Button.setEnabled(true);
 
+        runHandButton = new JButton("Run Hand");
+        runHandButton.setActionCommand("Run");
+        runHandButton.addActionListener(this);
+        runHandButton.setEnabled(true);
+
+        testButtonsPanel.add(runHandButton, BorderLayout.LINE_END);
         testButtonsPanel.add(test2Button, BorderLayout.LINE_END);
         testButtonsPanel.add(testButton, BorderLayout.LINE_END);
         testButtonsPanel.add(resetButton, BorderLayout.LINE_END);
@@ -192,8 +198,14 @@ public class MainWindow implements ActionListener {
         foldButton.setEnabled(Game.checkFoldAllowed());
         callButton.setEnabled(Game.checkCallAllowed());
         raiseButton.setEnabled(Game.checkRaiseAllowed());
-        betSlider.setMaximum(Game.getPlayers().get(Game.getCurrentActionIndex()).getStack());
-        betSlider.setValue(0);
+        testButton.setEnabled(Game.checkRebuyAllowed());
+        betSlider.setMaximum(Game.getPlayers().get(Game.getCurrentActionIndex()).getStack() +
+                Game.getCurrentPot().getBets()[Game.getPlayers().get(Game.getCurrentActionIndex()).getPlayerNum()]);
+        if(Game.getStreet() != 0 && Game.getHighestBet() == 0) {
+            betSlider.setValue(Game.getMinBet());
+        } else {
+            betSlider.setValue(Game.getLastRaiseSize() + Game.getHighestBet());
+        }
         setTextValue();
     }
 
@@ -217,8 +229,8 @@ public class MainWindow implements ActionListener {
             callButtonAction();
         }else if(e.getActionCommand().equals("Reset")) {
             resetButtonAction();
-        }else if(e.getActionCommand().equals("Slide")) {
-            betSliderAction();
+        } else if(e.getActionCommand().equals("Run")) {
+            runHandButtonAction();
         }else if(e.getActionCommand().equals("Test")){
             testButtonAction();
         }else if(e.getActionCommand().equals("Test2")){
@@ -310,11 +322,11 @@ public class MainWindow implements ActionListener {
     }
 
     public void testButtonAction(){
-
+        Game.rebuy();
     }
 
-    public void betSliderAction() {
-        setTextValue();
+    public void runHandButtonAction() {
+        Game.runHand();
     }
 
     public void test2ButtonAction(){

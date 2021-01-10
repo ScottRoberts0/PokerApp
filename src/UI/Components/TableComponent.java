@@ -126,7 +126,9 @@ public class TableComponent extends JPanel {
             StringBuilder pots = new StringBuilder();
 
             for (Pot pot : Game.getPots()) {
-                pots.append(pot).append(" ");
+                if(pot.getPotValue() > 0) {
+                    pots.append(pot).append(" ");
+                }
             }
 
             String name = Game.getPlayers().get(i).getPlayerName();
@@ -218,8 +220,6 @@ public class TableComponent extends JPanel {
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
                 // grab the card image
-                // TODO: Draw card backs instead of card value if the player has folded
-                //       After next git pull, there should be a players[player].getHasFolded() function
                 BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
                         (CARD_WIDTH * (Game.getPlayers().get(player).getHand()[cardNum].getValue() - 2)),
                         (CARD_HEIGHT * Game.getPlayers().get(player).getHand()[cardNum].getSuitValue()),
@@ -312,6 +312,8 @@ public class TableComponent extends JPanel {
                 g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
             }
         }
+
+
     }
 
     public void setTableCards(Card[] cards) {
