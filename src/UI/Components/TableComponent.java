@@ -295,6 +295,14 @@ public class TableComponent extends JPanel {
 
                 AnimationThread.getInstance().addAnimatableObject(tableCardsAnimated[i]);
 
+                System.out.println("Array:");
+                for(int j = 0; j < tableCards.length; j++) {
+                    if(tableCards[j] != null) {
+                        System.out.println(tableCards[j].getValue());
+                    }
+                }
+
+                System.out.println("Animated:");
                 for(CardComponent card : tableCardsAnimated) {
                     System.out.println(card);
                 }
