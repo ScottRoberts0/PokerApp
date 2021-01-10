@@ -250,31 +250,6 @@ public class TableComponent extends JPanel {
         AnimationThread.getInstance().removeAnimatableObjects();
     }
 
-    public void createTableCards() {
-        Point p;
-
-        // grab the center of this panel
-        Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
-
-        // grab the card image
-        for (int i = 0; i < 5; i++) {
-            if (tableCards[i] != null && tableCardsAnimated[i] == null) {
-                p = new Point((CARD_WIDTH * i) - (5 * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
-
-                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-
-                int dealerPosition = Game.getDealerIndex();
-                Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
-
-
-                tableCardsAnimated[i] = new CardComponent(dealerPoint.x, dealerPoint.y, new Card(tableCards[i].getValue(), tableCards[i].getSuitValue()));
-                tableCardsAnimated[i].moveTo(cardLoc.x, cardLoc.y, 500, true);
-
-                AnimationThread.getInstance().addAnimatableObject(tableCardsAnimated[i]);
-            }
-        }
-    }
-
     public void drawTableCards(Graphics g) {
         int totalCards = 0;
         Point p;
@@ -314,7 +289,6 @@ public class TableComponent extends JPanel {
 
                 int dealerPosition = Game.getDealerIndex();
                 Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
-
 
                 tableCardsAnimated[i] = new CardComponent(dealerPoint.x, dealerPoint.y, new Card(tableCards[i].getValue(), tableCards[i].getSuitValue()));
                 tableCardsAnimated[i].moveTo(cardLoc.x, cardLoc.y, 500, true);
