@@ -2,6 +2,7 @@ package Logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Pot {
     private int potValue;
@@ -49,7 +50,7 @@ public class Pot {
         //with the most money on the table
         if (!Game.checkHandCompleted()) {
             ArrayList<Integer> sortedBets = sortBets();
-            ArrayList<Player> sortedPlayers = sortPlayers(sortedBets);
+            ArrayList<Player> sortedPlayers = sortPlayersByBets();
             int difference = sortedBets.get(sortedBets.size() - 1) - sortedBets.get(sortedBets.size() - 2);
 
             sortedPlayers.get(sortedPlayers.size() - 1).refundBet(difference, Game.getCurrentPot());
@@ -68,10 +69,10 @@ public class Pot {
             }
         }
 
-        if(sortedBets.size() == 0) {
+/*        if(sortedBets.size() == 0) {
             sortedBets.add(0);
             sortedBets.add(0);
-        }
+        }*/
 
         //sort bets in ascending order
         boolean sorted = false;
@@ -91,12 +92,25 @@ public class Pot {
         return sortedBets;
     }
 
-    public ArrayList<Player> sortPlayers(ArrayList<Integer> sortedBets) {
-        //sorts players ascending order according to the amount of money they have in the pot
+    public ArrayList<Player> sortPlayersByStack() {
+        //sorts players in ascending order according to the size of their remaining stacks
         ArrayList<Player> sortedPlayers = new ArrayList<>();
-        for(int bet : sortedBets) {
+
+        sortedPlayers.addAll(playersInPot);
+
+        Collections.sort(sortedPlayers);
+
+        return sortedPlayers;
+    }
+
+    public ArrayList<Player> sortPlayersByBets() {
+        //sorts players in ascending order according to the size of their current bet
+        ArrayList<Player> sortedPlayers = new ArrayList<>();
+        ArrayList<Integer> sortedBets = sortBets();
+
+        for(int i = 0; i < sortedBets.size(); i++) {
             for(int j = 0; j < playersInPot.size(); j++) {
-                if(playersInPot.get(j).getMoneyInPot() == bet && !sortedPlayers.contains(playersInPot.get(j))) {
+                if(playersInPot.get(j).getMoneyInPot() == sortedBets.get(i)) {
                     sortedPlayers.add(playersInPot.get(j));
                 }
             }
@@ -110,22 +124,27 @@ public class Pot {
         //creates a list of pots and returns this, which is then appended to the list of pots in the Game class
         ArrayList<Pot> pots = new ArrayList<>();
         ArrayList<Integer> sortedBets = sortBets();
-        ArrayList<Player> playersSorted = sortPlayers(sortedBets);
+        ArrayList<Player> sortedPlayers = sortPlayersByStack();
+
 
         for(int bet : sortedBets) {
             System.out.println(bet);
         }
 
+        for(Player player : sortedPlayers) {
+            System.out.println(player);
+        }
+
         int potCount = Game.getPots().size() + 1;
         for(int i = 0; i < sortedBets.size() - 1; i++) {
             //condition for creating a side pot: there is a player all in, or there is a difference in bet sizes after all bets have finished
-            if(sortedBets.get(i) < sortedBets.get(i + 1) || (playersSorted.get(i).getStack() == 0 && pots.get(pots.size() - 1).getNumPlayersInPot() > 2)) {
+            if(sortedBets.get(i) < sortedBets.get(i + 1) || sortedPlayers.get(i).getStack() == 0) {
                 Pot sidePot = new Pot(potCount);
                 potCount++;
 
                 //add players to the side pot
-                for(int j = i + 1; j < playersSorted.size(); j++) {
-                    sidePot.addPlayerToPot(playersSorted.get(j));
+                for(int j = i + 1; j < sortedPlayers.size(); j++) {
+                    sidePot.addPlayerToPot(sortedPlayers.get(j));
                 }
 
                 //add money to the side pot, remove money from the main pot
@@ -137,7 +156,9 @@ public class Pot {
                     }
                 }
 
-                pots.add(sidePot);
+                if(sidePot.getNumPlayersInPot() > 1) {
+                    pots.add(sidePot);
+                }
             }
         }
 

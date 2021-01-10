@@ -13,6 +13,7 @@ public class Game {
     private static int bigBlindIndex;
     private static int currentActionIndex;
     private static int street;
+    private static double rebuyThreshold;
 
     //WIP:
     private static ArrayList<Player> players;
@@ -98,10 +99,12 @@ public class Game {
             pot.resetBets();
         }
 
+        updateStartingStackValues();
+
         //TODO: once satisified with side pots, enable the commented out lines below which will just finish hands automatically
-        //if(checkHandCompleted()) {
-        //    runHand();
-        //} else {
+        if(checkHandCompleted()) {
+            runHand();
+        } else {
             street++;
             if (street == 1) {
                 flop(Main.getGameWindow());
@@ -113,7 +116,7 @@ public class Game {
                 getWinners();
                 endHand();
             }
-        //}
+        }
     }
 
     public static void startGame() {
@@ -127,6 +130,7 @@ public class Game {
         lastRaiseSize = bb;
         minBet = bb;
         startingStackSize = 100000;
+        rebuyThreshold = 0.25;
 
         if(Networker.getInstance() == null) {
             addPlayer(new Player(0, startingStackSize, "Reid"));
@@ -137,15 +141,24 @@ public class Game {
             addPlayer(new Player(5, 12000, "Denis"));
         }
 
+/*        if(Networker.getInstance() == null) {
+            addPlayer(new Player(0, 99000, "Reid"));
+            addPlayer(new Player(1, startingStackSize, "Tyler"));
+            addPlayer(new Player(2, startingStackSize, "Dan"));
+            addPlayer(new Player(3, startingStackSize, "Scott"));
+            addPlayer(new Player(4, startingStackSize, "Pat"));
+            addPlayer(new Player(5, startingStackSize, "Denis"));
+        }*/
+
         //init pot
         mainPot = new Pot(1);
         currentPot = mainPot;
         pots = new ArrayList<>();
         pots.add(mainPot);
 
-        pickRandomDealer();
-
         dealHands();
+
+        pickRandomDealer();
 
         setStartingActionIndex();
         players.get(smallBlindIndex).postBlind(sb, mainPot);
@@ -207,6 +220,7 @@ public class Game {
         deck.shuffle();
         Arrays.fill(board, null);
 
+        updateStartingStackValues();
         resetHands();
         dealHands();
         resetFolds();
@@ -605,6 +619,10 @@ public class Game {
         return true;
     }
 
+    public static boolean checkRebuyAllowed() {
+        return players.get(currentActionIndex).getStack() <= (int) (startingStackSize * rebuyThreshold);
+    }
+
 
     public static int getHighestBet() {
         int highestBet = -1;
@@ -644,13 +662,14 @@ public class Game {
     public static void checkValidCurrentActionIndex() {
         if(street != 0) {
             //postflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while (!currentPot.containsPlayer(players.get(currentActionIndex)) || players.get(currentActionIndex).checkHasHand()) {
+            while (!currentPot.containsPlayer(players.get(currentActionIndex)) || players.get(currentActionIndex).checkHasHand() ||
+                    players.get(currentActionIndex).getStack() == 0) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
         } else {
             //preflop, if the pot does not contain the player, or the player is all in, move the action forward until we find a valid player
-            while(players.get(currentActionIndex).checkHasHand()) {
+            while(players.get(currentActionIndex).checkHasHand() || players.get(currentActionIndex).getStack() == 0) {
                 currentActionIndex++;
                 wrapCurrentActionIndex();
             }
@@ -713,7 +732,7 @@ public class Game {
     }
 
     public static void rebuy() {
-
+        players.get(currentActionIndex).resetStack();
     }
 
     public static void sitOut() {
@@ -799,6 +818,12 @@ public class Game {
 
     public static ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public static void updateStartingStackValues() {
+        for(Player player : players) {
+            player.updateStartingStackSize();
+        }
     }
 
     public static void setLastRaiseSize(int lastRaiseSize) {
