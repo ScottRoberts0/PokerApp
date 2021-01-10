@@ -136,22 +136,23 @@ public class Game {
         if(Networker.getInstance() == null) {
             addPlayer(new Player(0, startingStackSize, "Reid"));
             addPlayer(new Player(1, 75000, "Tyler"));
-            //addPlayer(new Player(2, 50000, "Dan"));
-            //addPlayer(new Player(3, 125000, "Scott"));
-            //addPlayer(new Player(4, 110000, "Pat"));
-            //addPlayer(new Player(5, 12000, "Denis"));
+            addPlayer(new Player(2, 50000, "Dan"));
+            addPlayer(new Player(3, 125000, "Scott"));
+            addPlayer(new Player(4, 110000, "Pat"));
+            addPlayer(new Player(5, 12000, "Denis"));
         }
 
-/*
-        if(Networker.getInstance() == null) {
+
+/*        if(Networker.getInstance() == null) {
             addPlayer(new Player(0, 50000, "Reid"));
             addPlayer(new Player(1, 50000, "Tyler"));
             addPlayer(new Player(2, startingStackSize, "Dan"));
             addPlayer(new Player(3, startingStackSize, "Scott"));
             addPlayer(new Player(4, startingStackSize, "Pat"));
             addPlayer(new Player(5, startingStackSize, "Denis"));
-        }
-*/
+        }*/
+
+
 
         //init pot
         mainPot = new Pot(1);
@@ -166,8 +167,6 @@ public class Game {
         setStartingActionIndex();
         players.get(smallBlindIndex).postBlind(sb, mainPot);
         players.get(bigBlindIndex).postBlind(bb, mainPot);
-        //players[getSmallBlindIndex()].postBlind(sb, mainPot);
-        //players[getBigBlindIndex()].postBlind(bb, mainPot);
 
         printPlayersAndPot();
 
@@ -476,18 +475,21 @@ public class Game {
         System.out.println(">>>>>>>>>> FLOP <<<<<<<<<<<<<<<<");
         dealFlop();
         gameWindow.setTableCards(board);
+        printBoard();
     }
 
     public static void turn(MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> TURN <<<<<<<<<<<<<<<<");
         dealTurn();
         gameWindow.setTableCards(board);
+        printBoard();
     }
 
     public static void river(MainWindow gameWindow) {
         System.out.println(">>>>>>>>>> RIVER <<<<<<<<<<<<<<<<");
         dealRiver();
         gameWindow.setTableCards(board);
+        printBoard();
     }
 
     public static void getWinners() {
