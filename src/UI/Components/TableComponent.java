@@ -290,7 +290,6 @@ public class TableComponent extends JPanel {
                 int dealerPosition = Game.getDealerIndex();
                 Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
 
-
                 tableCardsAnimated[i] = new CardComponent(dealerPoint.x, dealerPoint.y, new Card(tableCards[i].getValue(), tableCards[i].getSuitValue()));
                 tableCardsAnimated[i].moveTo(cardLoc.x, cardLoc.y, 500, true);
 

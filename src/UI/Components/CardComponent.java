@@ -33,6 +33,10 @@ public class CardComponent extends Animatable {
         this(x, y, card, new LinearEasingFunction());
     }
 
+    public String toString() {
+        return card.getValue() + " " + card.getSuitValue();
+    }
+
     @Override
     protected void paint(Graphics g) {
         // only re-calculate positions on objects that are moving

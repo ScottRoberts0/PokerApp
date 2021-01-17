@@ -10,13 +10,6 @@ public class Card {
         this.value = value;
         this.suitValue = suitValue;
 
-        //if value is outside of normal card range, set it to ace or king
-        if (value < 1) {
-            this.value = 1;
-        } else if (value > 13) {
-            this.value = 13;
-        }
-
         //name cards based on values
         if (value == 1) {
             this.name = "Ace";
