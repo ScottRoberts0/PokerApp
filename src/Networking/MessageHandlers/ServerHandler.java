@@ -17,17 +17,29 @@ public class ServerHandler extends LegacyHandler {
     @Override
     public LegacyMessage messageReceived(Communicator communicator, LegacyMessage message) {
         // get a response ready
-        LegacyMessage response = null;
+        LegacyMessage response = new LegacyMessage();
 
         // check the message type
         long messageTypee = message.getType();
 
         if(messageTypee == ClientConnectedMessage.MESSAGE_ID){
-            System.out.println("MessageType: Client Connected");
-            response = ClientConnectedMessage.serverClientConnected(communicator, message);
+            handleClientConnected(communicator, message);
         }
 
         return response;
+    }
+
+    private void handleClientConnected(Communicator communicator, LegacyMessage message){
+        System.out.println("MessageType: Client Connected");
+        // grab the playername
+        String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
+        System.out.println(playerName + "");
+
+        // add to the players in lobby list
+        Networker.getInstance().addPlayerToLobby(playerName);
+
+        // send a broadcast back to all players with new lobby list
+        Networker.getInstance().broadcastLobbyPlayerList();
     }
 
 }

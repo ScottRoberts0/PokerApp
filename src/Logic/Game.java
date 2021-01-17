@@ -142,7 +142,6 @@ public class Game {
             addPlayer(new Player(5, 12000, "Denis"));
         }
 
-
 /*        if(Networker.getInstance() == null) {
             addPlayer(new Player(0, 50000, "Reid"));
             addPlayer(new Player(1, 50000, "Tyler"));

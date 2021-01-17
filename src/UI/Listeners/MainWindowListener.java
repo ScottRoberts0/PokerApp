@@ -25,7 +25,11 @@ public class MainWindowListener implements WindowListener {
      */
     @Override
     public void windowClosing(WindowEvent e) {
-
+        if(Networker.getInstance() != null) {
+            Networker.getInstance().close();
+        }
+        e.getWindow().dispose();
+        System.exit(0);
     }
 
     /**
@@ -36,8 +40,6 @@ public class MainWindowListener implements WindowListener {
      */
     @Override
     public void windowClosed(WindowEvent e) {
-        Networker.getInstance().close();
-        System.exit(0);
     }
 
     /**

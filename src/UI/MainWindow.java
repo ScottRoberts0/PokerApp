@@ -169,19 +169,20 @@ public class MainWindow implements ActionListener {
 
     private void createWindow(){
         mainFrame = new JFrame();
+        //mainFrame.setDefaultCloseOperation(JFrame.);
         // TODO: this doesn't close the application
         mainFrame.addWindowListener(new MainWindowListener());
         mainFrame.setResizable(false);
 
         String title = "ULTRA POKER!";
-        if(Main.getNetworker() != null && Main.getNetworker().getIsServer()){
+        if(Networker.getInstance() != null && Networker.getInstance().getIsServer()){
             title += " - Server";
-        }else if (Main.getNetworker() != null && !Main.getNetworker().getIsServer()){
+        }else if (Networker.getInstance() != null && Networker.getInstance().getIsServer()){
             title += " - Client";
         }
         mainFrame.setTitle(title);
 
-        mainFrame.setBounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        mainFrame.setBounds(600, 100, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));

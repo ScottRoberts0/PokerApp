@@ -6,30 +6,30 @@ import Networking.Networker;
 public class Main {
 
     private static MainWindow gameWindow;
-    private static Networker networker;
+    private static LobbyWindow lobbyWindow;
 
     public static void main(String[] argsp) {
         if(argsp != null && argsp.length > 0){
-            if(argsp[0].equals("-client")){
-                networker = new Networker(false);
-                beginUI();
-            }else if(argsp[0].equals("-server")){
-                networker = new Networker(true);
-                beginUI();
+            if(argsp[0].equals("-network")){
+                if(argsp.length > 1 && argsp[1] != null) {
+                    beginLobbyUI(argsp[1]);
+                }else{
+                    beginLobbyUI("Tyler");
+                }
             }else{
-                beginUI();
+                beginGameUI();
                 Game.startGame();
                 gameWindow.updateButtons();
             }
         }
     }
 
-    public static Networker getNetworker(){
-        return networker;
+    public static void beginGameUI(){
+        gameWindow = new MainWindow();
     }
 
-    public static void beginUI(){
-        gameWindow = new MainWindow();
+    public static void beginLobbyUI(String playerNameDefault){
+        lobbyWindow = new LobbyWindow(playerNameDefault);
     }
 
     public static MainWindow getGameWindow(){

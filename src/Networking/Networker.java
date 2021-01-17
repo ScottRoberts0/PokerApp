@@ -3,12 +3,15 @@ package Networking;
 import Networking.MessageHandlers.ClientHandler;
 import Networking.MessageHandlers.ServerHandler;
 import Networking.Messages.*;
+import UI.LobbyWindow;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.messages.BeamMessage;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Networker {
 
@@ -19,22 +22,18 @@ public class Networker {
 
     private boolean isServer;
 
-    public Networker(boolean isServer){
+    private ArrayList<String> playersInLobby;
+
+    /**
+     * This constructor is used to begin a server Networker
+     */
+    public Networker(){
         instance = this;
-        this.isServer = isServer;
+        this.isServer = true;
 
-        if(isServer){
-            beginServer();
-        }else{
-            beginClient();
-        }
-    }
+        playersInLobby = new ArrayList<>();
 
-    public static Networker getInstance(){
-        return instance;
-    }
 
-    public void beginServer(){
         System.out.println("Server, baby!");
         // create and start the server
         server = new BeamServer("Poker Server", 45800, false);
@@ -44,14 +43,28 @@ public class Networker {
         server.addHandler(ServerHandler.class);
 
         // check if it's alive and then open the UI
-        if(server.isAlive()){
-            System.out.println("Server is alive");
-        }
+        if(!server.isAlive())
+            return;
 
+        System.out.println("Server is alive");
+
+        // add yourself to the lobby list
 
     }
 
-    public void beginClient(){
+    /**
+     * This constructor is used to begin a client Networker
+     *
+     * @param address IP Address
+     */
+    public Networker(String address, String playerName){
+        // store the instance and set the server flag
+        instance = this;
+        this.isServer = false;
+
+        // initialize the player list
+        playersInLobby = new ArrayList<>();
+
         System.out.println("Client, baby!");
         try {
             // create the client and connect to the server
@@ -77,17 +90,43 @@ public class Networker {
         // add a handler
         client.addHandler(ClientHandler.class);
 
-        // handshake with the server. Send a player name and wait for your player number.
-        ClientConnectedMessage mess = new ClientConnectedMessage("Tyler");
+        // handshake with the server. Send a player name
+        ClientConnectedMessage mess = new ClientConnectedMessage(playerName);
 
+        // the response will be the current player list
         BeamMessage response = client.sendMessage(mess);
 
+
         if(response != null){
-            ClientConnectedMessage cm = new ClientConnectedMessage(response);
-            cm.clientHandleServerResponse();
+            System.out.println("Message received: Connected to server\n");
         }else{
-            System.out.println("Response not received");
+            System.out.println("Response not received\n");
         }
+    }
+
+    public boolean getClientConnected(){
+        if(client != null){
+            return client.isConnected();
+        }
+        return false;
+    }
+
+    public ArrayList<String> getPlayersInLobby(){
+        return playersInLobby;
+    }
+
+    public void addPlayerToLobby(String playerName){
+        playersInLobby.add(playerName);
+
+        LobbyWindow.getInstance().updatePlayerList(playersInLobby);
+    }
+
+    public void clearPlayerList(){
+        playersInLobby.clear();
+    }
+
+    public static Networker getInstance(){
+        return instance;
     }
 
     public boolean getIsServer(){
@@ -104,11 +143,23 @@ public class Networker {
         server.broadcast(message);
     }
 
+    public void broadcastLobbyPlayerList(){
+        // create the broadcast message
+        PlayersInLobbyMessage playerListMessage = new PlayersInLobbyMessage();
+
+        //FIRE!!
+        server.broadcast(playerListMessage);
+    }
+
     public void close(){
         if(isServer) {
-            server.close();
+            if(server != null && server.isAlive())
+                // TODO: Broadcast a server closing message to let clients gracefully disconnect first.
+                server.close();
         }else {
-            client.close();
+            if(client != null && client.isConnected())
+                // TODO: Send a message to the server saying you're disconnecting. Might be useful later for reconnecting.
+                client.close();
         }
     }
 }
