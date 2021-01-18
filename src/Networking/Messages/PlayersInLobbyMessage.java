@@ -40,7 +40,7 @@ public class PlayersInLobbyMessage extends LegacyMessage {
         super (message);
     }
 
-    public static void clientReceivedPlayersInLobbyBroadcast(Communicator communicator, LegacyMessage message){
+    public static void clientHandle(Communicator communicator, LegacyMessage message){
         // this message is always a broadcast, no need for a response
 
         // delete all previous players in the player list

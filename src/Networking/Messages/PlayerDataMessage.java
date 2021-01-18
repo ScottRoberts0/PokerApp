@@ -3,6 +3,8 @@ package Networking.Messages;
 import Logic.Card;
 import Logic.Game;
 import Logic.Player;
+import UI.Main;
+import UI.MainWindow;
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
@@ -38,7 +40,7 @@ public class PlayerDataMessage extends LegacyMessage {
         super (message);
     }
 
-    public static void clientReceivedPlayerDataBroadcast(Communicator communicator, LegacyMessage message){
+    public static void clientHandle(Communicator communicator, LegacyMessage message){
         // this message is always a broadcast, no need for a response
         JsonFactory factory = new JsonFactory();
 
@@ -100,8 +102,15 @@ public class PlayerDataMessage extends LegacyMessage {
             }
 
             System.out.println(player);
+
+            Game.addPlayer(player);
         }
 
         System.out.println("");
+
+
+        Main.getGameWindow().getTable().createPlayerCards(true);
+
+        //Main.getGameWindow().setIsGameStarted(true);
     }
 }

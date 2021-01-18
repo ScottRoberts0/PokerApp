@@ -331,21 +331,6 @@ public class MainWindow implements ActionListener {
     }
 
     public void test2ButtonAction(){
-        if(isGameStarted){
-            
-        }else{
-            // waited for players to connect, starting the game
-            if(Game.getPlayers().size() > 1) {
-                Game.startGame();
 
-                Networker.getInstance().broadCastInitialGameData();
-
-                test2Button.setText("Test2");
-            }
-        }
-    }
-
-    public void setPlayerNumOnButton(){
-        test2Button.setText("" + Game.getPlayers().size());
     }
 }

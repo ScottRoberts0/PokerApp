@@ -25,20 +25,18 @@ public class ClientConnectedMessage extends LegacyMessage {
         super (message);
     }
 
-    /**
-     * This is called when the server receives a message from a client that has just connected
-     *
-     * @param communicator
-     * @param message
-     * @return
-     */
-    public static ClientConnectedMessage serverClientConnected(Communicator communicator, LegacyMessage message){
-        ClientConnectedMessage response = new ClientConnectedMessage();
+    public static void serverHandle(Communicator communicator, LegacyMessage message){
+        System.out.println("MessageType: Client Connected");
+        // grab the playername
+        String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
+        System.out.println(playerName + "");
 
+        // add to the players in lobby list
+        Networker.getInstance().addPlayerToLobby(playerName, communicator.getUID());
+        System.out.println(communicator.getUID() + "");
 
-        return response;
+        // send a broadcast back to all players with new lobby list
+        Networker.getInstance().broadcastLobbyPlayerList();
     }
-
-
 }
 

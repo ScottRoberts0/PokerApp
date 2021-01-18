@@ -6,10 +6,11 @@ import Networking.Messages.*;
 import UI.LobbyWindow;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
+import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
+import com.codebrig.beam.messages.LegacyMessage;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -23,6 +24,8 @@ public class Networker {
     private boolean isServer;
 
     private ArrayList<String> playersInLobby;
+    private ArrayList<Long> playerUIDs;
+    private boolean[] playersReadied;
 
     /**
      * This constructor is used to begin a server Networker
@@ -32,6 +35,7 @@ public class Networker {
         this.isServer = true;
 
         playersInLobby = new ArrayList<>();
+        playerUIDs = new ArrayList<>();
 
 
         System.out.println("Server, baby!");
@@ -121,6 +125,13 @@ public class Networker {
         LobbyWindow.getInstance().updatePlayerList(playersInLobby);
     }
 
+    public void addPlayerToLobby(String playerName, long communicatorUID){
+        playersInLobby.add(playerName);
+        playerUIDs.add(communicatorUID);
+
+        LobbyWindow.getInstance().updatePlayerList(playersInLobby);
+    }
+
     public void clearPlayerList(){
         playersInLobby.clear();
     }
@@ -160,6 +171,42 @@ public class Networker {
             if(client != null && client.isConnected())
                 // TODO: Send a message to the server saying you're disconnecting. Might be useful later for reconnecting.
                 client.close();
+        }
+    }
+
+    public void sendStartGameMessages(){
+        playersReadied = new boolean[playerUIDs.size()];
+
+        for(int i = 0; i < playerUIDs.size(); i++){
+            long id = playerUIDs.get(i);
+            if(id > -1){
+                // send off the player's number
+                PlayerNumMessage message = new PlayerNumMessage(i);
+                Communicator comm = server.getPool().getCommunicator(id);
+
+                LegacyMessage response = new LegacyMessage(comm.send(message));
+
+                if(response != null){
+                    playersReadied[i] = true;
+                    System.out.println("Player " + i + " readied.");
+                }
+            }else{
+                playersReadied[i] = true;
+            }
+        }
+
+        // double check to see if all the players are readied
+        boolean allReadied = true;
+        for(int i = 0; i < playersReadied.length; i ++){
+            if(!playersReadied[i]){
+                allReadied = false;
+                break;
+            }
+        }
+
+        // if they are, broadcast some game data, cards and shit
+        if(allReadied){
+            broadCastInitialGameData();
         }
     }
 }

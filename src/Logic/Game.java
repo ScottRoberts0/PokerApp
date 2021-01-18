@@ -30,6 +30,16 @@ public class Game {
     private static int bb;
     private static int minBet;
 
+    private static int localPlayerNum = 0;
+
+    public static int getLocalPlayerNum() {
+        return localPlayerNum;
+    }
+
+    public static void setLocalPlayerNum(int localPlayerNum) {
+        Game.localPlayerNum = localPlayerNum;
+    }
+
     public static int getStreet() {
         return street;
     }
@@ -140,6 +150,11 @@ public class Game {
             addPlayer(new Player(3, 125000, "Scott"));
             addPlayer(new Player(4, 110000, "Pat"));
             addPlayer(new Player(5, 12000, "Denis"));
+        }else{
+            ArrayList<String> playerNames = Networker.getInstance().getPlayersInLobby();
+            for(int i = 0; i < playerNames.size(); i ++){
+                addPlayer(new Player(i, 50000, playerNames.get(i)));
+            }
         }
 
 /*        if(Networker.getInstance() == null) {
@@ -150,8 +165,6 @@ public class Game {
             addPlayer(new Player(4, startingStackSize, "Pat"));
             addPlayer(new Player(5, startingStackSize, "Denis"));
         }*/
-
-
 
         //init pot
         mainPot = new Pot(1);

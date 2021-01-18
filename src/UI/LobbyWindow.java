@@ -1,5 +1,6 @@
 package UI;
 
+import Logic.Game;
 import Networking.Networker;
 import UI.Listeners.MainWindowListener;
 
@@ -186,7 +187,7 @@ public class LobbyWindow extends JFrame implements ActionListener {
             ipInputField.setEnabled(false);
 
             // add yourself as a player
-            net.addPlayerToLobby(nameInputField.getText());
+            net.addPlayerToLobby(nameInputField.getText(), -1);
 
             hostButton.setEnabled(false);
             joinButton.setEnabled(false);
@@ -195,8 +196,13 @@ public class LobbyWindow extends JFrame implements ActionListener {
     }
 
     private void startGameButtonPressed(){
-        if(Networker.getInstance().getPlayersInLobby().size() > 2){
+        if(Networker.getInstance().getPlayersInLobby().size() > 1){
+            Main.beginGameUI();
+            Game.startGame();
+            Main.getGameWindow().updateButtons();
+            close();
 
+            Networker.getInstance().sendStartGameMessages();
         }else{
             JOptionPane.showMessageDialog(this, "Not enough players");
         }
@@ -210,6 +216,12 @@ public class LobbyWindow extends JFrame implements ActionListener {
         }
 
         playerListBox.setModel(players);
+    }
+
+    public static void close(){
+        instance.setVisible(false);
+        instance.dispose();
+        instance = null;
     }
 
     /**

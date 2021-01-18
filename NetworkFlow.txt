@@ -1,8 +1,5 @@
-Server
-
-Client
-    Conenct to server
-    Wait for connection
-    Sent message to server with player name
-        Wait for server response with:
-            Player num
+Start game:
+    Server builds it's table UI, deals cards, etc
+    Server sends each client their player number and waits for a response.
+        When each client gets their player number, they build their blank table UI and await the player data broadcast.
+    When server sees all players have gotten their player number and responded, broadcast the general game data.

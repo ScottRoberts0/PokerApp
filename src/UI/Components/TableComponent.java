@@ -62,9 +62,6 @@ public class TableComponent extends JPanel {
         g.drawOval(x, ((this.getHeight() - TABLE_HEIGHT) / 2) + ins.top, TABLE_WIDTH - ins.left - ins.right,
                 TABLE_HEIGHT - ins.top - ins.bottom);
 
-        // draw table cards
-        //drawTableCards(g);
-
         // only try to paint players if there are some
         if (Main.getGameWindow().getIsGameStarted()) {
             // update labels
@@ -212,7 +209,7 @@ public class TableComponent extends JPanel {
 
         for (int player = 0; player < Game.getPlayers().size(); player++) {
             if (Game.getPlayers().get(player).getHand()[0] == null) {
-                // this player has no cards. Draw nothing.
+                // this player has no cards. Create nothing.
                 continue;
             }
             for (int cardNum = 0; cardNum < 2; cardNum++) {
@@ -221,12 +218,7 @@ public class TableComponent extends JPanel {
                 // grab the center of this panel
                 Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
-                // grab the card image
-                BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
-                        (CARD_WIDTH * (Game.getPlayers().get(player).getHand()[cardNum].getValue() - 2)),
-                        (CARD_HEIGHT * Game.getPlayers().get(player).getHand()[cardNum].getSuitValue()),
-                        CARD_WIDTH, CARD_HEIGHT);
-
+                // grab the player's card location
                 Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
                 cardLoc.y -= (CARD_HEIGHT / 2);
 
@@ -235,11 +227,18 @@ public class TableComponent extends JPanel {
                     cardLoc.y -= CARD_Y_STAGGER;
                 }
 
-                // TODO: Make cards come from the dealer
+                // Make cards come from the dealer
                 int dealerPosition = Game.getDealerIndex();
                 Point dealerPoint = GraphicalHelpers.addPoints(playerPositions[dealerPosition], panelCenter);
+
+                // create the card component
                 playerCards[player][cardNum] = new CardComponent(dealerPoint.x, dealerPoint.y, Game.getPlayers().get(player).getHand()[cardNum]);
                 playerCards[player][cardNum].moveTo(cardLoc.x, cardLoc.y, 500, false);
+
+                // if this is not the local player's cards, hide it as if it was folded
+                if(player != Game.getLocalPlayerNum()) {
+                    playerCards[player][cardNum].setHasFolded(true);
+                }
 
                 AnimationThread.getInstance().addAnimatableObject(playerCards[player][cardNum]);
             }
@@ -248,30 +247,6 @@ public class TableComponent extends JPanel {
 
     public void deletePlayerCards() {
         AnimationThread.getInstance().removeAnimatableObjects();
-    }
-
-    public void drawTableCards(Graphics g) {
-        int totalCards = 0;
-        Point p;
-
-        // grab the center of this panel
-        Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
-
-        // grab the card image
-        for (int i = 0; i < 5; i++) {
-            if (tableCards[i] != null) {
-                BufferedImage cardImage = GraphicalHelpers.getCardsImage().getSubimage(
-                        (CARD_WIDTH * (tableCards[i].getValue() - 2)),
-                        (CARD_HEIGHT * tableCards[i].getSuitValue()),
-                        CARD_WIDTH, CARD_HEIGHT);
-
-                p = new Point((CARD_WIDTH * i) - (5 * CARD_WIDTH / 2) + (TABLE_CARD_SPACER * i), 0);
-
-                Point cardLoc = GraphicalHelpers.addPoints(p, panelCenter);
-
-                g.drawImage(cardImage, cardLoc.x, cardLoc.y, null);
-            }
-        }
     }
 
     public void createTableCards() {
