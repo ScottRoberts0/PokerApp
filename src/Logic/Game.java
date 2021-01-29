@@ -768,8 +768,8 @@ public class Game {
         }
     }
 
-    private static void dealFlop(Card[] board, Deck deck, String value1, String suit1, String value2, String
-            suit2, String value3, String suit3) {
+    private static void dealFlop(Card[] board, Deck deck, int value1, int suit1, int value2, int
+            suit2, int value3, int suit3) {
         board[0] = deck.drawCard(value1, suit1);
         board[1] = deck.drawCard(value2, suit2);
         board[2] = deck.drawCard(value3, suit3);
@@ -779,7 +779,7 @@ public class Game {
         board[3] = deck.drawCard();
     }
 
-    private static void dealTurn(Card[] board, Deck deck, String value1, String suit1) {
+    private static void dealTurn(Card[] board, Deck deck, int value1, int suit1) {
         board[3] = deck.drawCard(value1, suit1);
     }
 
@@ -787,7 +787,7 @@ public class Game {
         board[4] = deck.drawCard();
     }
 
-    private static void dealRiver(Card[] board, Deck deck, String value1, String suit1) {
+    private static void dealRiver(Card[] board, Deck deck, int value1, int suit1) {
         board[4] = deck.drawCard(value1, suit1);
     }
 
@@ -802,7 +802,7 @@ public class Game {
     }
 
 
-    public static void equityCalculator(Player player1, String value1, String suit1, String value2, String
+    public static void equityCalculator(Player player1, int value1, int suit1, int value2, int
             suit2, Player player2, Card[] board, Deck deck) {
         double player1Wins = 0;
         double player2Wins = 0;

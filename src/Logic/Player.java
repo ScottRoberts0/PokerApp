@@ -212,7 +212,7 @@ public class Player implements Comparable {
      * @param value2 The value (1 [Ace] - 13 [King]) of the second card.
      * @param suit2 The suit value (0 = Diamonds, 1 = Hearts, 2 = Spades, 3 = Clubs) of the second card.
      */
-    public void drawHand(Deck deck, String value1, String suit1, String value2, String suit2) {
+    public void drawHand(Deck deck, int value1, int suit1, int value2, int suit2) {
         hand[0] = deck.drawCard(value1, suit1);
         hand[1] = deck.drawCard(value2, suit2);
     }
