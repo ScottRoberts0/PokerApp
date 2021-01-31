@@ -4,10 +4,15 @@ import Networking.Networker;
 import UI.Main;
 import UI.MainWindow;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class Game {
+    private static HandHistory handHistory;
+
     private static int dealerIndex;
     private static int smallBlindIndex;
     private static int bigBlindIndex;
@@ -176,11 +181,20 @@ public class Game {
 
         pickRandomDealer();
 
+        try {
+            handHistory = new HandHistory(new Date());
+            handHistory.writeHandStart(players);
+        } catch(IOException ignored) {
+            //Something here later???
+        }
+
         setStartingActionIndex();
         players.get(smallBlindIndex).postBlind(sb, mainPot);
         players.get(bigBlindIndex).postBlind(bb, mainPot);
 
         printPlayersAndPot();
+
+        //initialize the hand history
 
         Main.getGameWindow().getTable().createPlayerCards(true);
 
@@ -240,6 +254,12 @@ public class Game {
         resetFolds();
         nextDealer();
         setStartingActionIndex();
+
+        try {
+            handHistory.writeHandStart(players);
+        } catch(IOException ignored) {
+            //Something here later???
+        }
 
         players.get(getSmallBlindIndex()).postBlind(sb, mainPot);
         players.get(getBigBlindIndex()).postBlind(bb, mainPot);
@@ -766,6 +786,12 @@ public class Game {
         for (int i = 0; i < 3; i++) {
             board[i] = deck.drawCard();
         }
+
+        StringBuilder s = new StringBuilder();
+        for(int i = 0; i < 3; i++) {
+            s.append(" ").append(board[i].getShortName());
+        }
+        tryWriteActionToHH("Flop:" + s);
     }
 
     private static void dealFlop(Card[] board, Deck deck, int value1, int suit1, int value2, int
@@ -777,6 +803,8 @@ public class Game {
 
     public static void dealTurn() {
         board[3] = deck.drawCard();
+
+        tryWriteActionToHH("Turn: " + board[3].getShortName());
     }
 
     private static void dealTurn(Card[] board, Deck deck, int value1, int suit1) {
@@ -785,6 +813,8 @@ public class Game {
 
     public static void dealRiver() {
         board[4] = deck.drawCard();
+
+        tryWriteActionToHH("River: " + board[4].getShortName());
     }
 
     private static void dealRiver(Card[] board, Deck deck, int value1, int suit1) {
@@ -851,5 +881,13 @@ public class Game {
 
     public static void setLastRaiseSize(int lastRaiseSize) {
         Game.lastRaiseSize = lastRaiseSize;
+    }
+
+    public static void tryWriteActionToHH(String s) {
+        try {
+            handHistory.writeAction(s);
+        } catch (IOException ignored) {
+            //something here laters
+        }
     }
 }

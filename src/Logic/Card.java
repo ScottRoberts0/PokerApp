@@ -7,8 +7,18 @@ public class Card {
     private String name;
 
     public Card(int value, int suitValue) {
-        this.value = value;
-        this.suitValue = suitValue;
+        if(value < 1 || value > 14) {
+            //IllegalArgumentException is a runtime exception, therefore not required to be handled by compiler
+            throw new IllegalArgumentException("value must be an integer from 1 to 13");
+        } else {
+            this.value = value;
+        }
+
+        if(suitValue < 0 || suitValue > 3) {
+            throw new IllegalArgumentException("suitValue must be an integer from 0 to 3");
+        } else {
+            this.suitValue = suitValue;
+        }
 
         //name cards based on values
         if (value == 1) {
@@ -40,6 +50,11 @@ public class Card {
             return true;
         }
         return false;
+    }
+
+    public String getShortName() {
+        //checks to see if it is a 10, in which case gives Tsuit, if not, just the first char of the name
+        return (name.equals("10") ? "T" : name.charAt(0)) + "" + Character.toLowerCase(suit.charAt(0));
     }
 
     public String toString() {

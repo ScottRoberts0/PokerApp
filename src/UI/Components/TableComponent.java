@@ -3,6 +3,7 @@ package UI.Components;
 import Logic.Card;
 import Logic.Game;
 import Logic.Pot;
+import Networking.Networker;
 import UI.Animation.Animatable;
 import UI.Animation.AnimationThread;
 import UI.GraphicalHelpers;
@@ -236,7 +237,7 @@ public class TableComponent extends JPanel {
                 playerCards[player][cardNum].moveTo(cardLoc.x, cardLoc.y, 500, false);
 
                 // if this is not the local player's cards, hide it as if it was folded
-                if(player != Game.getLocalPlayerNum()) {
+                if(Networker.getInstance() != null && player != Game.getLocalPlayerNum()) {
                     playerCards[player][cardNum].setHasFolded(true);
                 }
 
