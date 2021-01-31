@@ -12,6 +12,7 @@ import java.util.Date;
 
 public class Game {
     private static HandHistory handHistory;
+    private final static boolean recordHandHistory = false;
 
     private static int dealerIndex;
     private static int smallBlindIndex;
@@ -181,9 +182,12 @@ public class Game {
 
         pickRandomDealer();
 
+        //initialize the hand history
         try {
-            handHistory = new HandHistory(new Date());
-            handHistory.writeHandStart(players);
+            if(recordHandHistory) {
+                handHistory = new HandHistory(new Date());
+                handHistory.writeHandStart(players);
+            }
         } catch(IOException ignored) {
             //Something here later???
         }
@@ -194,7 +198,6 @@ public class Game {
 
         printPlayersAndPot();
 
-        //initialize the hand history
 
         Main.getGameWindow().getTable().createPlayerCards(true);
 
@@ -256,7 +259,9 @@ public class Game {
         setStartingActionIndex();
 
         try {
-            handHistory.writeHandStart(players);
+            if(recordHandHistory) {
+                handHistory.writeHandStart(players);
+            }
         } catch(IOException ignored) {
             //Something here later???
         }
@@ -787,11 +792,7 @@ public class Game {
             board[i] = deck.drawCard();
         }
 
-        StringBuilder s = new StringBuilder();
-        for(int i = 0; i < 3; i++) {
-            s.append(" ").append(board[i].getShortName());
-        }
-        tryWriteActionToHH("Flop:" + s);
+        tryWriteActionToHH("Flop:" + writeBoardHelper());
     }
 
     private static void dealFlop(Card[] board, Deck deck, int value1, int suit1, int value2, int
@@ -804,7 +805,7 @@ public class Game {
     public static void dealTurn() {
         board[3] = deck.drawCard();
 
-        tryWriteActionToHH("Turn: " + board[3].getShortName());
+        tryWriteActionToHH("Turn: " + writeBoardHelper());
     }
 
     private static void dealTurn(Card[] board, Deck deck, int value1, int suit1) {
@@ -814,7 +815,7 @@ public class Game {
     public static void dealRiver() {
         board[4] = deck.drawCard();
 
-        tryWriteActionToHH("River: " + board[4].getShortName());
+        tryWriteActionToHH("River: " + writeBoardHelper());
     }
 
     private static void dealRiver(Card[] board, Deck deck, int value1, int suit1) {
@@ -885,9 +886,21 @@ public class Game {
 
     public static void tryWriteActionToHH(String s) {
         try {
-            handHistory.writeAction(s);
+            if(recordHandHistory) {
+                handHistory.writeAction(s);
+            }
         } catch (IOException ignored) {
             //something here laters
         }
+    }
+
+    public static StringBuilder writeBoardHelper() {
+        StringBuilder s = new StringBuilder();
+        for(Card card : board) {
+            if(card != null) {
+                s.append(" ").append(card.getShortName());
+            }
+        }
+        return s;
     }
 }

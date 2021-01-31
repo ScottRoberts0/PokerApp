@@ -12,7 +12,7 @@ public class HandHistory extends File {
 
     public HandHistory(String fileName) {
         super(fileName);
-        date = new Date();
+        this.date = new Date();
     }
 
     /**
@@ -33,9 +33,10 @@ public class HandHistory extends File {
         StringBuilder s = createCopy();
 
         //appends the new data to the copy
-        s.append("======== Hand at: " + new Date() + " ========\n");
+        s.append("======== Hand at: ").append(new Date()).append(" ========\n");
         for (Player player : players) {
-            s.append(player.getPlayerName()).append(" - stack: ").append(player.getStack()).append(" - cards: ").append(player.getHand()[0].getShortName()).append(" ")
+            s.append(player.getPlayerName()).append(" - stack: ").append(player.getStack()).append(" - cards: ")
+                    .append(player.getHand()[0].getShortName()).append(" ")
                     .append(player.getHand()[1].getShortName()).append("\n");
         }
 
