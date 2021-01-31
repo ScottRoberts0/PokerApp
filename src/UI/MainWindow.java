@@ -177,12 +177,12 @@ public class MainWindow implements ActionListener {
         String title = "ULTRA POKER!";
         if(Networker.getInstance() != null && Networker.getInstance().getIsServer()){
             title += " - Server";
-        }else if (Networker.getInstance() != null && Networker.getInstance().getIsServer()){
+        }else if (Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
             title += " - Client";
         }
         mainFrame.setTitle(title);
 
-        mainFrame.setBounds(600, 100, WINDOW_WIDTH, WINDOW_HEIGHT);
+        mainFrame.setBounds(450 + (Game.getLocalPlayerNum() * 100),  + (Game.getLocalPlayerNum() * 100), WINDOW_WIDTH, WINDOW_HEIGHT);
 
         mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));

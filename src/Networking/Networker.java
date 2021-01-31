@@ -98,14 +98,7 @@ public class Networker {
         ClientConnectedMessage mess = new ClientConnectedMessage(playerName);
 
         // the response will be the current player list
-        BeamMessage response = client.sendMessage(mess);
-
-
-        if(response != null){
-            System.out.println("Message received: Connected to server\n");
-        }else{
-            System.out.println("Response not received\n");
-        }
+        client.queueMessage(mess);
     }
 
     public boolean getClientConnected(){
