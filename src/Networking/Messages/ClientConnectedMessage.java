@@ -39,4 +39,3 @@ public class ClientConnectedMessage extends LegacyMessage {
         Networker.getInstance().broadcastLobbyPlayerList();
     }
 }
-

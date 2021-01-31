@@ -85,6 +85,8 @@ public class Player implements Comparable {
         mainPot.addToPot(betSize, playerNum);
         mainPot.addPlayerToPot(this);
         moneyInPot = betSize;
+
+        Game.tryWriteActionToHH(playerName + " posts blind " + betSize);
     }
 
     public void raise(int betSize, Pot pot) {
@@ -116,7 +118,10 @@ public class Player implements Comparable {
 
         pot.setPlayerActed(playerNum, true);
 
-        System.out.println(playerName + " raises to " + pot.getBets()[playerNum]);
+        String output = playerName + " (" + stack + ")" + " raises to " + pot.getBets()[playerNum];
+        Game.tryWriteActionToHH(output);
+
+        System.out.println(output);
         System.out.println();
     }
 
@@ -141,7 +146,10 @@ public class Player implements Comparable {
 
         pot.setPlayerActed(playerNum, true);
 
-        System.out.println(playerName + " calls " + callSize);
+        String output = playerName + " (" + stack + ")"  + " calls " + callSize;
+        Game.tryWriteActionToHH(output);
+
+        System.out.println(output);
         System.out.println();
     }
 
@@ -157,7 +165,10 @@ public class Player implements Comparable {
 
         this.hasFolded = true;
 
-        System.out.println(playerName + " folds");
+        String output = playerName + " (" + stack + ")"  + " folds";
+        Game.tryWriteActionToHH(output);
+
+        System.out.println(output);
         System.out.println();
     }
 
@@ -165,16 +176,23 @@ public class Player implements Comparable {
         //basically does nothing except they have acted
         pot.setPlayerActed(playerNum, true);
 
-        System.out.println(playerName + " checks");
+        String output = playerName + " (" + stack + ")"  + " checks";
+        Game.tryWriteActionToHH(output);
+
+        System.out.println(output);
         System.out.println();
     }
 
     public void win(int potSize) {
         stack += potSize;
-        if(madeHand[0] == null) {
-            System.out.println(playerName + " wins " + potSize + " satoshis!");
+        if(madeHand[0] == null || Game.getCurrentPot().getNumPlayersInPot() == 1) {
+            String output = playerName + " wins " + potSize + " satoshis!";
+            Game.tryWriteActionToHH(output);
+            System.out.println(output);
         } else {
-            System.out.println(playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!");
+            String output = playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!";
+            Game.tryWriteActionToHH(output);
+            System.out.println(output);
         }
         System.out.println();
     }
@@ -212,7 +230,11 @@ public class Player implements Comparable {
      * @param value2 The value (1 [Ace] - 13 [King]) of the second card.
      * @param suit2 The suit value (0 = Diamonds, 1 = Hearts, 2 = Spades, 3 = Clubs) of the second card.
      */
-    public void drawHand(Deck deck, String value1, String suit1, String value2, String suit2) {
+    public void drawHand(Deck deck, int value1, int suit1, int value2, int suit2) throws IllegalArgumentException {
+        if(value1 > 13 || value1 < 1 || value2 > 13 || value2 < 1 || suit1 > 3 || suit1 < 0 || suit2 > 3 || suit2 < 0) {
+            throw new IllegalArgumentException("Invalid argument for Card");
+        }
+
         hand[0] = deck.drawCard(value1, suit1);
         hand[1] = deck.drawCard(value2, suit2);
     }

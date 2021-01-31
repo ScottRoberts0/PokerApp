@@ -1,83 +1,62 @@
 package Logic;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Deck {
-    private Card[][] deck;
+    private ArrayList<Card> deck;
 
     public Deck() {
         //populates a deck with all 52 cards
-        deck = new Card[4][13];
+        deck = new ArrayList<>(52);
         shuffle();
     }
 
     public Card drawCard() {
-        Card card;
-        Card[][] copy = Arrays.copyOf(deck, deck.length);
-
-        int suitValue = (int) (Math.random() * 4);
-        int value = (int) (Math.random() * 13);
-
-        while (deck[suitValue][value] == null) {
-            suitValue = (int) (Math.random() * 4);
-            value = (int) (Math.random() * 13);
-        }
-
-        card = new Card(value + 1, suitValue);
-        deck[suitValue][value] = null;
-
+        Card card = deck.get(0);
+        deck.remove(0);
         return card;
     }
 
-    public Card drawCard(String name, String suit) {
-        /*this method will return the card regardless of whether it has been drawn or not,
-         * which means it is best to use this BEFORE drawing any card randomly*/
-        Card card;
+    /**
+     * This method will draw a specified card from the deck
+     * @param value 1 for Aces, 11 for Jacks, 12 for Queens, 13 for Kings
+     * @param suitValue 0 for Hearts, 1 for Diamonds, 2 for Clubs, 3 for Spades
+     * @return
+     */
+    public Card drawCard(int value, int suitValue) {
+        Card card = new Card(value, suitValue);
+        boolean changed = false;
 
-        int value = 0;
-        int suitValue = 0;
-
-        if (name == "ace") {
-            value = 1;
-        } else if (name == "king") {
-            value = 13;
-        } else if (name == "queen") {
-            value = 12;
-        } else if (name == "jack") {
-            value = 11;
-        } else {
-            value = Integer.parseInt(name);
-        }
-
-        if (suit == "diamonds") {
-            suitValue = 0;
-        } else if (suit == "hearts") {
-            suitValue = 1;
-        } else if (suit == "spades") {
-            suitValue = 2;
-        } else {
-            suitValue = 3;
-        }
-
-        card = new Card(value, suitValue);
-
-        deck[suitValue][value - 1] = null;
-        return card;
-    }
-
-    public void printDeck() {
-        for (int i = 0; i < deck.length; i++) {
-            for (int j = 0; j < deck[i].length; j++) {
-                System.out.println(deck[i][j]);
+        for(Card c : deck) {
+            if(card.equals(c)) {
+                card = c;
+                changed = true;
+                break;
             }
-            System.out.println();
+        }
+
+        if(changed) {
+            return card;
+        } else {
+            throw new NullPointerException("Card not in deck");
         }
     }
 
     public void shuffle() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 13; j++) {
-                deck[i][j] = new Card(j + 1, i);
+        for(int i = 0; i < 4; i++) {
+            for(int j = 0; j < 13; j++) {
+                deck.add(new Card(j + 1, i));
             }
         }
+
+        Collections.shuffle(deck);
+    }
+
+    public void printDeck() {
+        for(Card card : deck) {
+            System.out.println(card);
+        }
+
+        System.out.println();
     }
 }
