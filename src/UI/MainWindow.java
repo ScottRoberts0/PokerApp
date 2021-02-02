@@ -278,21 +278,21 @@ public class MainWindow implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals("Fold")){
             foldButtonAction();
-        }else if(e.getActionCommand().equals("Check")){
+        } else if(e.getActionCommand().equals("Check")){
             checkButtonAction();
-        }else if(e.getActionCommand().equals("Raise")){
+        } else if(e.getActionCommand().equals("Raise")){
             raiseButtonAction();
-        }else if(e.getActionCommand().equals("Call")){
+        } else if(e.getActionCommand().equals("Call")){
             callButtonAction();
-        }else if(e.getActionCommand().equals("Reset")) {
+        } else if(e.getActionCommand().equals("Reset")) {
             resetButtonAction();
         } else if(e.getActionCommand().equals("Run")) {
             runHandButtonAction();
-        }else if(e.getActionCommand().equals("Test")){
+        } else if(e.getActionCommand().equals("Test")) {
             testButtonAction();
-        }else if(e.getActionCommand().equals("Test2")){
+        } else if(e.getActionCommand().equals("Test2")) {
             test2ButtonAction();
-        }else if(e.getActionCommand().equals("RaiseText")){
+        } else if(e.getActionCommand().equals("RaiseText")) {
             int x = 0;
 
             x++;

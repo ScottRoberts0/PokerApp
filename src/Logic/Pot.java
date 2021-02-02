@@ -62,8 +62,6 @@ public class Pot {
         }
     }
 
-
-
     public ArrayList<Integer> sortBets() {
         ArrayList<Integer> sortedBets = new ArrayList<>();
 
