@@ -11,7 +11,6 @@ import UI.Main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class TableComponent extends JPanel {
@@ -121,7 +120,7 @@ public class TableComponent extends JPanel {
         for (int i = 0; i < Game.getPlayers().size(); i++) {
             int stack = Game.getPlayers().get(i).getStack();
 
-            int bet = Game.getPlayers().get(i).getMoneyInPot();
+            int bet = Game.getPlayers().get(i).getCurrentBet();
 
             StringBuilder pots = new StringBuilder();
 

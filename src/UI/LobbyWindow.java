@@ -199,7 +199,6 @@ public class LobbyWindow extends JFrame implements ActionListener {
         if(Networker.getInstance().getPlayersInLobby().size() > 1){
             Main.beginGameUI();
             Game.startGame();
-            Main.getGameWindow().updateButtons();
             close();
 
             Networker.getInstance().sendStartGameMessages();

@@ -1,27 +1,14 @@
 package Logic;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class Player implements Comparable {
-
-    public static final String PLAYER_NAME = "name";
-    public static final String PLAYER_CARD1_VALUE = "value0";
-    public static final String PLAYER_CARD1_SUIT = "suit0";
-    public static final String PLAYER_CARD2_VALUE = "value1";
-    public static final String PLAYER_CARD2_SUIT = "suit1";
-    public static final String PLAYER_STACK = "stack";
 
     private final int playerNum;
     private String playerName;
 
-    private int moneyInPot; //value used by the UI to display player's current bet
+    private int currentBet; //value used by the UI to display player's current bet
     private int stack;
     private int streetStartingStackSize;
     private boolean hasFolded;
@@ -69,7 +56,7 @@ public class Player implements Comparable {
     public void refundBet(int bet, Pot pot) {
         stack += bet;
         pot.removeFromPot(bet);
-        moneyInPot -= bet;
+        currentBet -= bet;
     }
 
     /**
@@ -84,9 +71,17 @@ public class Player implements Comparable {
         stack -= betSize;
         mainPot.addToPot(betSize, playerNum);
         mainPot.addPlayerToPot(this);
-        moneyInPot = betSize;
+        currentBet = betSize;
 
         Game.tryWriteActionToHH(playerName + " posts blind " + betSize);
+    }
+
+    public void setStack(int stack){
+        this.stack = stack;
+    }
+
+    public void setCurrentBet(int bet){
+        this.currentBet = bet;
     }
 
     public void raise(int betSize, Pot pot) {
@@ -94,7 +89,7 @@ public class Player implements Comparable {
         //bet sizes are formatted to be exactly the value passed in by the player
         if(stack - betSize == 0) {
             //if the player is going all in
-            moneyInPot += betSize;
+            currentBet += betSize;
             stack -= betSize;
             pot.addToPot(betSize, playerNum);
 
@@ -113,7 +108,7 @@ public class Player implements Comparable {
                 pot.addPlayerToPot(this);
             }
 
-            moneyInPot = betSize;
+            currentBet = betSize;
         }
 
         pot.setPlayerActed(playerNum, true);
@@ -134,7 +129,7 @@ public class Player implements Comparable {
             callSize = stack;
         }
 
-        moneyInPot += callSize;
+        currentBet += callSize;
 
         stack -= callSize;
         pot.addToPot(callSize, playerNum);
@@ -154,7 +149,7 @@ public class Player implements Comparable {
     }
 
     public void fold(ArrayList<Pot> pots) {
-        moneyInPot = 0;
+        currentBet = 0;
         resetHand();
 
         //when a player folds, they should be removed from every pot
@@ -198,7 +193,7 @@ public class Player implements Comparable {
     }
 
     public void resetMoneyInPot() {
-        moneyInPot = 0;
+        currentBet = 0;
     }
 
     public void resetFolded() {
@@ -312,55 +307,6 @@ public class Player implements Comparable {
         return Evaluator.getMadeHandName(madeHand);
     }
 
-    public String getPlayerStateForNetwork(){
-        String output = "";
-
-        JsonFactory factory = new JsonFactory();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
-            JsonGenerator generator = factory.createGenerator(out);
-            generator.writeStartObject();
-
-            // playername
-            generator.writeStringField(PLAYER_NAME, playerName);
-
-
-            // player cards, or -1 if the card is null
-            if(hand[0] != null){
-                generator.writeNumberField(PLAYER_CARD1_VALUE, hand[0].getValue());
-                generator.writeNumberField(PLAYER_CARD1_SUIT, hand[0].getSuitValue());
-            }else{
-                generator.writeNumberField(PLAYER_CARD1_VALUE, -1);
-                generator.writeNumberField(PLAYER_CARD1_SUIT, -1);
-            }
-            if(hand[1] != null){
-                generator.writeNumberField(PLAYER_CARD2_VALUE, hand[1].getValue());
-                generator.writeNumberField(PLAYER_CARD2_SUIT, hand[1].getSuitValue());
-            }else{
-                generator.writeNumberField(PLAYER_CARD2_VALUE, -1);
-                generator.writeNumberField(PLAYER_CARD2_SUIT, -1);
-            }
-
-            // stack
-            generator.writeNumberField(PLAYER_STACK, stack);
-
-
-            generator.writeEndObject();
-
-            generator.close();
-
-            output = new String(out.toByteArray());
-
-            System.out.println(output);
-
-        }catch (IOException e){
-            // this will probably never throw
-        }
-
-        return output;
-    }
-
     public int getMadeHandValue() {
         return Evaluator.getMadeHandValue(madeHand);
     }
@@ -393,8 +339,8 @@ public class Player implements Comparable {
         return playerName;
     }
 
-    public int getMoneyInPot() {
-        return moneyInPot;
+    public int getCurrentBet() {
+        return currentBet;
     }
 
     public boolean getHasFolded() {

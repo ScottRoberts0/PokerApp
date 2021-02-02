@@ -1,13 +1,14 @@
 package Networking;
 
+import Logic.Game;
 import Networking.MessageHandlers.ClientHandler;
 import Networking.MessageHandlers.ServerHandler;
 import Networking.Messages.*;
 import UI.LobbyWindow;
+import UI.Main;
 import com.codebrig.beam.BeamClient;
 import com.codebrig.beam.BeamServer;
 import com.codebrig.beam.Communicator;
-import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
 
 import java.io.IOException;
@@ -141,10 +142,19 @@ public class Networker {
         if(!isServer)
             return;
 
-        // get a message ready and put a message type header on it
+        // send the player data
         PlayerDataMessage message = new PlayerDataMessage();
 
         server.broadcast(message);
+
+        broadcastGameData();
+    }
+
+    public void broadcastGameData(){
+        // send the game state data
+        GameDataMessage message1 = new GameDataMessage();
+
+        server.broadcast(message1);
     }
 
     public void broadcastLobbyPlayerList(){
@@ -174,7 +184,7 @@ public class Networker {
             long id = playerUIDs.get(i);
             if(id > -1){
                 // send off the player's number
-                PlayerNumMessage message = new PlayerNumMessage(i);
+                StartGameMessage message = new StartGameMessage(i);
                 Communicator comm = server.getPool().getCommunicator(id);
 
                 LegacyMessage response = new LegacyMessage(comm.send(message));
@@ -201,5 +211,24 @@ public class Networker {
         if(allReadied){
             broadCastInitialGameData();
         }
+
+        // update the buttons now that the game is actually kind of started
+        Main.getGameWindow().updateButtons();
+    }
+
+    public void sendActionPrompt(){
+        // tell the next player what their actions are
+        ActionPromptMessage message = new ActionPromptMessage();
+
+        server.getPool().getCommunicator(Game.getCurrentActionIndex() - 1).queue(message); // queue is fine, no need for a response
+
+        // broadcast the new game data
+        broadcastGameData();
+    }
+
+    public void sendClientAction(int action){
+        ClientActionMessage message = new ClientActionMessage(action);
+
+        client.queueMessage(message);
     }
 }

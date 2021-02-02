@@ -6,17 +6,21 @@ import java.util.Collections;
 
 public class Pot {
     private int potValue;
-    private final int name;
+    private final int potNum;
     private ArrayList<Player> playersInPot;
     private int[] bets;
     private boolean[] playerHasActed;
 
     /**
-     * @param name Integer value corresponding to the side pot number. Should start at 2 as main pot will always be pot name 1.
+     * @param potNum Integer value corresponding to the side pot number. Should start at 2 as main pot will always be pot name 1.
      */
-    public Pot(int name) {
-        this.name = name;
-        this.potValue = 0;
+    public Pot(int potNum) {
+        this(potNum, 0);
+    }
+
+    public Pot(int potNum, int potValue){
+        this.potNum = potNum;
+        this.potValue = potValue;
         this.playersInPot = new ArrayList<>();
         this.bets = new int[Game.getNumPlayers()];
         this.playerHasActed = new boolean[Game.getNumPlayers()];
@@ -110,7 +114,7 @@ public class Pot {
 
         for(int i = 0; i < sortedBets.size(); i++) {
             for(int j = 0; j < playersInPot.size(); j++) {
-                if(playersInPot.get(j).getMoneyInPot() == sortedBets.get(i)) {
+                if(playersInPot.get(j).getCurrentBet() == sortedBets.get(i)) {
                     sortedPlayers.add(playersInPot.get(j));
                 }
             }
@@ -242,7 +246,7 @@ public class Pot {
 
 
     public void printPlayersInPot() {
-        System.out.println("POT " + name + " (VALUE: " + this.potValue + ")" + " PLAYERS IN POT: ");
+        System.out.println("POT " + potNum + " (VALUE: " + this.potValue + ")" + " PLAYERS IN POT: ");
         for(Player player : this.playersInPot) {
             System.out.println(player);
         }
@@ -250,10 +254,10 @@ public class Pot {
     }
 
     public String toString() {
-        if(name == 1) {
+        if(potNum == 0) {
             return "MAIN POT: " + potValue + "§";
         } else {
-            return "POT " + name + ": " + potValue + "§";
+            return "POT " + potNum + ": " + potValue + "§";
         }
     }
 }

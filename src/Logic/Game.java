@@ -5,7 +5,6 @@ import UI.Main;
 import UI.MainWindow;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,8 +31,8 @@ public class Game {
 
     private static int lastRaiseSize;
     private static int startingStackSize;
-    private static int sb;
-    private static int bb;
+    private static int smallBlindValue;
+    private static int bigBlindValue;
     private static int minBet;
 
     private static int localPlayerNum = 0;
@@ -70,24 +69,18 @@ public class Game {
         return players.size();
     }
 
-    public static void addPlayer(Player player){
-        if(players == null){
-            players = new ArrayList<Player>();
-        }
-
-        players.add(player);
+    public static int getSmallBlindValue() {
+        return smallBlindValue;
     }
 
-    public static int getSb() {
-        return sb;
-    }
-
-    public static int getBb() {
-        return bb;
-    }
+    public static int getBigBlindValue() { return bigBlindValue; }
 
     public static int getMinBet() {
         return minBet;
+    }
+
+    public static void setMinBet(int minBetNew){
+        minBet = minBetNew;
     }
 
     public static ArrayList<Pot> getPots() {
@@ -96,6 +89,18 @@ public class Game {
 
     public static Pot getCurrentPot() {
         return currentPot;
+    }
+
+    public static void setPots(ArrayList<Pot> newPots){
+        pots = newPots;
+    }
+
+    public static void addPlayer(Player player){
+        if(players == null){
+            players = new ArrayList<>();
+        }
+
+        players.add(player);
     }
 
     public static void nextStreet() {
@@ -142,10 +147,10 @@ public class Game {
         board = new Card[5];
         Arrays.fill(board, null);
         street = 0;
-        sb = 500;
-        bb = 1000;
-        lastRaiseSize = bb;
-        minBet = bb;
+        smallBlindValue = 500;
+        bigBlindValue = 1000;
+        lastRaiseSize = bigBlindValue;
+        minBet = bigBlindValue;
         startingStackSize = 100000;
         rebuyThreshold = 0.25;
 
@@ -173,7 +178,7 @@ public class Game {
         }*/
 
         //init pot
-        mainPot = new Pot(1);
+        mainPot = new Pot(0);
         currentPot = mainPot;
         pots = new ArrayList<>();
         pots.add(mainPot);
@@ -193,8 +198,8 @@ public class Game {
         }
 
         setStartingActionIndex();
-        players.get(smallBlindIndex).postBlind(sb, mainPot);
-        players.get(bigBlindIndex).postBlind(bb, mainPot);
+        players.get(smallBlindIndex).postBlind(smallBlindValue, mainPot);
+        players.get(bigBlindIndex).postBlind(bigBlindValue, mainPot);
 
         printPlayersAndPot();
 
@@ -266,9 +271,9 @@ public class Game {
             //Something here later???
         }
 
-        players.get(getSmallBlindIndex()).postBlind(sb, mainPot);
-        players.get(getBigBlindIndex()).postBlind(bb, mainPot);
-        lastRaiseSize = bb;
+        players.get(getSmallBlindIndex()).postBlind(smallBlindValue, mainPot);
+        players.get(getBigBlindIndex()).postBlind(bigBlindValue, mainPot);
+        lastRaiseSize = bigBlindValue;
 
         Main.getGameWindow().updateButtons();
         Main.getGameWindow().getTable().deletePlayerCards();
@@ -453,14 +458,17 @@ public class Game {
         setBigBlindIndex();
     }
 
-    public static void nextDealer() {
-        dealerIndex++;
-        wrapDealerIndex();
+    public static void setDealerIndex(int index){
+        dealerIndex = index;
+    }
 
-        while(players.get(dealerIndex).getStack() == 0) {
+    public static void nextDealer() {
+        do{
             dealerIndex++;
-            wrapDealerIndex();
-        }
+            if (dealerIndex >= players.size()) {
+                dealerIndex = 0;
+            }
+        }while(players.get(dealerIndex).getStack() == 0);
 
         System.out.println("Dealer index: " + dealerIndex);
 
@@ -468,35 +476,39 @@ public class Game {
         setBigBlindIndex();
     }
 
-    public static void wrapDealerIndex() {
-        if (dealerIndex > players.size() - 1) {
-            dealerIndex = 0;
-        }
+    public static void setSmallBlindIndex(int index){
+        smallBlindIndex = index;
     }
 
     public static void setSmallBlindIndex() {
-        smallBlindIndex = dealerIndex + 1;
-        if (smallBlindIndex > players.size() - 1) {
+        if(dealerIndex + 1 >= players.size()){
             smallBlindIndex = 0;
+        }else{
+            smallBlindIndex = dealerIndex + 1;
         }
 
-        while(players.get(smallBlindIndex).getStack() == 0) {
+        while(players.get(smallBlindIndex).getStack() == 0); {
             smallBlindIndex++;
-            if (smallBlindIndex > players.size() - 1) {
+            if (smallBlindIndex >= players.size()) {
                 smallBlindIndex = 0;
             }
         }
     }
 
+    public static void setBigBlindIndex(int index){
+        bigBlindIndex = index;
+    }
+
     public static void setBigBlindIndex() {
-        bigBlindIndex = smallBlindIndex + 1;
-        if (bigBlindIndex > players.size() - 1) {
+        if(smallBlindIndex + 1 >= players.size()){
             bigBlindIndex = 0;
+        }else{
+            bigBlindIndex = smallBlindIndex + 1;
         }
 
         while(players.get(bigBlindIndex).getStack() == 0) {
             bigBlindIndex++;
-            if (bigBlindIndex > players.size() - 1) {
+            if (bigBlindIndex >= players.size()) {
                 bigBlindIndex = 0;
             }
         }
@@ -679,7 +691,9 @@ public class Game {
         }
     }
 
-
+    public static void setActionIndex(int index){
+        currentActionIndex = index;
+    }
 
     public static void setStartingActionIndex() {
         if (street == 0) {

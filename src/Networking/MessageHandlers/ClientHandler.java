@@ -1,8 +1,6 @@
 package Networking.MessageHandlers;
 
-import Networking.Messages.PlayerDataMessage;
-import Networking.Messages.PlayersInLobbyMessage;
-import Networking.Messages.PlayerNumMessage;
+import Networking.Messages.*;
 import com.codebrig.beam.Communicator;
 import com.codebrig.beam.handlers.LegacyHandler;
 import com.codebrig.beam.messages.LegacyMessage;
@@ -10,7 +8,9 @@ import com.codebrig.beam.messages.LegacyMessage;
 public class ClientHandler extends LegacyHandler {
 
     public ClientHandler(){
-        super(PlayerDataMessage.MESSAGE_ID, PlayersInLobbyMessage.MESSAGE_ID, PlayerNumMessage.MESSAGE_ID);
+        super(  PlayerDataMessage.MESSAGE_ID, PlayersInLobbyMessage.MESSAGE_ID,
+                StartGameMessage.MESSAGE_ID, GameDataMessage.MESSAGE_ID,
+                ActionPromptMessage.MESSAGE_ID);
     }
 
     @Override
@@ -27,9 +27,15 @@ public class ClientHandler extends LegacyHandler {
         }else if(messageTypee == PlayersInLobbyMessage.MESSAGE_ID){
             System.out.println("MessageType: Player Lobby List");
             PlayersInLobbyMessage.clientHandle(comm, message);
-        }else if(messageTypee == PlayerNumMessage.MESSAGE_ID){
+        }else if(messageTypee == StartGameMessage.MESSAGE_ID){
             System.out.println("MessageType: Start Game");
-            PlayerNumMessage.cliendHandle(comm, message);
+            StartGameMessage.clientHandle(comm, message);
+        }else if(messageTypee == GameDataMessage.MESSAGE_ID){
+            System.out.println("MessageType: Game data");
+            GameDataMessage.clientHandle(comm, message);
+        }else if(messageTypee == ActionPromptMessage.MESSAGE_ID){
+            System.out.println("MessageType: Action Prompt");
+            ActionPromptMessage.clientHandle(comm, message);
         }
 
         return response;

@@ -26,7 +26,6 @@ public class ClientConnectedMessage extends LegacyMessage {
     }
 
     public static void serverHandle(Communicator communicator, LegacyMessage message){
-        System.out.println("MessageType: Client Connected");
         // grab the playername
         String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
         System.out.println(playerName + "");

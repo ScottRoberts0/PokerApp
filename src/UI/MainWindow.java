@@ -8,6 +8,8 @@ import javax.swing.event.ChangeListener;
 
 import Logic.Card;
 import Logic.Game;
+import Logic.Player;
+import Networking.Messages.ActionPromptMessage;
 import Networking.Networker;
 import UI.Components.TableComponent;
 import UI.Listeners.MainWindowListener;
@@ -15,6 +17,7 @@ import UI.Listeners.MainWindowListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class MainWindow implements ActionListener {
 
@@ -33,7 +36,6 @@ public class MainWindow implements ActionListener {
     private JTextField raiseTextBox;
 
     public MainWindow() {
-
         createWindow();
 
         drawTable();
@@ -195,18 +197,72 @@ public class MainWindow implements ActionListener {
     }
 
     public void updateButtons(){
+        // server does this a bit different
+        if(Networker.getInstance() != null){
+            // disable all the buttons
+            checkButton.setEnabled(false);
+            foldButton.setEnabled(false);
+            callButton.setEnabled(false);
+            raiseButton.setEnabled(false);
+            testButton.setEnabled(false);
+
+            // check to see if the new action is to a client
+            if(Game.getCurrentActionIndex() > 0 && Networker.getInstance().getIsServer()){
+                // send an action prompt message which tells the current client what actions it can take
+                Networker.getInstance().sendActionPrompt();
+
+                return;
+            }
+
+            // if this is a client, just back out.
+            if(!Networker.getInstance().getIsServer()){
+                return;
+            }
+        }
+
         checkButton.setEnabled(Game.checkCheckAllowed());
         foldButton.setEnabled(Game.checkFoldAllowed());
         callButton.setEnabled(Game.checkCallAllowed());
         raiseButton.setEnabled(Game.checkRaiseAllowed());
         testButton.setEnabled(Game.checkRebuyAllowed());
-        betSlider.setMaximum(Game.getPlayers().get(Game.getCurrentActionIndex()).getStack() +
-                Game.getCurrentPot().getBets()[Game.getPlayers().get(Game.getCurrentActionIndex()).getPlayerNum()]);
-        if(Game.getStreet() != 0 && Game.getHighestBet() == 0) {
+        updateBetSlider();
+    }
+
+    public void updateButtons(int actionsAllowed, int minBet, int maxBet){
+        // enable the buttons based off the bit mask
+        checkButton.setEnabled((actionsAllowed & ActionPromptMessage.CHECK_BIT) == ActionPromptMessage.CHECK_BIT ? true : false);
+        foldButton.setEnabled((actionsAllowed & ActionPromptMessage.FOLD_BIT) == ActionPromptMessage.FOLD_BIT ? true : false);
+        callButton.setEnabled((actionsAllowed & ActionPromptMessage.CALL_BIT) == ActionPromptMessage.CALL_BIT ? true : false);
+        raiseButton.setEnabled((actionsAllowed & ActionPromptMessage.RAISE_BIT) == ActionPromptMessage.RAISE_BIT ? true : false);
+
+        // update the bet slider
+        updateBetSlider(maxBet, minBet);
+    }
+
+    public void updateBetSlider(){
+        int actionIndex = Game.getCurrentActionIndex();
+        ArrayList<Player> players = Game.getPlayers();
+
+        int maxBet = players.get(actionIndex).getStack() +
+                Game.getCurrentPot().getBets()[players.get(actionIndex).getPlayerNum()];
+
+        betSlider.setMaximum(maxBet);
+        if (Game.getStreet() != 0 && Game.getHighestBet() == 0) {
             betSlider.setValue(Game.getMinBet());
         } else {
             betSlider.setValue(Game.getLastRaiseSize() + Game.getHighestBet());
         }
+
+        // update the textbox value while we're here
+        setTextValue();
+    }
+
+    public void updateBetSlider(int maxBet, int minBet){
+        betSlider.setMaximum(maxBet);
+        betSlider.setMinimum(minBet);
+        betSlider.setValue(minBet);
+
+        // update the textbox value while we're here
         setTextValue();
     }
 
@@ -244,75 +300,91 @@ public class MainWindow implements ActionListener {
     }
 
     public void callButtonAction() {
-        Game.getPlayers().get(Game.getCurrentActionIndex()).call(Game.getCurrentPot());
+        if(Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
+            // client does things a bit different
+            Networker.getInstance().sendClientAction(ActionPromptMessage.CALL_BIT);
+        }else {
+            Game.getPlayers().get(Game.getCurrentActionIndex()).call(Game.getCurrentPot());
 
-        if (Game.checkFolds()) {
-            Game.endHand();
-        } else if (Game.checkBettingRoundCompleted()) {
-            Game.nextStreet();
-        } else {
-            Game.updateCurrentAction();
+            if (Game.checkFolds()) {
+                Game.endHand();
+            } else if (Game.checkBettingRoundCompleted()) {
+                Game.nextStreet();
+            } else {
+                Game.updateCurrentAction();
+            }
+
+            Game.printPlayersAndPot();
         }
-
-        Game.printPlayersAndPot();
-
         updateButtons();
     }
 
     public void foldButtonAction() {
-        int actionIndex = Game.getCurrentActionIndex();
+        if(Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
+            // client does things a bit different
+            Networker.getInstance().sendClientAction(ActionPromptMessage.FOLD_BIT);
+        }else {
+            int actionIndex = Game.getCurrentActionIndex();
 
-        Game.getPlayers().get(actionIndex).fold(Game.getPots());
+            Game.getPlayers().get(actionIndex).fold(Game.getPots());
 
-        getTable().foldPlayer(actionIndex);
+            getTable().foldPlayer(actionIndex);
 
-        if (Game.checkFolds()) {
-            Game.endHand();
-        } else if (Game.checkBettingRoundCompleted()) {
-            Game.nextStreet();
-        } else {
-            Game.updateCurrentAction();
+            if (Game.checkFolds()) {
+                Game.endHand();
+            } else if (Game.checkBettingRoundCompleted()) {
+                Game.nextStreet();
+            } else {
+                Game.updateCurrentAction();
+            }
+
+            Game.printPlayersAndPot();
         }
-
-        Game.printPlayersAndPot();
-
         updateButtons();
     }
 
     public void raiseButtonAction() {
-        int holder = Game.getHighestBet();
-        int betValue = Game.formatBetValue();
+        if(Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
+            // client does things a bit different
+            Networker.getInstance().sendClientAction(ActionPromptMessage.RAISE_BIT);
+        }else {
+            int holder = Game.getHighestBet();
+            int betValue = Game.formatBetValue();
 
-        Game.setLastRaiseSize(betValue - holder);
+            Game.setLastRaiseSize(betValue - holder);
 
-        Game.getPlayers().get(Game.getCurrentActionIndex()).raise(betValue, Game.getCurrentPot());
+            Game.getPlayers().get(Game.getCurrentActionIndex()).raise(betValue, Game.getCurrentPot());
 
-        if (Game.checkFolds()) {
-            Game.endHand();
-        } else if (Game.checkBettingRoundCompleted()) {
-            Game.nextStreet();
-        } else {
-            Game.updateCurrentAction();
+            if (Game.checkFolds()) {
+                Game.endHand();
+            } else if (Game.checkBettingRoundCompleted()) {
+                Game.nextStreet();
+            } else {
+                Game.updateCurrentAction();
+            }
+
+            Game.printPlayersAndPot();
         }
-
-        Game.printPlayersAndPot();
-
         updateButtons();
     }
 
     public void checkButtonAction() {
-        Game.getPlayers().get(Game.getCurrentActionIndex()).check(Game.getCurrentPot());
+        if(Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
+            // client does things a bit different
+            Networker.getInstance().sendClientAction(ActionPromptMessage.CHECK_BIT);
+        }else {
+            Game.getPlayers().get(Game.getCurrentActionIndex()).check(Game.getCurrentPot());
 
-        if (Game.checkFolds()) {
-            Game.endHand();
-        } else if (Game.checkBettingRoundCompleted()) {
-            Game.nextStreet();
-        } else {
-            Game.updateCurrentAction();
+            if (Game.checkFolds()) {
+                Game.endHand();
+            } else if (Game.checkBettingRoundCompleted()) {
+                Game.nextStreet();
+            } else {
+                Game.updateCurrentAction();
+            }
+
+            Game.printPlayersAndPot();
         }
-
-        Game.printPlayersAndPot();
-
         updateButtons();
     }
 
