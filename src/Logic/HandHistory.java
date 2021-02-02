@@ -10,22 +10,27 @@ import java.util.Scanner;
 public class HandHistory extends File {
     private final Date date;
 
+    /**
+     * Must specify file location and file name
+     * @param fileName
+     */
     public HandHistory(String fileName) {
         super(fileName);
         this.date = new Date();
     }
 
     /**
-     * new HandHistory(new Date());
+     * Enter a manual date or use a new date (new Date())
      * @param date
      */
     public HandHistory(Date date) {
         super("Histories/Hand History " + date.toString().replaceAll(":", " "));
         this.date = date;
-    }
 
-    public Date getDate() {
-        return date;
+        File histories = new File("Histories");
+        if (!histories.exists()) {
+            histories.mkdir();
+        }
     }
 
     public void writeHandStart(ArrayList<Player> players) throws IOException {
@@ -40,10 +45,7 @@ public class HandHistory extends File {
                     .append(player.getHand()[1].getShortName()).append("\n");
         }
 
-        PrintWriter output = new PrintWriter(this);
-        //writes the new file
-        output.println(s);
-        output.close();
+        write(s);
     }
 
     public void writeAction(String action) throws IOException {
@@ -53,6 +55,10 @@ public class HandHistory extends File {
         //append the newest action to the StringBuilder
         s.append(action);
 
+        write(s);
+    }
+
+    public void write(StringBuilder s) throws IOException {
         PrintWriter output = new PrintWriter(this);
         //write the new file
         output.println(s);
@@ -75,5 +81,9 @@ public class HandHistory extends File {
         }
 
         return s;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

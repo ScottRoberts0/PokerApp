@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class Game {
     private static HandHistory handHistory;
-    private final static boolean recordHandHistory = false;
+    private final static boolean recordHandHistory = true;
 
     private static int dealerIndex;
     private static int smallBlindIndex;
@@ -188,8 +188,8 @@ public class Game {
                 handHistory = new HandHistory(new Date());
                 handHistory.writeHandStart(players);
             }
-        } catch(IOException ignored) {
-            //Something here later???
+        } catch(IOException e) {
+            System.out.println(e + e.getMessage() + "\nHand histories not recorded for this session");
         }
 
         setStartingActionIndex();
@@ -260,10 +260,10 @@ public class Game {
 
         try {
             if(recordHandHistory) {
-                handHistory.writeHandStart(players);
+                handHistory.writeHandStart(currentPot.getPlayersInPot());
             }
-        } catch(IOException ignored) {
-            //Something here later???
+        } catch(IOException e) {
+            System.out.println(e + e.getMessage() + "\nHand histories not recorded for this session");
         }
 
         players.get(getSmallBlindIndex()).postBlind(sb, mainPot);
@@ -421,15 +421,6 @@ public class Game {
             deck.shuffle();
             a++;
         }
-    }*/
-
-    /*
-    public static Player[] createPlayers(int numPlayers, Deck deck, int stackSize) {
-        Player[] players = new Player[numPlayers];
-        for (int i = 0; i < players.size(); i++) {
-            players[i] = new Player(i, deck, stackSize);
-        }
-        return players;
     }*/
 
     public static ArrayList<Player> createPlayersList(int numPlayers, int stackSize) {
@@ -805,7 +796,7 @@ public class Game {
     public static void dealTurn() {
         board[3] = deck.drawCard();
 
-        tryWriteActionToHH("Turn: " + writeBoardHelper());
+        tryWriteActionToHH("Turn:" + writeBoardHelper());
     }
 
     private static void dealTurn(Card[] board, Deck deck, int value1, int suit1) {
@@ -815,7 +806,7 @@ public class Game {
     public static void dealRiver() {
         board[4] = deck.drawCard();
 
-        tryWriteActionToHH("River: " + writeBoardHelper());
+        tryWriteActionToHH("River:" + writeBoardHelper());
     }
 
     private static void dealRiver(Card[] board, Deck deck, int value1, int suit1) {
