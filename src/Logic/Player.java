@@ -178,18 +178,20 @@ public class Player implements Comparable {
         System.out.println();
     }
 
-    public void win(int potSize) {
+    public String win(int potSize) {
+        String output;
         stack += potSize;
         if(madeHand[0] == null || Game.getCurrentPot().getNumPlayersInPot() == 1) {
-            String output = playerName + " wins " + potSize + " satoshis!";
-            Game.tryWriteActionToHH(output);
-            System.out.println(output);
+            output = playerName + " wins " + potSize + " satoshis!";
         } else {
-            String output = playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!";
-            Game.tryWriteActionToHH(output);
-            System.out.println(output);
+            output = playerName + " wins " + potSize + " satoshis with a " + getMadeHandName() + "!";
         }
+
+        Game.tryWriteActionToHH(output);
+        System.out.println(output);
         System.out.println();
+
+        return output;
     }
 
     public void resetMoneyInPot() {

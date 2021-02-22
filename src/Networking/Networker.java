@@ -138,12 +138,8 @@ public class Networker {
         return isServer;
     }
 
-    public void broadCastInitialGameData(){
-        if(!isServer)
-            return;
-
-        // send the player data
-        PlayerDataMessage message = new PlayerDataMessage();
+    public void broadCastPlayerData(boolean firstSend){
+        PlayerDataMessage message = new PlayerDataMessage(firstSend);
 
         server.broadcast(message);
 
@@ -151,18 +147,21 @@ public class Networker {
     }
 
     public void broadcastGameData(){
-        // send the game state data
-        GameDataMessage message1 = new GameDataMessage();
+        GameDataMessage message = new GameDataMessage();
 
-        server.broadcast(message1);
+        server.broadcast(message);
     }
 
     public void broadcastLobbyPlayerList(){
-        // create the broadcast message
         PlayersInLobbyMessage playerListMessage = new PlayersInLobbyMessage();
 
-        //FIRE!!
         server.broadcast(playerListMessage);
+    }
+
+    public void broadcastEndOfHand(){
+        EndHandMessage message = new EndHandMessage("TODO");
+
+        server.broadcast(message);
     }
 
     public void close(){
@@ -209,7 +208,7 @@ public class Networker {
 
         // if they are, broadcast some game data, cards and shit
         if(allReadied){
-            broadCastInitialGameData();
+            broadCastPlayerData(true);
         }
 
         // update the buttons now that the game is actually kind of started

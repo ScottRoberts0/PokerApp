@@ -9,8 +9,13 @@ import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
 import com.sun.jdi.connect.Connector;
 
+/**
+ * This message data includes the name of a recently connected player
+ */
 public class ClientConnectedMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1000;
+
+    public final static String MESSAGE_PLAYERNAME = "playername";
 
     public ClientConnectedMessage() {
         super(MESSAGE_ID);
@@ -18,7 +23,7 @@ public class ClientConnectedMessage extends LegacyMessage {
 
     public ClientConnectedMessage(String playerName){
         super(MESSAGE_ID);
-        this.setString(PokerMessage.MESSAGE_PLAYERNAME, playerName);
+        this.setString(MESSAGE_PLAYERNAME, playerName);
     }
 
     public ClientConnectedMessage(BeamMessage message) {
@@ -27,7 +32,7 @@ public class ClientConnectedMessage extends LegacyMessage {
 
     public static void serverHandle(Communicator communicator, LegacyMessage message){
         // grab the playername
-        String playerName = message.get(PokerMessage.MESSAGE_PLAYERNAME);
+        String playerName = message.get(MESSAGE_PLAYERNAME);
         System.out.println(playerName + "");
 
         // add to the players in lobby list

@@ -212,10 +212,20 @@ public class Game {
     public static void endHand() {
         //if every has folded, award the pot to the last player in the hand
         if (checkFolds()) {
-            currentPot.getPlayersInPot().get(0).win(currentPot.getPotValue());
+            String winnerText = currentPot.getPlayersInPot().get(0).win(currentPot.getPotValue());
+        }
+
+        // fire a quick notification to clients that the hand is over.
+        if(Networker.getInstance() != null){
+            Networker.getInstance().broadcastEndOfHand();
         }
 
         resetHand();
+
+        // send new player data
+        if(Networker.getInstance() != null){
+            Networker.getInstance().broadCastPlayerData(false);
+        }
     }
 
     public static boolean checkHandCompleted() {
@@ -533,10 +543,15 @@ public class Game {
     }
 
     public static void getWinners() {
+        // cycle through each pot
         for(Pot pot : pots) {
+            // grab a list of winners in the case of split pots
             ArrayList<Player> winners = Evaluator.findWinner(board, pot);
             for(int i = 0; i < winners.size(); i++) {
+                // print pot amount
                 System.out.print(pot + ": ");
+
+                // award each winner it's share of the pot
                 winners.get(i).win(pot.getPotValue() / winners.size());
             }
         }

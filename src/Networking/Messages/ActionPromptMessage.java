@@ -10,6 +10,9 @@ import com.codebrig.beam.messages.LegacyMessage;
 
 import java.util.ArrayList;
 
+/**
+ * This message data includes what action(s) a client is able to take and what the max/min bets are to be
+ */
 public class ActionPromptMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1005;
 

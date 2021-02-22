@@ -7,6 +7,9 @@ import com.codebrig.beam.Communicator;
 import com.codebrig.beam.messages.BeamMessage;
 import com.codebrig.beam.messages.LegacyMessage;
 
+/**
+ * This message data includes what action a client has taken, if it was a raise, it includes the raise amount
+ */
 public class ClientActionMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1006;
 

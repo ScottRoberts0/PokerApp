@@ -252,6 +252,8 @@ public class TableComponent extends JPanel {
     public void createTableCards() {
         Point p;
 
+        System.out.println("creating cards");
+
         // grab the center of this panel
         Point panelCenter = new Point(this.getWidth() / 2, this.getHeight() / 2);
 
@@ -276,7 +278,10 @@ public class TableComponent extends JPanel {
     public void setTableCards(Card[] cards) {
         tableCards = cards;
         createTableCards();
-        createTableCards();
+    }
+
+    public Card[] getTableCards(){
+        return tableCards;
     }
 
     private int count = 0;

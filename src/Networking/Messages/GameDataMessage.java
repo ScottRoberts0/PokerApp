@@ -1,5 +1,6 @@
 package Networking.Messages;
 
+import Logic.Card;
 import Logic.Game;
 import Logic.Player;
 import Logic.Pot;
@@ -11,6 +12,16 @@ import com.codebrig.beam.messages.LegacyMessage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This message includes all up-to-date game data:
+ *      Action index
+ *      Bets
+ *      Stacks
+ *      Pots
+ *      Number of pots (side pots)
+ *      Dealer, BB, SB indexes
+ *      Table cards
+ */
 public class GameDataMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1004;
 
@@ -22,6 +33,7 @@ public class GameDataMessage extends LegacyMessage {
     public final static String DEALER_INDEX = "dealerIndex";
     public final static String SB_INDEX = "sbIndex";
     public final static String BB_INDEX = "bbIndex";
+    public final static String TABLE_CARDS = "tableCards";
 
     public GameDataMessage(){
         super(MESSAGE_ID);
@@ -52,6 +64,18 @@ public class GameDataMessage extends LegacyMessage {
         for(int i = 0; i < pots.size(); i ++){
             setInt(POTS + i, pots.get(i).getPotValue());
         }
+
+        // turn cards
+        Card[] tableCards = Main.getGameWindow().getTable().getTableCards();
+        for(int i = 0; i < 5; i ++){
+            if(tableCards[i] != null) {
+                setInt(TABLE_CARDS + (i* 2), tableCards[i].getValue());
+                setInt(TABLE_CARDS + (i* 2) + 1, tableCards[i].getSuitValue());
+            }else{
+                setInt(TABLE_CARDS + (i* 2), -1);
+                setInt(TABLE_CARDS + (i* 2) + 1, -1);
+            }
+        }
     }
 
     public GameDataMessage(BeamMessage message) {
@@ -59,7 +83,7 @@ public class GameDataMessage extends LegacyMessage {
     }
 
     public static void clientHandle(Communicator comm, LegacyMessage message){
-        while(PlayerDataMessage.waitingForFirstPlayerData){
+        while(PlayerDataMessage.processingPlayerData){
             // chill here until the first set of player data has arrived.
             System.out.println("Waiting....");
             try {
@@ -93,5 +117,19 @@ public class GameDataMessage extends LegacyMessage {
         if(!Main.getGameWindow().getIsGameStarted()){
             Main.getGameWindow().setIsGameStarted(true);
         }
+
+        // table cards
+        int cardValue, suitValue;
+        Card[] cards = new Card[5];
+        for(int i = 0; i < 5; i++){
+            cardValue = message.getInt(TABLE_CARDS + (i * 2));
+            suitValue = message.getInt(TABLE_CARDS + (i * 2) + 1);
+            if(cardValue >= 0){
+                cards[i] = new Card(cardValue, suitValue);
+            }else{
+                cards[i] = null;
+            }
+        }
+        Main.getGameWindow().getTable().setTableCards(cards);
     }
 }

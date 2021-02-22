@@ -10,7 +10,7 @@ public class ClientHandler extends LegacyHandler {
     public ClientHandler(){
         super(  PlayerDataMessage.MESSAGE_ID, PlayersInLobbyMessage.MESSAGE_ID,
                 StartGameMessage.MESSAGE_ID, GameDataMessage.MESSAGE_ID,
-                ActionPromptMessage.MESSAGE_ID);
+                ActionPromptMessage.MESSAGE_ID, EndHandMessage.MESSAGE_ID);
     }
 
     @Override
@@ -36,6 +36,9 @@ public class ClientHandler extends LegacyHandler {
         }else if(messageTypee == ActionPromptMessage.MESSAGE_ID){
             System.out.println("MessageType: Action Prompt");
             ActionPromptMessage.clientHandle(comm, message);
+        }else if(messageTypee == EndHandMessage.MESSAGE_ID){
+            System.out.println("MessageType: End Hand");
+            EndHandMessage.clientHandle(comm, message);
         }
 
         return response;

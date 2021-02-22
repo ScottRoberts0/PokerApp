@@ -10,13 +10,15 @@ import com.codebrig.beam.messages.LegacyMessage;
 public class StartGameMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1003;
 
+    public final static String MESSAGE_PLAYERNUM = "playernum";
+
     public StartGameMessage() {
         super(MESSAGE_ID);
     }
 
     public StartGameMessage(int playerNum){
         super(MESSAGE_ID);
-        this.setInt(PokerMessage.MESSAGE_PLAYERNUM, playerNum);
+        this.setInt(MESSAGE_PLAYERNUM, playerNum);
     }
 
     public StartGameMessage(BeamMessage message) {
@@ -28,7 +30,7 @@ public class StartGameMessage extends LegacyMessage {
 
     public static void clientHandle(Communicator communicator, LegacyMessage message){
         // grab the player number
-        int playerNum = message.getInt(PokerMessage.MESSAGE_PLAYERNUM);
+        int playerNum = message.getInt(MESSAGE_PLAYERNUM);
 
         System.out.println("Player Number: " + playerNum);
 

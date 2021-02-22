@@ -17,8 +17,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This message data includes the names of all players currently connected
+ */
 public class PlayersInLobbyMessage extends LegacyMessage {
     public final static int MESSAGE_ID = 1002;
+
+    public final static String MESSAGE_NUMPLAYERS = "numplayers";
+    public final static String MESSAGE_PLAYER_STRING = "ps";
 
     public PlayersInLobbyMessage() {
         super(MESSAGE_ID);
@@ -28,11 +34,11 @@ public class PlayersInLobbyMessage extends LegacyMessage {
 
         // start plugging this message full of data
         // add number of players
-        this.setInt(PokerMessage.MESSAGE_NUMPLAYERS, playerList.size());
+        this.setInt(MESSAGE_NUMPLAYERS, playerList.size());
 
         // add player data
         for(int i = 0; i < playerList.size(); i ++){
-            this.setString(PokerMessage.MESSAGE_PLAYER_STRING + i, playerList.get(i));
+            this.setString(MESSAGE_PLAYER_STRING + i, playerList.get(i));
         }
     }
 
@@ -46,11 +52,11 @@ public class PlayersInLobbyMessage extends LegacyMessage {
         // delete all previous players in the player list
         Networker.getInstance().clearPlayerList();
 
-        int numPlayers = message.getInt(PokerMessage.MESSAGE_NUMPLAYERS);
+        int numPlayers = message.getInt(MESSAGE_NUMPLAYERS);
 
         // get player data
         for(int i = 0; i < numPlayers; i ++){
-            String name = message.getString(PokerMessage.MESSAGE_PLAYER_STRING + i);
+            String name = message.getString(MESSAGE_PLAYER_STRING + i);
 
             Networker.getInstance().addPlayerToLobby(name);
         }
