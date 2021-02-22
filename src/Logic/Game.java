@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class Game {
     private static HandHistory handHistory;
-    private final static boolean recordHandHistory = true;
+    private final static boolean recordHandHistory = false;
 
     private static int dealerIndex;
     private static int smallBlindIndex;
@@ -585,7 +585,10 @@ public class Game {
         return bigBlindIndex;
     }
 
-    //handles formatting bet sizes so that they conform to the rules
+    /**
+     * Handles formatting bet sizes so that they conform to the rules
+     * @return in value of the bet
+     */
     public static int formatBetValue() {
         int betValue;
 

@@ -228,12 +228,20 @@ public class MainWindow implements ActionListener {
         updateBetSlider();
     }
 
+    /**
+     * This is called by a client after receiving data from the server. Nothing is calculated, enabled buttons are
+     * given directly from the server.
+     *
+     * @param actionsAllowed Bit masked value for the buttons to be enabled bit[0] - check,  bit[1] - fold,  bit[2] - call,  bit[3] - raise
+     * @param minBet
+     * @param maxBet
+     */
     public void updateButtons(int actionsAllowed, int minBet, int maxBet){
         // enable the buttons based off the bit mask
-        checkButton.setEnabled((actionsAllowed & ActionPromptMessage.CHECK_BIT) == ActionPromptMessage.CHECK_BIT ? true : false);
-        foldButton.setEnabled((actionsAllowed & ActionPromptMessage.FOLD_BIT) == ActionPromptMessage.FOLD_BIT ? true : false);
-        callButton.setEnabled((actionsAllowed & ActionPromptMessage.CALL_BIT) == ActionPromptMessage.CALL_BIT ? true : false);
-        raiseButton.setEnabled((actionsAllowed & ActionPromptMessage.RAISE_BIT) == ActionPromptMessage.RAISE_BIT ? true : false);
+        checkButton.setEnabled((actionsAllowed & ActionPromptMessage.CHECK_BIT) == ActionPromptMessage.CHECK_BIT);
+        foldButton.setEnabled((actionsAllowed & ActionPromptMessage.FOLD_BIT) == ActionPromptMessage.FOLD_BIT);
+        callButton.setEnabled((actionsAllowed & ActionPromptMessage.CALL_BIT) == ActionPromptMessage.CALL_BIT);
+        raiseButton.setEnabled((actionsAllowed & ActionPromptMessage.RAISE_BIT) == ActionPromptMessage.RAISE_BIT);
 
         // update the bet slider
         updateBetSlider(maxBet, minBet);
@@ -245,13 +253,17 @@ public class MainWindow implements ActionListener {
 
         int maxBet = players.get(actionIndex).getStack() +
                 Game.getCurrentPot().getBets()[players.get(actionIndex).getPlayerNum()];
+        int minBet;
 
         betSlider.setMaximum(maxBet);
         if (Game.getStreet() != 0 && Game.getHighestBet() == 0) {
-            betSlider.setValue(Game.getMinBet());
+            minBet = Game.getMinBet();
         } else {
-            betSlider.setValue(Game.getLastRaiseSize() + Game.getHighestBet());
+            minBet = Game.getLastRaiseSize() + Game.getHighestBet();
         }
+
+        betSlider.setValue(minBet);
+        betSlider.setMinimum(minBet);
 
         // update the textbox value while we're here
         setTextValue();
@@ -281,7 +293,7 @@ public class MainWindow implements ActionListener {
         } else if(e.getActionCommand().equals("Check")){
             checkButtonAction();
         } else if(e.getActionCommand().equals("Raise")){
-            raiseButtonAction();
+            raiseButtonAction(-1);
         } else if(e.getActionCommand().equals("Call")){
             callButtonAction();
         } else if(e.getActionCommand().equals("Reset")) {
@@ -343,13 +355,30 @@ public class MainWindow implements ActionListener {
         updateButtons();
     }
 
-    public void raiseButtonAction() {
+    public void raiseButtonAction(int clientBetValue) {
         if(Networker.getInstance() != null && !Networker.getInstance().getIsServer()){
             // client does things a bit different
-            Networker.getInstance().sendClientAction(ActionPromptMessage.RAISE_BIT);
+            // check that the raise is amove the minimum
+            int raiseEntered;
+            try {
+                raiseEntered = Integer.parseInt(raiseTextBox.getText());
+            }catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(table, "Enter a number, dummy...");
+                return;
+            }
+            if(raiseEntered > betSlider.getMaximum() || raiseEntered < betSlider.getMinimum()){
+                JOptionPane.showMessageDialog(table, "Cannot raise by this... Too high or too low, maybe? Try again...");
+                return;
+            }
+            Networker.getInstance().sendClientAction(ActionPromptMessage.RAISE_BIT, raiseEntered);
         }else {
             int holder = Game.getHighestBet();
-            int betValue = Game.formatBetValue();
+            int betValue;
+            if(clientBetValue > -1){
+                betValue = clientBetValue;
+            }else{
+                betValue = Game.formatBetValue();
+            }
 
             Game.setLastRaiseSize(betValue - holder);
 

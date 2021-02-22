@@ -227,7 +227,13 @@ public class Networker {
     }
 
     public void sendClientAction(int action){
-        ClientActionMessage message = new ClientActionMessage(action);
+        ClientActionMessage message = new ClientActionMessage(action, 0);
+
+        client.queueMessage(message);
+    }
+
+    public void sendClientAction(int action, int raiseValue){
+        ClientActionMessage message = new ClientActionMessage(action, raiseValue);
 
         client.queueMessage(message);
     }
